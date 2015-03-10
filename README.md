@@ -1,6 +1,4 @@
 CAPortal 
-@author David.Meredith@stfc.ac.uk 
-@author Sam.Worley@stfc.ac.uk  
 ====================================
 
 A portal interface to an OpenCA DB that provides: 
