@@ -1,0 +1,63 @@
+# These parameters that are always read from this file without caching. 
+# These means you can manually update these properties at runtime and a server 
+# restart is not needed.  
+
+# Optional: Specify a comma separated list of values that are valid 'services' for host certificates. 
+# Host certificates with a service have the form 'servicename/valid.domain.name' 
+hostname.service.values=ldap,portal,gsissh,gsiftp,host,cvs,mysql,afs,gssklog,sam,condor,ldr,cas,gemlca,phedex,lhcbvobox,harccrm,harcacceptor
+
+# Specify true to use a recaptcha on the request user certificate page or false for not. 
+# If true, then the recaptcha public and private key must also be set. 
+# Used for recatcha, see: https://www.google.com/recaptcha 
+use.recaptcha=false
+
+# If use.recaptcha is true, specify the recaptcha private key and public key.   
+# If use.recaptcha is false, then these two properties are not accessed.  
+recaptcha.private.key=privatekeyhere_adfafaafafadfafa
+recaptcha.public.key=pubkeyhere_adfadfadfadsfadfafafa
+
+# Specify either 'server' or 'client'
+# Used to specify whether a PKCS#10 signing request is created either:
+# a) server side, using BouncyCastle (meaning the private key is returned to the client over the wire), 
+# b) client side, using ForgeJS (JavaScript lib). 
+# Obviously client is better because the privateKey does not need to go over the wire, 
+# however, server is allowed according guidelines on privateKey protection and 
+# this may be better if additional attributes are needed.  
+createCsrOnClientOrServer=client
+
+# Value is used to populate the 'VERSION' header in the 'request' table's 'data' 
+# column. It is used to record which client inserts the CSR row into the DB (e.g. 
+#  this portal or another interface to the DB). 
+# It is recommended to identify whether the client or server was 
+# responsible for building the PKCS#10, e.g. by appending 's' or 'c' .  
+db.request.row.data.col.version.value=Portal_0.1c
+
+
+# Send email on the following actions, specify true or false. 
+email.ra.on.renew=false
+email.ra.on.new=false
+email.ra.on.revoke=false
+email.user.on.new=false
+email.admins.on.error=false
+email.on.host.cert.email.update=false
+
+
+# Email addresses of the portal admins. Use a comma separated list for multiple addresses
+# with no spaces. This email list is used when:
+# - there are no RA operators for the requested RA  (this may happen if the institution has no RAs). 
+# - if an error/exception occurs 
+email.admin.addresses=somebody@world.com
+
+
+# A List storing CA Admins' DNs. 
+# Use a semi-colon separated list for multiple DNs with no spaces. 
+# This list is used for:
+#   - Authorising a promotion / demotion of a certificate
+#
+# CN=example,L=Where,OU=CLRC,O=eScienceDev,C=UK;
+#
+senior.caops=
+
+# Does the CA DB support renewals of bulk certificates (i.e. bulk_chain table and seq_bulk sequence are deployed) 
+# This property is only used when a bulk certificate is renewed via the portal. true or false 
+support.bulk.on.renew=false

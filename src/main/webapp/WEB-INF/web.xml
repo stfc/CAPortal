@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+		/WEB-INF/spring/root-context.xml
+		/WEB-INF/spring/applicationContext-security.xml
+		</param-value>
+	</context-param>
+	
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+    <!-- 
+    you need to add ContextLoaderListener in web.xml, only if you want to load other Spring context xml files 
+    using the contextConfigLocation as above.  If you have configured everything 
+   in one spring config file you don't need the ContextLoaderListener, just the dispatcher servlet is sufficient. 
+    -->	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+	</listener>
+	
+	<servlet>
+		<servlet-name>appServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+<!--            <param-value></param-value>-->
+			<param-value>
+			/WEB-INF/spring/appServlet/servlet-context.xml
+			</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+
+    <!--<session-config>-->
+        <!-- 
+        Note, session-timeout does NOT set the expiration date for the JSESSIONID cookie sent by Tomcat. 
+        Unfortunately the only effect of <session-timeout> is that the server 
+        stores the sessions for n mins. However in the browser the cookie is still 
+        set without an expiration date, and thus disappears as soon as the browser is closed. 
+        But, in servlet 3, you can add: 
+        <cookie-config>
+           <max-age>31536000</max-age>
+        </cookie-config>
+        -->
+        <!--<session-timeout>2</session-timeout>
+    </session-config>-->
+    
+</web-app>

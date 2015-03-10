@@ -1,0 +1,46 @@
+
+<style type="text/css">
+    /* Sticky footer styles
+    -------------------------------------------------- */
+    html {
+        position: relative;
+        min-height: 100%;
+    }
+    /* Custom page CSS
+    -------------------------------------------------- */
+    /* Not required for template or sticky footer method. */
+
+    body > .container {
+      padding: 60px 15px 0;
+    }
+    .container .text-muted {
+      margin: 20px 0;
+    }
+
+    #footer > .container {
+      padding-right: 15px;
+      padding-left: 15px;
+    }
+
+    code {
+      font-size: 80%;
+    }
+</style>
+
+
+<div id="push"></div>
+
+<div id="footer">
+    <div class="container">
+        <p class="muted credit">Courtesy   <a href="http://ngs.ac.uk">UK CA</a> and <a href="http://stfc.ac.uk">STFC</a>.
+            Questions/comments welcome <a href="mailto:support@grid-support.ac.uk">Grid Support Helpdesk</a>
+        </p>
+    </div>
+</div>
+
+<!-- The javascript -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="${pageContext.request.contextPath}/resources/jquery/jquery-1.11.0.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/bootstrap/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/javascript/sharedfuncts.js"></script>
+

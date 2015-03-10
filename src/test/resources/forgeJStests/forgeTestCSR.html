@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+Simple test script that imports the minified ForgeJS script and creates a 
+CSR. Check out the JavaScript console for log statements and results. 
+You can simply open this html file in your browser from disk. 
+-->
+<html>
+    <head>
+        <title>Forge test PKCS10 in JS</title>
+        <meta charset="windows-1252">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+        <div>Check the JS console for test output (create PKCS#10 CSR) e.g. 
+        using Firebug or Chrome console</div>
+
+        
+        <!-- Import the minified ForgeJS lib -->
+        <script src="../../../main/webapp/resources/javascript/forge.min.js"></script>
+        <script>
+//var forge = require('../js/forge');
+
+console.log('Generating 1024-bit key-pair...');
+var keys = forge.pki.rsa.generateKeyPair(1024);
+console.log('Key-pair created.');
+
+console.log('Creating certification request (CSR) ...');
+var csr = forge.pki.createCertificationRequest();
+csr.publicKey = keys.publicKey;
+csr.setSubject([{
+  name: 'commonName',
+  value: 'David Meredith'
+  //value: 'example.org'
+}, {
+  name: 'countryName',
+  value: 'UK'
+}, 
+//{
+//  shortName: 'ST',
+//  value: 'Virginia'
+//}, 
+{
+  name: 'localityName',
+  value: 'DL'
+}, {
+  name: 'organizationName',
+  value: 'eScience'
+}, {
+  shortName: 'OU',
+  value: 'CLRC'
+}]);
+// add optional attributes
+csr.setAttributes([{
+  name: 'challengePassword',
+  value: 'password'
+}, {
+  name: 'unstructuredName',
+  value: 'My company'
+}]);
+
+// sign certification request
+csr.sign(keys.privateKey/*, forge.md.sha256.create()*/);
+console.log('Certification request (CSR) created.');
+
+// PEM-format keys and csr
+var pem = {
+  privateKey: forge.pki.privateKeyToPem(keys.privateKey),
+  publicKey: forge.pki.publicKeyToPem(keys.publicKey),
+  csr: forge.pki.certificationRequestToPem(csr)
+};
+
+console.log('\nKey-Pair:');
+console.log(pem.privateKey);
+console.log(pem.publicKey);
+
+console.log('\nCertification Request (CSR):');
+console.log(pem.csr);
+
+// verify certification request
+try {
+  if(csr.verify()) {
+    console.log('Certification request (CSR) verified.');
+  }
+  else {
+    throw new Error('Signature not verified.');
+  }
+}
+catch(err) {
+  console.log('Certification request (CSR) verification failure: ' +
+    JSON.stringify(err, null, 2));
+}
+
+
+            
+        </script>
+
+ 
+    </body>
+
+       
+    
+</html>

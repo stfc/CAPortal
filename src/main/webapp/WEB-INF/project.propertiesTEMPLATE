@@ -1,0 +1,49 @@
+
+# DB connection parameters:  
+jdbc.driverClassName=org.postgresql.Driver
+jdbc.url=jdbc:postgresql://youhost.ac.uk:5432/yourdb
+jdbc.username=yourdbusername
+jdbc.password=yourdbpassword
+
+
+# PKCS10 config params. These values are looked up when creating CSRs: 
+supported.pkcs10.orgname.oid=eScienceDev
+supported.pkcs10.country.oid=UK
+supported.pkcs10.min.modulus=2048
+supported.pkcs10.min.exponent=5
+
+
+# Path to properties file that contains mutable properties that can be changed
+# at runtime - these values are always read from this properties file (server restart not required). 
+# Use forward slashes for Win, e.g. 
+#mutable.config.params.full.path=C:/Users/full/path/to/mutableproperties.properties
+mutable.config.params.full.path=/full/path/to/file/mutableproperties.properties
+
+	
+# The base url of the portal. 
+# Normally, you will only need to update the server part (you should not need to change
+# '/caportal' unless you have deployed the 'caportal.war' file using another name)   
+# This value is used for example when sending emails to RAs and other uses. 
+base.portal.url=https://portal.ca.grid-support.ac.uk/caportal
+
+
+# Properties for the mailSender bean. Note, you will probably need to modify 
+# the 'mailSender' bean properties directly in 'root-context.xml' to configure the bean with  
+# finer grain control and to configure extra properties beyond those configured here. 
+# You can use a gmail account for example: 
+email.host=smtp.gmail.com
+email.port=587
+email.username=somebody@gmail.com
+email.password=password
+# 
+# Or if you have a mailserver on local host you can set just the 'email.host' 
+# and then comment out all the 'mailSender' bean properties in 'root-context.xml' 
+# except for the host property that is defined with the following line: 
+#   '<property name="host" value="${email.host}" />' 
+#email.host=localhost
+#email.port=
+#email.username=
+#email.password=
+
+# The portal can (optionally) send emails, this is used for the from address: 
+email.from=support@grid-support.ac.uk

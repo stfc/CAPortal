@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <body>
+        <div>
+            Dear RA Operator,
+            <br/>
+            A new <b>host</b> certificate request is waiting for your approval at the UK e-Science CA for: <br/>
+            (${param1})
+            <br/>
+            Please visit the following link to see the request: 
+            <br/>
+            ${basePortalUrl}/raop/viewcsr?requestId=${req_key}
+            <br/>
+            <br/>
+            All your <b>pending</b> requests for <b>your RA</b> are listed at the RAOP Home page:<br/> 
+            ${basePortalUrl}/raop 
+            <br/>
+            <br/>
+
+            This is a request for a HOST certificate:
+            <ul>
+                <li>Confirm that, to the best of your knowledge, the person applying for the 
+                    certificate is the system administrator for the service or has been authorised 
+                    to apply for the certificate by the system administrator.</li>
+                <li>Approve the request.</li>
+            </ul>
+            <br/>
+
+            For further information about RA procedures, please refer to the documentation 
+            on the NGS web site at http://www.ngs.ac.uk/ra-documentation
+            <br/>
+            If anything goes wrong, go to http://www.ngs.ac.uk/contact-helpdesk and submit 
+            a query into the Certification queue. 
+            <br/>
+            Thanks, 
+            <br/>
+            CA Operator
+        </div>
+    </body>
+</html>

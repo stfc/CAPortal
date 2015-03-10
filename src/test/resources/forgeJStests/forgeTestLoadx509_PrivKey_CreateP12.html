@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Forge test PKCS12 in JS</title>
+        <meta charset="windows-1252">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+        <div>Check the JS console for test output (create keys, create <b>cert-chain</b>, create .p12, b64 encode .p12)</div>
+        <br/>
+        Base64 encoded .p12 file text: 
+        <textarea id="privateKeyTextArea" style="width: 650px; height: 154px;"></textarea>
+        
+        <script src="../../../main/webapp/resources/javascript/forge.min.js"></script>
+        <script src="../../../main/webapp/resources/javascript/FileSaver.js"></script>
+        <script src="../../../main/webapp/resources/javascript/base64.js"></script>
+        <script src="../../../main/webapp/resources/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript">
+//var forge = require('../js/forge');
+
+// Sample test certificates from the DEV CA 
+// The certificateDev has the following subject and issuer: 
+//subject= /C=UK/O=eScienceDev/OU=CLRC/L=DL/CN=david meredith
+//issuer= /C=UK/O=eScienceDev/OU=NGS/CN=DevelopmentCA
+var _pem = {
+certificateDev:'-----BEGIN CERTIFICATE-----\r\n' +
+'MIIFWzCCBEOgAwIBAgICDgQwDQYJKoZIhvcNAQEFBQAwSTELMAkGA1UEBhMCVUsx\r\n' +
+'FDASBgNVBAoTC2VTY2llbmNlRGV2MQwwCgYDVQQLEwNOR1MxFjAUBgNVBAMTDURl\r\n' +
+'dmVsb3BtZW50Q0EwHhcNMTMxMTE4MTYyNjMxWhcNMTQwNTE3MTYyNjMxWjBYMQsw\r\n' +
+'CQYDVQQGEwJVSzEUMBIGA1UEChMLZVNjaWVuY2VEZXYxDTALBgNVBAsTBENMUkMx\r\n' +
+'CzAJBgNVBAcTAkRMMRcwFQYDVQQDEw5kYXZpZCBtZXJlZGl0aDCCASIwDQYJKoZI\r\n' +
+'hvcNAQEBBQADggEPADCCAQoCggEBAJrj6LsRb0kYP9wSCVRM0aaUFhAEaBSpTX70\r\n' +
+'adjuqYX38RnTLqi9fnjDZhesKypBqZJYnJumc1tKu9S6XjburBCG8EQ3SIXL4exS\r\n' +
+'sBrAnYuRHyxFZwS71VQfIU92KC0xmPgRLwiLv1ucrjs2ddEFSQqNRyscFE4wfnUn\r\n' +
+'xrFCTgSZf6Mq5t6IQ47VpvsD7pRdRBK7Ps6mdSnJxYZvMqXltvu9111H2JugUHKn\r\n' +
+'9bm8s/42WrDSbaczmjkghydDrW+qCq485zFcNx6AMtyihGLf3XtfWuoJVqGYeSdx\r\n' +
+'5Zo8PFKO/VCeWzPVDTsIKXY6vhy7Y1l0ZneNeR1PRd0nYYh/ba0CAwEAAaOCAjww\r\n' +
+'ggI4MAwGA1UdEwEB/wQCMAAwEQYJYIZIAYb4QgEBBAQDAgWgMA4GA1UdDwEB/wQE\r\n' +
+'AwID6DAsBglghkgBhvhCAQ0EHxYdVUsgZS1TY2llbmNlIFVzZXIgQ2VydGlmaWNh\r\n' +
+'dGUwHQYDVR0OBBYEFGfvKe0cxenrpsY/jEUHM6IQ6Ew8MHEGA1UdIwRqMGiAFAXv\r\n' +
+'zO2cwMpQVWOamhSGFvfibOMCoU2kSzBJMQswCQYDVQQGEwJVSzEUMBIGA1UEChML\r\n' +
+'ZVNjaWVuY2VEZXYxDDAKBgNVBAsTA05HUzEWMBQGA1UEAxMNRGV2ZWxvcG1lbnRD\r\n' +
+'QYIBATAkBgNVHREEHTAbgRlkYXZpZC5tZXJlZGl0aEBzdGZjLmFjLnVrMCUGA1Ud\r\n' +
+'EgQeMByBGnN1cHBvcnRAZ3JpZC1zdXBwb3J0LmFjLnVrMBkGA1UdIAQSMBAwDgYM\r\n' +
+'KwYBBAHZLwEBAQEHMEkGCWCGSAGG+EIBBAQ8FjpodHRwOi8vY2EuZ3JpZC1zdXBw\r\n' +
+'b3J0LmFjLnVrL3B1Yi9jcmwvZXNjaWVuY2Utcm9vdC1jcmwuY3JsMEcGCWCGSAGG\r\n' +
+'+EIBAwQ6FjhodHRwOi8vY2EuZ3JpZC1zdXBwb3J0LmFjLnVrL3B1Yi9jcmwvZXNj\r\n' +
+'aWVuY2UtY2EtY3JsLmNybDBJBgNVHR8EQjBAMD6gPKA6hjhodHRwOi8vY2EuZ3Jp\r\n' +
+'ZC1zdXBwb3J0LmFjLnVrL3B1Yi9jcmwvZXNjaWVuY2UtY2EtY3JsLmNybDANBgkq\r\n' +
+'hkiG9w0BAQUFAAOCAQEARfux/FKvLb0zan8oOKHgOwak6rAaSAeFrPNOmbo1mb+h\r\n' +
+'+TFEUZDQu14I6OsdH5OA3+hRsJDBAijRinpIL26EVljCpef+uMdE77KdWK1QLPgQ\r\n' +
+'9MZCmtgx7W9/7RzxOn2cdVwjCvCtriB2wMoH7oSfkT2qP+suiberFEA6skMbGuhK\r\n' +
+'NPqzbXmivR6D9FNjQugVkpN9eOLnzv7gauZDmzW+rVbhq6kG3SnijIPQ+vIY+d2z\r\n' +
+'aFbWLJ/AIg3g47wsFUamDTv4IbNf8/r2izi/vKottxayr10FxXjgu0WyTJxuJ0hf\r\n' +
+'5QNTNszXU70duufM3Oa2C/EanuWzzj4ZaMon/HFXFg==\r\n' +
+'-----END CERTIFICATE-----\r\n',  
+
+privateKeyDev:'-----BEGIN RSA PRIVATE KEY-----\r\n' +
+'Proc-Type: 4,ENCRYPTED\r\n' +
+'DEK-Info: DES-EDE3-CBC,01D504BED554B24D\r\n' +
+'\r\n' +
+'UH//NrgtZN+qiVjfVEOgreQqKWlNAcx75r8sorDyVK8F6au0qHL9qdu91HWJUJEO\r\n' +
+'uYp6vxn/jT8J7GQzH7zsmJJ4GDVvyvC14/zruEk5R5XlGjRfuiAtGdfQ9kEdJGFb\r\n' +
+'Vlqoh24kAlKemoxPdn3NQedw65+Ay8hshd4EjtnXfD/mXDfGioF7Af1X17HoxVv1\r\n' +
+'KPJ+JpKlj8p/C6anLQ/yNInRdUcnkWfTN5HPPdtSKavwr8g44K2Ewf9YoP1yl+VT\r\n' +
+'yt+g1i9+5ErGSYgXBQmECVvWmPi7rYY3gUUR7vy6pGTjBAfKHMbdgA1ngmnN7DKH\r\n' +
+'wSXeIfX5EzW5a4onZzVry0F0WPBzF6bZMVJKf81Y2l7qkSRqk8v7pt1XafgKhrKE\r\n' +
+'NGfjxqNGZZMCENcJXppbSnNBoWVLn1Fqo72i3gvMFTkDFHF5dAwVUpX9hhsMEiGp\r\n' +
+'ZFAEiwFaNE4nE4MMWUM2AtCihAz0cxdtD1iUIg3bCeGQuFeGLABVQUs/CQ+gXAFf\r\n' +
+'jd6DVH/g4+YFMfpRQEc0DygHmZhbpzSENQDq/SkAPoKNvvWuoLlqvLw6jh1WTRHd\r\n' +
+'VFXExdppCZ9cTRBKCwtiEvx/70jLAEKL08HJcaE12Uhj3kEoNJlXuvTXHu0+wyul\r\n' +
+'RumJcoW0+8caV6ciG+IhJLR58+VXtWYG3mZ+T/NeIzsTITSR5Aa7sNXa+dZxhUyz\r\n' +
+'IHmBydBTajDleAIJPh73toBMzK1EAh5Ylaxk2JDd1GB8e3FXSXAsoaKJxbaadIJi\r\n' +
+'kXoNISHCygf/EqqRgC/p/9pPPwynbzttS+tcaGzgegfGELdaIUqKllbb8971MUYk\r\n' +
+'tXbYhkIhxZuX2GFIMdgj5jcP+IzQ9styx1rkmI1aO0deb9EB6V5V11jRsN6U6FbZ\r\n' +
+'xvKBmk73uho3ckjFmn95/dWzD9bzjEhy2AN9jFU6qc1cdNViP+qPp2revM81+bwh\r\n' +
+'EsNlN0eMw8QM/0ZxiuaerSOPXRWHOTgu3UjkmIwx3uAQp9o7+25wXXMmvNoQcwxM\r\n' +
+'xCLf+gFb91yEbpPC5Vxlnlt/GV0sKx65BdACjCzZ4DdXM6vE71y17LQ5rdX3F24v\r\n' +
+'f1wSO7NoVIgwhQdUOYO+ye8CgwyRoT5K+f7M8J/D52f9CH74+UfHjDCmeKUWIPDq\r\n' +
+'7NgsjB8KoH2dQ/cIcvXX9jD7OOouxvezLRvyvtvlLB1oVOEEOKlnKKJdoW9maYG8\r\n' +
+'5VBK8F9dKBYX7yxGRI4pml+rl+31Zm15W5BqC2zxLPQHJix+T2AILpOFAn4Fh6VR\r\n' +
+'I2dbSuT/fGFLG8l7NTUdu1NfN2iP4Q+gnudZsVnePL98is6JJgw0sRO1RqM+qwxb\r\n' +
+'UpQ9Wnb7sgWD/6R6z8idfLW59YaYMkFywvsf35omspcPoJGLqme0Dnc+faSn4Y62\r\n' +
+'IfZWtaGH+1CKXCDni5fiZzJA1WenThZHw9WxZGQNQWqjAZ5piVZsy4nvb3Xirtju\r\n' +
+'Qc72jPXHSml94ZDKXEyIOCW6DzVaPWA9EIGDC91/F5189fKGV4u6ErMF4Zv5GKx+\r\n' +
+'vns5U6/HlckjaIfutu4lE9UQuJ+AUX6BcHDyaqXv42cVOcsSYQYvFQ+yYupTE903\r\n' +
+'-----END RSA PRIVATE KEY-----\r\n', 
+
+cacertDev:'-----BEGIN CERTIFICATE-----\r\n' +
+'MIID1zCCAr+gAwIBAgIBATANBgkqhkiG9w0BAQUFADBJMQswCQYDVQQGEwJVSzEU\r\n' +
+'MBIGA1UEChMLZVNjaWVuY2VEZXYxDDAKBgNVBAsTA05HUzEWMBQGA1UEAxMNRGV2\r\n' +
+'ZWxvcG1lbnRDQTAeFw0wNzEwMDgxNTMwMjdaFw0xNzEwMTExNTMwMjdaMEkxCzAJ\r\n' +
+'BgNVBAYTAlVLMRQwEgYDVQQKEwtlU2NpZW5jZURldjEMMAoGA1UECxMDTkdTMRYw\r\n' +
+'FAYDVQQDEw1EZXZlbG9wbWVudENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB\r\n' +
+'CgKCAQEA5FoXtAzaY7bFYEu5aBkzyubBc8i7S8UyXHZ89OCGp46rU8+h4oOR7+mQ\r\n' +
+'GHHhuXri2q9qt7q7p5CnKpCMS6ETCNxvgV4Bq2Rr51/2w2ZpoJKn1YYUYY0IAGA2\r\n' +
+'/cJkkepoKU0b41UTfUbXwPVz9GyVDT1LtR9LNCSgIXTWkWmw969kdP4NcPoDSa7L\r\n' +
+'23/JVJ9QriiYrk4xABv3dIGN18vUSOobf15IL9cOFISzoDz+Bknlq4aYwjQXTNdz\r\n' +
+'a7h3VKh/ehIQGshogJ4fOsjl0Bu6U8FtEaF7O2J1hiUaBWHllJnIprwes9QKZWg0\r\n' +
+'1N/Mv/LMVtiyf5fa/3maLHJ6w/6lqQIDAQABo4HJMIHGMA8GA1UdEwEB/wQFMAMB\r\n' +
+'Af8wHQYDVR0OBBYEFAXvzO2cwMpQVWOamhSGFvfibOMCMHEGA1UdIwRqMGiAFAXv\r\n' +
+'zO2cwMpQVWOamhSGFvfibOMCoU2kSzBJMQswCQYDVQQGEwJVSzEUMBIGA1UEChML\r\n' +
+'ZVNjaWVuY2VEZXYxDDAKBgNVBAsTA05HUzEWMBQGA1UEAxMNRGV2ZWxvcG1lbnRD\r\n' +
+'QYIBATAOBgNVHQ8BAf8EBAMCAQYwEQYJYIZIAYb4QgEBBAQDAgEGMA0GCSqGSIb3\r\n' +
+'DQEBBQUAA4IBAQCuWtORTy5kKzJyUSAf0QT2MmlOnK2VVulZmk0Wd81p549bohc0\r\n' +
+'LRyS3vAh5tVbn6oK4jvmdVUFDIgY3bmKs5CUzwUb9AJbol9ZyQbRUXZK93wuwpOp\r\n' +
+'gzHiRRXgR6wbiKcuVuocKk1Lxcw2pv3oLJFZm6NHZ3avAi1rUxsVBVrMtpCkyEz3\r\n' +
+'JeeyirJucPgWp8SMEhaWSRZRhthaCCD9JpIg7fgVkPOASUw4IuA8bVlg4PaPdfeM\r\n' +
+'16w6Qu3r0kuT71qA9rLof1eYGAMCkz0ctjMAB6zuijnkKSyhjYhN4cZBipSzrEJj\r\n' +
+'NvQScF6oqopL4+GkjbcHU+EkawbGRMh+DURy\r\n' +
+'-----END CERTIFICATE-----\r\n', 
+}; 
+
+//The easiest and most compatible way to transmit public keys or to store 
+//private keys is to convert them to PEM format. Private keys may be optionally 
+//encrypted when converting them (by using a different method, see below).
+// http://stackoverflow.com/questions/20067182/javascript-forge-crypto-library-recreating-public-and-private-keys-for-later-re?rq=1
+
+//********Converting a public key to/from PEM:
+
+// convert a Forge public key to PEM-format
+//var pem = pki.publicKeyToPem(publicKey);
+// convert a PEM-formatted public key to a Forge public key
+//var publicKey = pki.publicKeyFromPem(pem);
+
+//*******Converting a private key to/from PEM:
+
+// convert a Forge private key to PEM-format
+// (preferred method if you don't want encryption)
+//var pem = pki.privateKeyToPem(privateKey);
+
+// wraps and encrypts a Forge private key and outputs it in PEM format
+// (preferred method if you do want encryption)
+//var pem = pki.encryptRsaPrivateKey(privateKey, 'password');
+
+// encrypts a Forge private key and outputs it in PEM format using OpenSSL's
+// proprietary legacy format + encapsulated PEM headers (DEK-Info)
+// (perhaps more compatible with some legacy OpenSSL-based applications)
+//var pem = pki.encryptRsaPrivateKey(privateKey, 'password', {legacy: true});
+
+// decrypts a PEM-formatted, encrypted private key
+//var privateKey = pki.decryptRsaPrivateKey(pem, 'password');
+
+try {
+ var cert = forge.pki.certificateFromPem(_pem.certificateDev, true);
+ var cacert = forge.pki.certificateFromPem(_pem.cacertDev, true);
+// var rootcert = forge.pki.certificateFromPem(_pem.rootcert, true);
+ var privateKey  = forge.pki.decryptRsaPrivateKey(_pem.privateKeyDev, 'daf1djm');
+ 
+ var chain=[cert, cacert/*, rootcert*/];  
+ 
+ // create PKCS12
+  console.log('\nCreating PKCS#12...');
+  var password = 'daf1djm';
+  //var newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(privateKey, [cert], password, {generateLocalKeyId: true, friendlyName: 'test'});
+  var newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(privateKey, chain, password, 
+  {generateLocalKeyId: true, friendlyName: 'test', algorithm: '3des'});
+  var newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
+
+  console.log('\nBase64-encoded new PKCS#12:');
+  var b64p12 = forge.util.encode64(newPkcs12Der); 
+  //console.log(b64p12);
+
+  $(document).ready(function() {
+      $('#privateKeyTextArea').text(b64p12); 
+  }); 
+  
+
+  var myBuffer = base64DecToArr(b64p12).buffer; 
+  var p12blob = new Blob([myBuffer], {type: 'application/octet-stream'}); 
+  saveAs(p12blob, "devTestCert.p12");
+
+  // create CA store (w/own certificate in this example)
+  //var caStore = forge.pki.createCaStore([cert]);
+  //console.log('\nLoading new PKCS#12 to confirm...');
+  //loadPkcs12(newPkcs12Der, password, caStore);
+}
+catch(ex) {
+  if(ex.stack) {
+    console.log(ex.stack);
+  }
+  else {
+    console.log('Error', ex);
+  }
+}
+
+/*try {
+  // generate a keypair
+  console.log('Generating 1024-bit key-pair...');
+  var keys = forge.pki.rsa.generateKeyPair(1024);
+  console.log('Key-pair created.');
+
+  // create a certificate
+  console.log('Creating self-signed certificate...');
+  var cert = forge.pki.createCertificate();
+  cert.publicKey = keys.publicKey;
+  cert.serialNumber = '01';
+  cert.validity.notBefore = new Date();
+  cert.validity.notAfter = new Date();
+  cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1);
+  var attrs = [{
+    name: 'commonName',
+    value: 'example.org'
+  }, {
+    name: 'countryName',
+    value: 'US'
+  }, {
+    shortName: 'ST',
+    value: 'Virginia'
+  }, {
+    name: 'localityName',
+    value: 'Blacksburg'
+  }, {
+    name: 'organizationName',
+    value: 'Test'
+  }, {
+    shortName: 'OU',
+    value: 'Test'
+  }];
+  cert.setSubject(attrs);
+  cert.setIssuer(attrs);
+  cert.setExtensions([{
+    name: 'basicConstraints',
+    cA: true
+  }, {
+    name: 'keyUsage',
+    keyCertSign: true,
+    digitalSignature: true,
+    nonRepudiation: true,
+    keyEncipherment: true,
+    dataEncipherment: true
+  }, {
+    name: 'subjectAltName',
+    altNames: [{
+      type: 6, // URI
+      value: 'http://example.org/webid#me'
+    }]
+  }]);
+
+  // self-sign certificate
+  cert.sign(keys.privateKey);
+  console.log('Certificate created.');
+
+  // create PKCS12
+  console.log('\nCreating PKCS#12...');
+  var password = 'password';
+  var newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(
+    keys.privateKey, [cert], password,
+    {generateLocalKeyId: true, friendlyName: 'test'});
+  var newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
+
+  console.log('\nBase64-encoded new PKCS#12:');
+  console.log(forge.util.encode64(newPkcs12Der));
+
+  // create CA store (w/own certificate in this example)
+  var caStore = forge.pki.createCaStore([cert]);
+
+  console.log('\nLoading new PKCS#12 to confirm...');
+  loadPkcs12(newPkcs12Der, password, caStore);
+}
+catch(ex) {
+  if(ex.stack) {
+    console.log(ex.stack);
+  }
+  else {
+    console.log('Error', ex);
+  }
+}*/
+
+/*
+function loadPkcs12(pkcs12Der, password, caStore) {
+  var pkcs12Asn1 = forge.asn1.fromDer(pkcs12Der);
+  var pkcs12 = forge.pkcs12.pkcs12FromAsn1(pkcs12Asn1, false, password);
+
+  // load keypair and cert chain from safe content(s) and map to key ID
+  var map = {};
+  for(var sci = 0; sci < pkcs12.safeContents.length; ++sci) {
+    var safeContents = pkcs12.safeContents[sci];
+    console.log('safeContents ' + (sci + 1));
+
+    for(var sbi = 0; sbi < safeContents.safeBags.length; ++sbi) {
+      var safeBag = safeContents.safeBags[sbi];
+      console.log('safeBag.type: ' + safeBag.type);
+
+      var localKeyId = null;
+      if(safeBag.attributes.localKeyId) {
+        localKeyId = forge.util.bytesToHex(
+          safeBag.attributes.localKeyId[0]);
+        console.log('localKeyId: ' + localKeyId);
+        if(!(localKeyId in map)) {
+          map[localKeyId] = {
+            privateKey: null,
+            certChain: []
+          };
+        }
+      }
+      else {
+        // no local key ID, skip bag
+        continue;
+      }
+
+      // this bag has a private key
+      if(safeBag.type === forge.pki.oids.pkcs8ShroudedKeyBag) {
+        console.log('found private key');
+        map[localKeyId].privateKey = safeBag.key;
+      }
+      // this bag has a certificate
+      else if(safeBag.type === forge.pki.oids.certBag) {
+        console.log('found certificate');
+        map[localKeyId].certChain.push(safeBag.cert);
+      }
+    }
+  }
+
+  console.log('\nPKCS#12 Info:');
+
+  for(var localKeyId in map) {
+    var entry = map[localKeyId];
+    console.log('\nLocal Key ID: ' + localKeyId);
+    if(entry.privateKey) {
+      var privateKeyP12Pem = forge.pki.privateKeyToPem(entry.privateKey);
+      var encryptedPrivateKeyP12Pem = forge.pki.encryptRsaPrivateKey(
+        entry.privateKey, password);
+
+      console.log('\nPrivate Key:');
+      console.log(privateKeyP12Pem);
+      console.log('Encrypted Private Key (password: "' + password + '"):');
+      console.log(encryptedPrivateKeyP12Pem);
+    }
+    else {
+      console.log('');
+    }
+    if(entry.certChain.length > 0) {
+      console.log('Certificate chain:');
+      var certChain = entry.certChain;
+      for(var i = 0; i < certChain.length; ++i) {
+        var certP12Pem = forge.pki.certificateToPem(certChain[i]);
+        console.log(certP12Pem);
+      }
+
+      var chainVerified = false;
+      try {
+        chainVerified = forge.pki.verifyCertificateChain(caStore, certChain);
+      }
+      catch(ex) {
+        chainVerified = ex;
+      }
+      console.log('Certificate chain verified: ', chainVerified);
+    }
+  }
+}*/
+
+            
+        </script>
+
+ 
+    </body>
+
+       
+    
+</html>

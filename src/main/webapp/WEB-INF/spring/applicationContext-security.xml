@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+Spring Security context 
+@author David Meredith  
+ -->
+
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/security 
+    http://www.springframework.org/schema/security/spring-security.xsd">
+    
+    <!--http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/security 
+    http://www.springframework.org/schema/security/spring-security-3.1.xsd">-->
+
+<!-- Note, Rather than specify the versioned XSD, use the default with no version numbers as per: 
+    http://stackoverflow.com/questions/17022058/what-xmlns-schemalocation-to-use-in-spring-context-file-->
+    
+    <!-- Remove debug in normal use -->
+    <!--<debug />-->
+    
+    <!-- 
+    To secure the business tier: pre-post- is for spring annotations  
+    while jsr250- if for standard annotations 
+    -->
+    <!-- <global-method-security pre-post-annotations="enabled" /> -->
+    <global-method-security jsr250-annotations="enabled" /> 
+
+    <http pattern="/resources/**" security="none"/>
+    <http pattern="/loggedout.jsp" security="none"/>
+    <!-- <http pattern="/myindex.jsp" security="none"/> -->
+    <http pattern="/" security="none"/> 
+
+    <!-- auto-config="true" -->
+    <!--<http use-expressions="true" entry-point-ref="forbiddenAuthEntryPoint">-->
+    <!--<http use-expressions="true" entry-point-ref="authenticationEntryPoint">-->
+    <http use-expressions="true" disable-url-rewriting="true" entry-point-ref="authenticationEntryPoint">
+
+        <!-- Custom filter added in the spring security filter chain that 
+        updates the user's security context and current Roles for every request. 
+        This is needed as the users cert may have been revoked by another RA. -->
+        <custom-filter ref="refreshAuthTokenFilter" before="FILTER_SECURITY_INTERCEPTOR"/>  
+         
+        <intercept-url pattern="/allindex.jsp" access="permitAll" />
+        <intercept-url pattern="/timeout.jsp" access="permitAll" />
+        <intercept-url pattern="/pub/**"   access="permitAll" /> 
+        <intercept-url pattern="/denied/**" access="permitAll" />
+        <!--<intercept-url pattern="/rest/**"   access="permitAll" />
+        <intercept-url pattern="/cert_owner/renew/**" access="hasRole('ROLE_CERTOWNER')"/>-->  
+        <!--<intercept-url pattern="/cert_owner/**" access="hasRole('ROLE_CERTOWNER') and isFullyAuthenticated()"/>
+        <intercept-url pattern="/raop/**" access="hasRole('ROLE_RAOP') and isFullyAuthenticated()"/>
+        <intercept-url pattern="/caop/**" access="hasRole('ROLE_CAOP')and isFullyAuthenticated()"/>       
+        <intercept-url pattern="/**" access="hasRole('ROLE_CA_ADMIN') and isFullyAuthenticated()" />-->
+        <intercept-url pattern="/cert_owner/**" access="hasRole('ROLE_CERTOWNER')"/>
+        <intercept-url pattern="/raop/**" access="hasRole('ROLE_RAOP')"/>
+        <intercept-url pattern="/caop/**" access="hasRole('ROLE_CAOP')"/>       
+        <intercept-url pattern="/**" access="hasRole('ROLE_CA_ADMIN')" />
+
+        <!-- Specify regex to return whole DN string -->
+        <!--<x509 subject-principal-regex="(.*)" />-->
+        
+        <x509 user-service-ref="caX509AuthMan"/>
+         
+
+        <!-- Uncomment to limit the number of sessions a user can have -->
+        <!-- <session-management invalid-session-url="/denied/timeout">
+            <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
+        </session-management>-->
+
+        <!-- http://www.baeldung.com/spring-security-session -->  
+        <!-- Attribute: invalid-session-url
+        The URL to which a user will be redirected if they submit an invalid 
+        session indentifier. Typically used to detect session timeouts 
+        -->
+        <!--<session-management invalid-session-url="/timeout.jsp">-->
+            <!-- expired-url - The URL a user will be redirected to if they 
+            attempt to use a session which has been "expired" because they 
+            have logged in again.-->
+            <!--<concurrency-control expired-url="/sessionExpired.jsp"/>
+        </session-management>-->
+
+        <!-- If we provided a log out handler as below, the user's security 
+        context is correctly cleared, however, the client will still be able to 
+        re-login immediately as this does NOT clear the browser SSL state/cache.  
+        Clearing SSL state on logout is not possible, see:  
+        http://forum.springsource.org/showthread.php?52803-Clear-SSL-State-on-Logout&s=e077b42fd45ae3a3177a01c90339893c  
+        Therefore, is no point using a logout handler with cert auth (unless 
+        you fallback to form-based auth handler if no certs present. 
+        -->
+        <!--<logout invalidate-session="true" logout-success-url="/"
+        logout-url="/j_spring_security_logout"/> -->
+        <access-denied-handler error-page="/denied"/>
+        
+        <!--<logout delete-cookies="JSESSIONID" invalidate-session="true" logout-url="/j_spring_security_logout" /> -->
+
+    </http>
+
+    <!--    
+    Spring/default forbid entry without redirecting to a form login, not a friendly error page however.--> 
+   <!-- <beans:bean id="forbiddenAuthEntryPoint" 
+                class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint">
+    </beans:bean>-->
+
+    <!-- Redirect to /denied page to display the access denied info -->
+    <beans:bean id="authenticationEntryPoint"
+      class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+     <beans:property name="loginFormUrl" value="/denied"/>
+    </beans:bean>
+    
+     
+    <!--<beans:bean id="caAuthMan" class="uk.ac.ngs.security.CaJdbcUserDetailsService"/>-->
+    <beans:bean id="caX509AuthMan" class="uk.ac.ngs.security.CaX509JdbcPreAuthUserDetails"/>
+     
+
+	<!--  
+	Dont forget to add a global <authentication-manager> element to your configuration 
+	(with child <authentication-provider> elements).  
+	Alternatively you can use the authentication-manager-ref attribute on your <http> and 
+	<global-method-security> elements. -->
+
+	<!--<authentication-manager alias="authenticationManager">
+		<authentication-provider user-service-ref="caAuthMan"/>
+	</authentication-manager>-->
+    
+    <authentication-manager alias="authenticationManager">
+	</authentication-manager>
+
+    <!--
+    InMemoryDaoImpl UserService is used for testing/debugging  
+    -->
+	<!-- <authentication-manager alias="authenticationManager">
+		<authentication-provider>
+			<user-service>
+			    <user authorities="ROLE_CERTOWNER,ROLE_RAOP,ROLE_CAOP" 
+			    name="CN=david meredith, L=DL, OU=CLRC, O=eScience, C=UK"/>
+			    <user authorities="ROLE_CERTOWNER,ROLE_RAOP,ROLE_CAOP" 
+			    name="CN=john kewley, L=DL, OU=CLRC, O=eScience, C=UK"/>
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+ 	-->	 
+
+    <beans:bean id="refreshAuthTokenFilter" class="uk.ac.ngs.filters.RefreshCurrentAuthenticationTokenFilter">
+    </beans:bean>
+    
+</beans:beans>

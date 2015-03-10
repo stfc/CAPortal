@@ -1,0 +1,57 @@
+General issues
+=======================
+1.
+--Issue--:
+If using an unsupported browser without Flash installed, no way currently to prompt to save
+host and user information to a file when request a certificate (host or user).
+--Workaround--:
+Manually copy text from csr textarea and save to a file manually. MUST BE PLAIN TEXT.
+
+2.
+--Issue--:
+Misleading SEVERE entries in catalina.<date>.log file
+Some of the logs have the following SEVERE entries.  However, it appears these 
+messages are harmless; over-zealous/erroneous reporting by tomcat. They won't 
+cause memory leaks and these particular SEVERE messages can be ignored. Fixed in tomcat >= 7.0.6 
+
+"SEVERE: A web application created a ThreadLocal with key of type 
+[org.springframework.core.NamedThreadLocal] (value [Prototype beans currently in creation]) 
+and a value of type [null] (value [null]) but failed to remove it when the web 
+application was stopped. To prevent a memory leak, the ThreadLocal has been forcibly removed" 
+
+http://forum.spring.io/forum/spring-projects/container/76574-installation-threadlocal-forcefully-removed 
+http://wiki.apache.org/tomcat/MemoryLeakProtection 
+
+
+Safari issues
+=======================
+1. 
+--Issue--: 
+Safari 'remembers' SSL certificate choice and will not prompt again after selection:
+https://discussions.apple.com/message/22461058#22461058
+--Workaround--: 
+Can manually assign desired certificate as shown here: http://support.apple.com/kb/HT1679
+
+2.
+--Issue--:
+Safari requires a certificate if there is one in the browser already (cancelling leads to denied page)
+even when server is set to clientAuth="want":
+http://superuser.com/questions/521919/safari-forces-user-to-select-client-certificate-even-if-it-is-optional
+http://lists.apple.com/archives/apple-cdsa/2012/Dec/msg00005.html
+--Workaround--:
+Remove certificates from keychain or select suitable certificate.
+
+3. 
+--Issue--:
+Safari can't distinguish the correct issuing CA for the clients certificate. 
+If you go to the dev CA portal and you don't have a DEV ca cert but you do have a real 
+CA cert from the UK CA, then Safari always requests a client cert selection.  
+Cancelling leads to denied page. 
+
+
+Tomcat issues
+===============
+See README.txt 
+
+
+

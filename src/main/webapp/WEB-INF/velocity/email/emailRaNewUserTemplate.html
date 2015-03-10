@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <body>
+        <div>
+            Dear RA Operator, <br/>
+            A new <b>User</b> certificate request is waiting for your approval at the UK e-Science CA for:
+            <br/>
+            (${param1}) 
+            <br/>
+            <br/>
+            Please visit the following link to see the request: 
+            <br/>
+            ${basePortalUrl}/raop/viewcsr?requestId=${req_key}
+            <br/>
+            <br/>
+            All your <b>pending</b> requests for <b>your RA</b> are listed at the RAOP Home page:<br/> 
+            ${basePortalUrl}/raop 
+            <br/>
+            <br/>
+
+
+            This is a request for a PERSONAL certificate, the user must come to you and 
+            show valid photo ID - either passport (any country), UK driver's license with 
+            photo ID, or your site's photo ID. 
+            When they do so; 
+            <ul>
+                <li>Check to your satisfaction that the user is the responsible sysadmin for the 
+                    host identified by the Distinguished Name.</li> 
+                <li> Check the user's identity, using the photo id.  Don't proceed unless the 
+                    photo id is valid and identifies the user.</li>
+                <li>Print out the request form.</li>
+                <li>Approve the request.</li>
+                <li>Take a photo copy of the user's identity document and attach it to the 
+                    request form. Store them in a secure place.</li>
+            </ul>
+            <br/>
+            For further information about RA procedures, please refer to the documentation 
+            on the NGS web site at: http://www.ngs.ac.uk/ra-documentation
+            <br/>
+            If anything goes wrong, go to http://www.ngs.ac.uk/contact-helpdesk and submit 
+            a query into the Certification queue. 
+            <br/>
+            <br/>
+            Thanks, 
+            <br/>
+            CA Operator
+        </div>
+    </body>
+</html>

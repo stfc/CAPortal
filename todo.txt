@@ -1,0 +1,222 @@
+
+link from certs to csrs and vice-versa. 
+info on who made the original request. 
+certs shown as VALID even in cert has expired (correct but misleading) 
+
+
+Clarify RA List
+----------------
+Currently sometimes a CA Op is treated as an RA Op and sometimes not.
+This might depend on where the s/w gets the "RA list" from (raoplist table or static conf file). 
+E.g. If we do the following search in the CA Portal:
+https://portal.ca.grid-support.ac.uk/caportal/pub/viewRAs?ou=Bristol
+We get "Dave Newbold". I don't think he is an RA Op or even has been. I think he is the RA Manager.
+As such he shouldn't really appear in this list so I guess our search needs tuning a tad.
+
+
+
+Emails on new CSR/renewals
+--------------------------
+New Cert:
+* I think only RA Ops (not CA Ops) are mentioned in the email telling you to go see an RA.
+* We need to check whether both RA Ops and CA Ops get an email, I think they do
+
+Renew Cert:
+* Both RA Ops and CA Ops (for that "domain") get sent an email seeking their approval
+
+Other
+-------
+- Order by on searches (order by req_key or submitted date etc). 
+- Do we want the data column search available for RAOPS ? 
+- List highest serial number/stats on tables? 
+- Logging/war stuff dynamic? 
+- Restrict tomcat manager app in deployment.  
+
+
+
+Change Certificate Email
+========================
+Here are the different cases of when a user might like to change an email 
+"in"/"associated with" his certificate:
+
+I suggest we restrict ourselves to case 3 for now
+
+Use case 1. Personal certificate
+    * Email addresss is INSIDE the certificate (SAN as I recall), it may also be in a database column
+    * The Certificate Asserts that that user is the owner of that email address - it is part of the identity
+    * If the email address in the cert becomes invalid then the user is supposed to revoke the certificate and apply for a new one
+    * When an RA checks the ID of the user he should also check the email address is correct
+    * Changing CW and/or CA Portal to enable such a change would pretty much require a Change Interface
+       (although personally I think we should be able to work out how to do this by extending the Renewal i/f at some point)
+
+Use case 2. "old style" host certificate
+    * Email address is in the DN (Email= field)
+    * We don't create any more new ones like this, although we do honour the Email= field when renewing
+    * Email address is also stored in a DB column so could in theory be changed without amending the certificate itself
+    * It is not used for sending signed emails so RA doesn't care too much if it is changed or not
+
+Use case 3. current host certificates
+    * Email address is not stored anywhere within the certificate itself
+    * It is stored only in the DB column (except for those ones where it isn't - remember that bug)
+    * It is not used for sending signed emails so RA doesn't care too much if it is changed or not
+
+Options (not mutually exclusive!):
+1. Allow any CA Op to amend the email address of any use-case-3 Host certificate 2. Allow any RA Op to amend the email address of a use-case-3 Host certificate from within their "domain"
+3. Allow someone authenticated with a use-case-3 Host certificate to change its email
+
+Maybe we should go for 2 since I don't think many people keep their host certs in their browser and unauthenticating with the personal one and then re-authenticating with your own might be an issue for some users in some browsers. Once that is done I'm guessing adding option 1 wouldn't be too nasty.
+Option 3, if it was simple to implement, would also be handy though for those that do store such certs in their browser.
+I'd have to think longer if it would make sense for use-case-2 (host certs with emails embedded) since it might cause confusion
+
+
+
+CRR Revocation 
+===============
+When viewing a revoked cert, add link to the CRR
+---------------------------------------------------
+Consider adding a 'search by cert serial' on the Search CRR page
+------------------------------------------------------------------
+
+
+Below are what I can see are things that we can do with OpenCA that we can't *yet* 
+do with the CA Portal + other tools. Note that User and RA functions are highest 
+priority since that would allow us to move OpenCA inside the portal w/o losing functionality.
+
+General
+* Probably need some more links to the CA documentation pages, that sort of thing
+
+User functions
+* Small tweaks about Host certs already given to Dave [In Development]
+* Request cert with an Arbitrary pkcs10 
+   https://ca.grid-support.ac.uk/cgi-bin/pub/pki?cmd=pkcs10_req
+   [not certain this is essential or to be encouraged]
+
+RA functions
+* Look up details about *any* other RA (but not edit). Note that I am not convinced
+   that they need to be able to look up *any* other RA, but seeing at least their own "domain" would be good
+* Can look up CA certificates and past CRLs in OpenCA - I don't think this is needed for RAs
+RA Op: nice if they can see all (well most anyway) of the RA DB records. 
+I don't know whether they should be allowed to edit their own details or not
+
+
+
+
+CA functions
+* Export/Import ready for signing - should be smart to avoid double exporting and not exporting when nothing
+   to export
+* Editing RA details  -old i/f is really Slooooooooow
+
+CA Op: they need to be able to see the RA records and update them. They also need to be able to add new RA Ops and new RA Mans.
+    Also "disable" them - make them inactive.
+
+[my preference, still for approval by Jens] CA Man: promote User certs to be RA Ops, promote certs to be CA Ops
+    Add new RAs (we haven't talked about this yet)
+
+Only DB Admin can create a CA Man.
+
+Other Portal stuff (mixture of User, RA and CA)
+* Retiring DNs
+* Promoting to RA Op / CA Op - maybe this should only be permitted by named CA Ops or
+   CA Managers or something like that.
+* Amending email addresses - I've sent round various ideas for that for Personal certs, host certs, etc
+* Amend CertWizard MOTD (Message of the Day)
+
+
+
+
+Node Interface Requirements
+============================
+1. There should be a CA Op TODO page like there is an RA Op TODO page if you see what I mean.
+    This would list the CSRs and CRRs that were ready to be signed. It would provide the buttons for exporting and importing.
+
+2. We should have extra "smartness" so that if there were no CSRs or CRRs pending then the Export button wouldn't be
+    available. Likewise the Import only appears if a) Export has been done and b) stuff ready to import.
+    This would reduce risks of double export/import etc
+
+3. Ideally there'd be checkboxes for each item so that you could de-select a troublesome item rather than always doing all items.
+    Maybe extra options for export only-CRR and export only-CSR might be useful in troubleshooting scenarios.
+
+4. Import would probably need to import everything that has been signed so things don't get out of synch.
+
+5. Import also kicks off the email messages - the templates for this are stored on the signing machine. IMO this is not
+    good as it is trickier for us to fine-tune the messages.
+
+Other things for the CA Op part of the CA Portal [c|sh]ould include [most mentioned already on webpage as TODO]
+* Registering RA Ops - amending DB to start with;
+* Promoting to RA Op  / CA Op and demoting
+* Amend CertWiz MOTD
+* Amending email address for a host cert when it is not contained within the certificate. Actually why should this be a
+   CA Op only job - I suppose the certificate holder could do it, although maybe it wouldn't normally be in his browser.
+
+
+
+
+
+JK summary of OpenCA RA promoting/demoting 
+============================================
+The following file is used for promoting/demoting certificates:
+/usr/local/ca/bin/role_utilities.sh
+
+all the real work is done in Java (!), but this command line is fairly self-contained if you are calling it using a call-out. The alternative would be dig into the Java code and see what the code actually does.
+
+It is invoked by doing stuff like
+/usr/local/ca/bin/role_utilities.sh change caop 3585 /usr/local/ca/bin/role_utilities.sh change raop 3590 /usr/local/ca/bin/role_utilities.sh change user 3585
+
+For testing just now we can have it such that any "CA Operator" can promote/demote anyone to/from "RA Operator", "CA Operator" or  "User", but note that this isn't current practice/policy - currently only CA Manager and Assistant does this (i.e. Jens and myself).
+
+I've asked Jens to confirm what policy he wants for live. It is certain whether CA Ops will be only allowed to promote to RA Op, CA Op or no promotions/demotions at all with that privilege being confined to a new CA Manager role.
+
+NOTE: there are also
+/usr/local/ca/bin/do_OP_list.sh
+and
+/usr/local/ca/bin/do_RAemail_list.sh
+which do things like restart OpenCA (rather than wait for the overnight reset) and update the RAemail lists (which again I think happens overnight).
+
+Cheers
+
+JK
+===============================================
+#!/bin/bash
+
+DIR=/usr/local/ca/bin
+LIB=../lib/
+
+DBPROPS=../conf/database.properties
+
+if [ -z $JAVA_HOME ]; then
+    echo "ERROR: JAVA_HOME not found in your environment."
+    echo "Please set the JAVA_HOME variable in your environment to match the loc ation of the Java Virtual Machine you want to use."
+    exit 1
+fi
+
+function hlp
+{
+        echo -e "Usage: role_utilities.sh query SERIAL"
+        echo -e "   or: role_utilities.sh change NEWROLE SERIAL"
+        echo -e "   or: role_utilities.sh list ROLETYPE"
+        echo -e "\nMiscellaneous utilities for retrieving and changing roles whe re"
+        echo -e "\tquery\tShow role of user SERIAL where:"
+        echo -e "\t\t\tSERIAL = user's certificate serial in decimal"
+        echo -e "\tchange\tChange role to NEWROLE of user with serial SERIAL whe re:"
+        echo -e "\t\t\tNEWROLE = user's new role which can be: user|raop|caop"
+        echo -e "\t\t\tSERIAL = user's certificate serial in decimal"
+        echo -e "\tlist\tList all users with valid certificates of ROLETYPE: rao
+p|caop"
+        echo -e "Serials can be in hex or decimal.  In hex they must be preceded
+ by: 0x"
+        exit 1
+}
+
+if [[ $# -lt 2 ]] || [[ $# -gt 3 ]]
+then
+        hlp
+fi
+
+cd $DIR
+#add all jars from lib to JARS
+JARS=`find ${LIB} -name '*jar' | while read JAR_FILE; do \
+    echo -n ":$JAR_FILE"; \
+done`
+LOCALCLASSPATH=${JAVA_HOME}/lib/tools.jar${JARS}
+
+$JAVA_HOME/bin/java -classpath ${LOCALCLASSPATH} uk.ac.cclrc.esc.ca.utils.roleutils.Start -dbconfig $DBPROPS $@

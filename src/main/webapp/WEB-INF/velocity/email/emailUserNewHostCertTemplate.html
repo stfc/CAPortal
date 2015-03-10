@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <body>
+        Dear ${clientCN},<br/>
+        Thank you for requesting a new host certificate from the UK e-Science CA.<br/> 
+        The requested host certificate DNs is:<br/> 
+        [${requestedDN}]<br/>
+        <br/>
+        Now please contact one of your Registration Authority operators confirming that 
+        you submitted the request. The RA will then approve the request(s). 
+        Please remember PIN that you just used.  The RA will ask you for it.  It is to prove that *you* made the request.
+        <br/>
+        <br>
+        Your Registration Authority operator(s) are:<br/> 
+        ${raCNs}<br/>
+        <br/>
+        And their last known email addresses:<br/>
+        ${raEmails}<br/>
+        Please contact the CA if these RAs are unavailable.<br/> 
+        Yours faithfully,<br/>
+        CA Operator 
+        <br/>
+        <br/>
+        Please note: After your certificate request has been approved, 
+        if you get an authentication error when trying to access the portal 
+        then the chances are you may have a certificate from our CA that has now <b>expired</b>. 
+        To get round this you'll likely have to restart your browser and/or clear your Recent History
+        and this time press 'Cancel' if prompted to select your (expired) certificate.
+    </body>
+</html>

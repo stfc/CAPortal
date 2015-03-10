@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<!--
+Simple test script that imports the minified ForgeJS script and creates  
+keys, cert, .p12 and provides a download using FileSaver.js. 
+Check out the JavaScript console for log statements and results. 
+You can simply open this html file in your browser from disk. 
+-->
+<html>
+    <head>
+        <title>Forge test PKCS#12 in JS</title>
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+        <div>Check the JS console for test output (i.e. firebug, or Chrome's console). 
+            <br/>
+            (Tests: Create: keys, cert, .p12 then b64 encode .p12 and provide download using JS Blob)</div>
+        <br/>
+        <button id="runTest">Run Test</button><span id="pleaseWait"></span>
+        <div id="div1" style="width:80px;height:80px;background-color:red;"></div>
+        <br/>
+        Base64 encoded .p12 file text:
+        <br/>
+        <textarea id="privateKeyTextArea" style="width: 650px; height: 154px;"></textarea>
+        <br/>
+        You should also be prompted for a .p12 file download.
+        If this fails, you could paste in the b64 code above into the following 
+        site that will convert the b64 text into a binary .p12 file: 
+        <a href='http://www.opinionatedgeek.com/dotnet/tools/base64decode/'>
+            http://www.opinionatedgeek.com/dotnet/tools/base64decode/ 
+        </a>
+
+
+        <br/>
+        <br/>
+        <div id="linkHolder"></div>
+        
+<!--       <a href="" id="mydownloadURI">SampleDownloadURI</a>-->
+       
+       <br/>
+<!--        <a href="data:application/octet-stream;base64,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"
+         target="_blank" download="mycert.p12">SampleDownloadURI2</a>
+        <br/>-->
+<!--        <a href="data:application/octet-stream;base64,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"
+         target="_blank">SampleDownloadURI3</a>-->
+        
+
+
+        <script src="../../../main/webapp/resources/javascript/forge.min.js"></script>
+        <script src="../../../main/webapp/resources/javascript/FileSaver.js"></script>
+        <script src="../../../main/webapp/resources/javascript/base64.js"></script>
+        <script src="../../../main/webapp/resources/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript">
+
+// http://stackoverflow.com/questions/1964839/jquery-please-wait-loading-animation
+            $(document).ready(function() {
+                $('#div1').hide();
+
+                $('#runTest').click(function() {
+                    //$('#pleaseWait').text("Please wait, test running...");
+                    $('#div1').fadeIn("slow");
+                    runTest(); 
+                    //$('#pleaseWait').text("");
+                    $('#div1').fadeOut("slow");
+                });
+            });
+
+            function runTest() {
+                try {
+                    // generate a keypair
+                    console.log('Generating 1024-bit key-pair...');
+                    var keys = forge.pki.rsa.generateKeyPair(1024);
+                    console.log('Key-pair created.');
+
+                    // create a certificate
+                    console.log('Creating self-signed certificate...');
+                    var cert = forge.pki.createCertificate();
+                    cert.publicKey = keys.publicKey;
+                    cert.serialNumber = '01';
+                    cert.validity.notBefore = new Date();
+                    cert.validity.notAfter = new Date();
+                    cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1);
+                    var attrs = [{
+                            name: 'commonName',
+                            value: 'some body'
+                        }, {
+                            name: 'countryName',
+                            value: 'UK'
+                        },
+                        //{
+                        //  shortName: 'ST',
+                        //  value: 'Virginia'
+                        //}, 
+                        {
+                            name: 'localityName',
+                            value: 'DL'
+                        }, {
+                            name: 'organizationName',
+                            value: 'eScience'
+                        }, {
+                            shortName: 'OU',
+                            value: 'CLRC'
+                        }];
+                    cert.setSubject(attrs);
+                    cert.setIssuer(attrs);
+                    /*cert.setExtensions([{
+                     name: 'basicConstraints',
+                     cA: true
+                     }, {
+                     name: 'keyUsage',
+                     keyCertSign: true,
+                     digitalSignature: true,
+                     nonRepudiation: true,
+                     keyEncipherment: true,
+                     dataEncipherment: true
+                     }, {
+                     name: 'subjectAltName',
+                     altNames: [{
+                     type: 6, // URI
+                     value: 'http://example.org/webid#me'
+                     }]
+                     }]);
+                     */
+                    cert.setExtensions([{
+                            name: 'basicConstraints',
+                            cA: false/*,
+                             pathLenConstraint: 4*/
+                        }, {
+                            name: 'keyUsage',
+                            keyCertSign: true,
+                            digitalSignature: true,
+                            nonRepudiation: true,
+                            keyEncipherment: true,
+                            dataEncipherment: true
+                        }, {
+                            name: 'extKeyUsage',
+                            serverAuth: true,
+                            clientAuth: true,
+                            codeSigning: true,
+                            emailProtection: true,
+                            timeStamping: true
+                        }, {
+                            name: 'nsCertType',
+                            client: true,
+                            server: true,
+                            email: true,
+                            objsign: true,
+                            sslCA: true,
+                            emailCA: true,
+                            objCA: true
+                        }, {
+                            name: 'subjectAltName',
+                            altNames: [{
+                                    type: 6, // URI
+                                    value: 'http://example.org/webid#me'
+                                }, {
+                                    type: 7, // IP
+                                    ip: '127.0.0.1'
+                                }]
+                        }, {
+                            name: 'subjectKeyIdentifier'
+                        }]);
+
+                    // self-sign certificate
+                    cert.sign(keys.privateKey);
+                    console.log('Certificate created.');
+
+                    // create PKCS12
+                    console.log('\nCreating PKCS#12...');
+                    var password = 'password';
+                    var newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(
+                            keys.privateKey, [cert], password,
+                            {generateLocalKeyId: true, friendlyName: 'test', algorithm: '3des'});
+                    var newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
+
+                    console.log('\nBase64-encoded new PKCS#12:');
+                    var b64p12 = forge.util.encode64(newPkcs12Der);
+                    //console.log(b64p12);
+                   
+                    // create a dataURI link 
+                    //$('#mydownloadURI').attr('href', 'data:application/octet-stream;base64,'+b64p12);
+                    $('#linkHolder').after("<a href='data:application/octet-stream;base64,"+b64p12+"' download='myCertificate.p12'>Download link Added</a><br/>"); 
+ 
+                    $(document).ready(function() {
+                        $('#privateKeyTextArea').text(b64p12);
+                    });
+
+                    try { 
+                          var myBuffer = base64DecToArr(b64p12).buffer;
+                          // Blob object fails in Safari - TODO investigate alternative ways to 
+                          // prompt the user to download. 
+                          var p12blob = new Blob([myBuffer], {type: 'application/octet-stream'});
+                          //var p12blob = new Blob([newPkcs12Der], {type: 'application/octet-binary'});
+                          //var p12blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
+                          saveAs(p12blob, "myp12.p12");
+                    } catch(ex){
+                        // here show an alert asking user to copy the b64p12 
+                        // text locally, then run "base64 -d [FILE]"
+                        alert("Please copy the highlighted text to a file \n\
+                              and then run 'base64 -d [File] > mycertificate.p12'"); 
+                    }
+
+
+                    // create CA store (w/own certificate in this example)
+                    //var caStore = forge.pki.createCaStore([cert]);
+                    //console.log('\nLoading new PKCS#12 to confirm...');
+                    //loadPkcs12(newPkcs12Der, password, caStore);
+                }
+                catch (ex) {
+                    if (ex.stack) {
+                        console.log(ex.stack);
+                    }
+                    else {
+                        console.log('Error', ex);
+                    }
+                }
+            }
+
+            /*function loadPkcs12(pkcs12Der, password, caStore) {
+             var pkcs12Asn1 = forge.asn1.fromDer(pkcs12Der);
+             var pkcs12 = forge.pkcs12.pkcs12FromAsn1(pkcs12Asn1, false, password);
+             
+             // load keypair and cert chain from safe content(s) and map to key ID
+             var map = {};
+             for(var sci = 0; sci < pkcs12.safeContents.length; ++sci) {
+             var safeContents = pkcs12.safeContents[sci];
+             console.log('safeContents ' + (sci + 1));
+             
+             for(var sbi = 0; sbi < safeContents.safeBags.length; ++sbi) {
+             var safeBag = safeContents.safeBags[sbi];
+             console.log('safeBag.type: ' + safeBag.type);
+             
+             var localKeyId = null;
+             if(safeBag.attributes.localKeyId) {
+             localKeyId = forge.util.bytesToHex(
+             safeBag.attributes.localKeyId[0]);
+             console.log('localKeyId: ' + localKeyId);
+             if(!(localKeyId in map)) {
+             map[localKeyId] = {
+             privateKey: null,
+             certChain: []
+             };
+             }
+             }
+             else {
+             // no local key ID, skip bag
+             continue;
+             }
+             
+             // this bag has a private key
+             if(safeBag.type === forge.pki.oids.pkcs8ShroudedKeyBag) {
+             console.log('found private key');
+             map[localKeyId].privateKey = safeBag.key;
+             }
+             // this bag has a certificate
+             else if(safeBag.type === forge.pki.oids.certBag) {
+             console.log('found certificate');
+             map[localKeyId].certChain.push(safeBag.cert);
+             }
+             }
+             }
+             
+             console.log('\nPKCS#12 Info:');
+             
+             for(var localKeyId in map) {
+             var entry = map[localKeyId];
+             console.log('\nLocal Key ID: ' + localKeyId);
+             if(entry.privateKey) {
+             var privateKeyP12Pem = forge.pki.privateKeyToPem(entry.privateKey);
+             var encryptedPrivateKeyP12Pem = forge.pki.encryptRsaPrivateKey(
+             entry.privateKey, password);
+             
+             console.log('\nPrivate Key:');
+             console.log(privateKeyP12Pem);
+             console.log('Encrypted Private Key (password: "' + password + '"):');
+             console.log(encryptedPrivateKeyP12Pem);
+             }
+             else {
+             console.log('');
+             }
+             if(entry.certChain.length > 0) {
+             console.log('Certificate chain:');
+             var certChain = entry.certChain;
+             for(var i = 0; i < certChain.length; ++i) {
+             var certP12Pem = forge.pki.certificateToPem(certChain[i]);
+             console.log(certP12Pem);
+             }
+             
+             var chainVerified = false;
+             try {
+             chainVerified = forge.pki.verifyCertificateChain(caStore, certChain);
+             }
+             catch(ex) {
+             chainVerified = ex;
+             }
+             console.log('Certificate chain verified: ', chainVerified);
+             }
+             }
+             }*/
+
+
+        </script>
+
+
+    </body>
+
+
+
+</html>

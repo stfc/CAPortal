@@ -1,0 +1,21 @@
+
+We are looking into using JS in the browser to create CSRs and local private 
+keys that are never sent to the server. There are lots of available APIs 
+to do JS crypto, some mentioned below. Also useful links that are for/against 
+JS in the browser: 
+
+// great post here: 
+blog.opal.io/crypto-in-the-browser.html
+   Issues with JS in browser: 
+   http://www.matasano.com/articles/javascript-cryptography/ 
+   In defence of JS in the browser: 
+   http://blog.meadhbh.org/2013/08/in-defense-of-javascript-cryptography.html
+
+https://github.com/digitalbazaar/forge
+https://www.pidder.de/pidcrypt/
+https://code.google.com/p/crypto-js/
+https://github.com/tonyg/js-nacl
+kjur.github.io/jsrsasign/index.html
+
+// Worlds first test CA written entirley in JS: 
+kjur.github.io/jsrsasign/tool_ca.html

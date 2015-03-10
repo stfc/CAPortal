@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<!--
+Simple test script that imports the minified ForgeJS script and creates a 
+CSR, base64 encodes and a html5 download URI. 
+Check out the JavaScript console for log statements and results. 
+You can simply open this html file in your browser from disk. 
+David Meredith
+-->
+<html>
+    <head>
+        <title>Forge test CSR (PKCS#10) in JS</title>
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+        <div>Check the JS console for test output (i.e. firebug, or Chrome's console). 
+            <br/>
+            (Tests: Create: keys, csr, then b64 encode CSR and provide download)</div>
+        <br/>
+        <button id="runTest">Run Test</button><span id="pleaseWait"></span>
+        <br/>
+        Base64 encoded CSR text:
+        <br/>
+        <textarea id="csrTextArea" style="width: 650px; height: 154px;"></textarea>
+        <br/>
+        <!--You should also be prompted for a .p12 file download.
+        If this fails, you could paste in the b64 code above into the following 
+        site that will convert the b64 text into a binary .p12 file: 
+        <a href='http://www.opinionatedgeek.com/dotnet/tools/base64decode/'>
+            http://www.opinionatedgeek.com/dotnet/tools/base64decode/ 
+        </a>-->
+
+        <a href="#" id="mydownloadURI" class="btn btn-small btn-primary" target="_blank" download="usercertinfo.txt">Downloaduri</a>
+
+
+        <script src="../../../main/webapp/resources/javascript/forge.min.js"></script>
+        <script src="../../../main/webapp/resources/javascript/FileSaver.js"></script>
+        <script src="../../../main/webapp/resources/javascript/base64.js"></script>
+        <script src="../../../main/webapp/resources/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+
+
+                // See:  
+                // http://api.jquery.com/val/ 
+                // At present, using .val() on textarea elements strips carriage 
+                // return characters from the browser-reported value. When this 
+                // value is sent to the server via XHR however, carriage returns 
+                // are preserved (or added by browsers which do not include them 
+                // in the raw value). A workaround for this issue can be achieved 
+                // using a valHook as follows:
+                $.valHooks.textarea = {
+                  get: function(elem) {
+                    return elem.value.replace(/\r?\n/g, "\r\n");
+                  }
+                };
+
+
+                $('#runTest').click(function() {
+                    var csr = createCSR();
+                    $('#csrTextArea').text(csr.csr+'\n'+csr.privateKey);  
+                    var comments = "hello world \r\n this is your csr:\r\n"; 
+                    var csrval = $('#csrTextArea').val().replace(/\r?\n/g, "\r\n"); 
+                    $('#mydownloadURI').attr('href', 'data:text;base64,'+btoa(comments+csrval));    
+                });
+            });
+
+
+
+            function createCSR() {
+                //var forge = require('../js/forge');
+                console.log('Generating 2048-bit key-pair...');
+                var keys = forge.pki.rsa.generateKeyPair(2048);
+                console.log('Key-pair created.');
+
+                console.log('Creating certification request (CSR) ...');
+                var csr = forge.pki.createCertificationRequest();
+                csr.publicKey = keys.publicKey;
+                
+                csr.setSubject([
+                    // RFC 2253 RDNs in REVERSE ordering (C, O, OU, L, CN).  
+                    {
+                        name: 'countryName',
+                        value: 'UK'
+                    },
+                    {
+                        name: 'organizationName',
+                        value: 'eScience'
+                    },
+                    {
+                        shortName: 'OU',
+                        value: 'CLRC'
+                    },
+                    {
+                        name: 'localityName',
+                        value: 'DL'
+                    },
+                    {
+                        name: 'commonName',
+                        value: 'some valid body'
+                    }, 
+                    
+                    // Valid RFC 2253 RDNs and their ordering (CN, LOC, OU, O, C).  
+                    /*{
+                        name: 'commonName',
+                        value: 'some valid body'
+                    }, 
+                    {
+                        name: 'localityName',
+                        value: 'DL'
+                    },
+                    {
+                        shortName: 'OU',
+                        value: 'CLRC'
+                    },
+                    {
+                        name: 'organizationName',
+                        value: 'eScience'
+                    },
+                    {
+                        name: 'countryName',
+                        value: 'UK'
+                    },*/
+                    //{
+                    //  shortName: 'ST',
+                    //  value: 'Virginia'
+                    //}, 
+                      
+                ]);
+                // add optional attributes
+                /*csr.setAttributes([{
+                        name: 'challengePassword',
+                        value: 'password'
+                    }, {
+                        name: 'unstructuredName',
+                        value: 'My company'
+                    }, {
+                          name: 'subjectAltName',
+                          value: 'davidismeredith@world.com' 
+                    }
+                    ]);*/
+
+                // sign certification request (defaults to sha1) 
+                csr.sign(keys.privateKey/*, forge.md.sha256.create()*/);
+                console.log('Certification request (CSR) created.');
+
+                var algOpts = {algorithm: '3des'};
+                // PEM-format keys and csr
+                var pem = {
+                    //privateKey: forge.pki.privateKeyToPem(keys.privateKey),
+                    //privateKey: forge.pki.encryptRsaPrivateKey(keys.privateKey, 'password'),
+                    privateKey: forge.pki.encryptRsaPrivateKey(keys.privateKey, 'password', algOpts),
+                    publicKey: forge.pki.publicKeyToPem(keys.publicKey),
+                    csr: forge.pki.certificationRequestToPem(csr)
+                };
+
+                //console.log('\nKey-Pair:');
+                //console.log(pem.privateKey);
+                //console.log(pem.publicKey);
+                //console.log('\nCertification Request (CSR):');
+                //console.log(pem.csr);
+
+                // verify certification request
+                try {
+                    if (csr.verify()) {
+                        console.log('Certification request (CSR) verified.');
+                    }
+                    else {
+                        throw new Error('Signature not verified.');
+                    }
+                }
+                catch (err) {
+                    console.log('Certification request (CSR) verification failure: ' +
+                            JSON.stringify(err, null, 2));
+                }
+                return pem;
+            }
+
+            /*function loadPkcs12(pkcs12Der, password, caStore) {
+             var pkcs12Asn1 = forge.asn1.fromDer(pkcs12Der);
+             var pkcs12 = forge.pkcs12.pkcs12FromAsn1(pkcs12Asn1, false, password);
+             
+             // load keypair and cert chain from safe content(s) and map to key ID
+             var map = {};
+             for(var sci = 0; sci < pkcs12.safeContents.length; ++sci) {
+             var safeContents = pkcs12.safeContents[sci];
+             console.log('safeContents ' + (sci + 1));
+             
+             for(var sbi = 0; sbi < safeContents.safeBags.length; ++sbi) {
+             var safeBag = safeContents.safeBags[sbi];
+             console.log('safeBag.type: ' + safeBag.type);
+             
+             var localKeyId = null;
+             if(safeBag.attributes.localKeyId) {
+             localKeyId = forge.util.bytesToHex(
+             safeBag.attributes.localKeyId[0]);
+             console.log('localKeyId: ' + localKeyId);
+             if(!(localKeyId in map)) {
+             map[localKeyId] = {
+             privateKey: null,
+             certChain: []
+             };
+             }
+             }
+             else {
+             // no local key ID, skip bag
+             continue;
+             }
+             
+             // this bag has a private key
+             if(safeBag.type === forge.pki.oids.pkcs8ShroudedKeyBag) {
+             console.log('found private key');
+             map[localKeyId].privateKey = safeBag.key;
+             }
+             // this bag has a certificate
+             else if(safeBag.type === forge.pki.oids.certBag) {
+             console.log('found certificate');
+             map[localKeyId].certChain.push(safeBag.cert);
+             }
+             }
+             }
+             
+             console.log('\nPKCS#12 Info:');
+             
+             for(var localKeyId in map) {
+             var entry = map[localKeyId];
+             console.log('\nLocal Key ID: ' + localKeyId);
+             if(entry.privateKey) {
+             var privateKeyP12Pem = forge.pki.privateKeyToPem(entry.privateKey);
+             var encryptedPrivateKeyP12Pem = forge.pki.encryptRsaPrivateKey(
+             entry.privateKey, password);
+             
+             console.log('\nPrivate Key:');
+             console.log(privateKeyP12Pem);
+             console.log('Encrypted Private Key (password: "' + password + '"):');
+             console.log(encryptedPrivateKeyP12Pem);
+             }
+             else {
+             console.log('');
+             }
+             if(entry.certChain.length > 0) {
+             console.log('Certificate chain:');
+             var certChain = entry.certChain;
+             for(var i = 0; i < certChain.length; ++i) {
+             var certP12Pem = forge.pki.certificateToPem(certChain[i]);
+             console.log(certP12Pem);
+             }
+             
+             var chainVerified = false;
+             try {
+             chainVerified = forge.pki.verifyCertificateChain(caStore, certChain);
+             }
+             catch(ex) {
+             chainVerified = ex;
+             }
+             console.log('Certificate chain verified: ', chainVerified);
+             }
+             }
+             }*/
+
+
+        </script>
+
+
+    </body>
+
+
+
+</html>
