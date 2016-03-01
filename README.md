@@ -43,9 +43,9 @@ Configuration
   connection details and a path to the mutableproperties.properties file. 
 - Copy 'WEB-INF/mutableproperties.propertiesTEMPLATE' to 'WEB-INF/mutableproperties.properties' and update  
   to specify your details.
-- Configure your servlet container/server for client certificate authentication. This will vary 
+- Configure your WebServer and servlet container/server for client certificate authentication. This will vary 
   according to your server and can be quite complex (but is just a one time setup). 
-  See below for info on how to configure Tomcat. 
+  See below for info on how to configure Apache and Tomcat. 
 - Specify your preferred logging level in 'src/main/resources/log4j.xml'
 - Build
 
@@ -94,11 +94,85 @@ For Apache Tomcat, the shared/common lib dir is '<TOMCAT_HOME>/lib'
 
 
 
-Configuring Tomcat for client cert auth
+Configuring Front end WebServer  for Client Cert Auth
 ========================================
-Overview
---------
-Basically, you need to configure the Tomcat <Connector> (in server.xml) for SSL by specifying 
+Basically, you can either configure Tomcat as the front-end webserver (not recommended) or run Tomcat behind Apache HTTPD
+as a reverse proxy and let Apache perform the client certificate prompting/validation (strongly recommended). Both options are 
+detailed below. 
+
+##Use Apache HTTPD as front-end WebServer and configure Apache for SSL
+This is the recommended approach because apache is more configurable for SSL and client cert authentication. In your apache config, use mod_proxy to pass/reverse-pass requests to/from the tomcat instance via Tomcat's ajp connector. You will also need to use <Location> directives to specify the URLs that require client certificate verification. 
+Your apache installation will require configuring with the CA certificates for your CA and the host cert/key.
+
+Sample apache config fragment (not all shown): 
+```
+#   SSL Engine Switch:
+#   Enable/Disable SSL for this virtual host.
+SSLEngine on
+
+# Use mod_proxy to pass all requests to/from the target Tomcat's ajp connector
+ProxyPass         /  ajp://localhost:8009/
+ProxyPassReverse  /  ajp://localhost:8009/
+
+# Specify which webapp URLs need client certificate verification
+# (note we also specify the urls with trailing forward slash so that all 
+# child-urls also require client-cert auth, e.g. /caporta/cert_owner/) 
+ 
+# URLs for Cert owner pages
+<Location /caportal/cert_owner>
+  SSLVerifyClient require
+  SSLVerifyDepth 10
+</Location>
+<Location /caportal/cert_owner/>
+  SSLVerifyClient require
+  SSLVerifyDepth 10
+</Location>
+
+# URLs for RA ops pages
+<Location /caportal/raop>
+  SSLVerifyClient require
+  SSLVerifyDepth 10
+</Location>
+<Location /caportal/raop/>
+  SSLVerifyClient require
+  SSLVerifyDepth 10
+</Location>
+
+# URLs for CA operator pages
+<Location /caportal/caop>
+  SSLVerifyClient require
+  SSLVerifyDepth 10
+</Location>
+<Location /caportal/caop/>
+  SSLVerifyClient require
+  SSLVerifyDepth 10
+</Location>
+
+# this option is mandatory to force apache to forward the client cert data to tomcat
+SSLOptions +ExportCertData
+
+#   SSL Protocol support:
+# List the enable protocol levels with which clients will be able to
+# connect.  Disable SSLv2 access by default:
+SSLProtocol all -SSLv2 -SSLv3
+SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+
+# Specify host cert/key/CA certs etc 
+SSLCertificateFile /etc/grid-security/portal.ca.grid-support.ac.uk.crt
+SSLCertificateKeyFile /etc/grid-security/portal.ca.grid-support.ac.uk.key
+SSLCertificateChainFile /etc/grid-security/quovadis-chain.crt
+SSLCACertificatePath /etc/grid-security/certificates/
+SSLCARevocationPath  /etc/grid-security/certificates/
+```
+
+Sample tomcat server.xml fragment (not all shown):
+```
+<!-- Define an AJP 1.3 Connector on port 8009 -->
+<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
+```
+
+##Use Tomcat as front-end WebServer and configure Tomcat for SSL
+Not recommended. Basically, you need to configure the Tomcat <Connector> (in server.xml) for SSL by specifying 
 both a server certificate and trust (CA) certificates. Importantly, config of this element varies depending on  
 whether you choose to use the Tomcat APR (apache portable runtime) Connector or the 
 Tomcat JSSE Connector (the <Connector> supports different attributes depending on this choice
@@ -110,8 +184,7 @@ as shown below!).
 - See APR Connector: http://tomcat.apache.org/tomcat-6.0-doc/apr.html
 
 
-JSSE Connector SSL and Client Cert authentication
-------------------------------------------------
+###JSSE Connector SSL and Client Cert authentication
 - See JSSE Connector: http://tomcat.apache.org/tomcat-6.0-doc/config/http.html#SSL%20Support
 
 The validity of the client cert needs to be verified against the cert authority which 
@@ -164,8 +237,7 @@ setting, e.g:
   obtained from the JVM documentation for the allowed values for algorithm when creating an SSLContext instance e.g.
   Oracle Java 6 and Oracle Java 7.
  
- APR Connector SSL and Client Cert authentication
---------------------------------------------------
+### APR Connector SSL and Client Cert authentication
 - See APR Connector: http://tomcat.apache.org/tomcat-6.0-doc/apr.html
 - See: https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/ 
 
@@ -189,8 +261,7 @@ setting, e.g:
   The default is for the SSLProtocol attribute to be set to ALL, with other acceptable values being SSLv2, SSLv3, TLSv1 and SSLv2+SSLv3. 
   Starting with version 1.1.21 of the Tomcat native library any combination of the three protocols concatenated with a plus sign will be supported
 
-Notes
-------
+###Notes
 - By default, if the tomcat installation is native APR, then it will use the openssl 
 implementation, otherwise it will use the Java JSSE implementation. To avoid auto 
 configuration you can define which implementation to use by specifying a classname in 
