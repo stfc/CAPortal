@@ -100,7 +100,7 @@ Basically, you can either configure Tomcat as the front-end webserver (not recom
 as a reverse proxy and let Apache perform the client certificate prompting/validation (strongly recommended). Both options are 
 detailed below. 
 
-##Use Apache HTTPD as front-end WebServer and configure Apache for SSL
+##Use Apache HTTPD as front-end WebServer and configure Apache for SSL (apache acts as reverse proxy)
 This is the recommended approach because apache is more configurable for SSL and client cert authentication. In your apache config, use mod_proxy to pass/reverse-pass requests to/from the tomcat instance via Tomcat's ajp connector. You will also need to use <Location> directives to specify the URLs that require client certificate verification. 
 Your apache installation will require configuring with the CA certificates for your CA and the host cert/key.
 
