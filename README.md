@@ -104,6 +104,8 @@ detailed below.
 This is the recommended approach because apache is more configurable for SSL and client cert authentication. In your apache config, use mod_proxy to pass/reverse-pass requests to/from the tomcat instance via Tomcat's ajp connector. You will also need to use <Location> directives to specify the URLs that require client certificate verification. 
 Your apache installation will require configuring with the CA certificates for your CA and the host cert/key.
 
+See: [Tricks to do client cert auth behind reverse proxy](http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start)
+
 Sample apache config fragment (not all shown): 
 ```
 #   SSL Engine Switch:
