@@ -94,10 +94,10 @@ For Apache Tomcat, the shared/common lib dir is '<TOMCAT_HOME>/lib'
 
 
 
-Configuring Front end WebServer  for Client Cert Auth
+Configuring Front end WebServer for Client Cert Auth
 ========================================
 Basically, you can either configure Tomcat as the front-end webserver (not recommended) or run Tomcat behind Apache HTTPD
-as a reverse proxy and let Apache perform the client certificate prompting/validation (strongly recommended). Both options are 
+(apache acts as a reverse proxy) and let Apache perform the client certificate prompting/validation (strongly recommended). Both options are 
 detailed below. 
 
 ##Use Apache HTTPD as front-end WebServer and configure Apache for SSL (apache acts as reverse proxy)
