@@ -111,9 +111,9 @@ public class CaOpNode {
     public String nodeImport() {
         log.debug("import requested");
         //Check for stuff to import
-        //If nothing to import, delete ‘caportal-import.lock’ to re-enable Import button
+        //If nothing to import, delete caportal-import.lock to re-enable Import button
         //If true, start a global TX
-        //On commit (success), delete ‘caportal-import.lock’ to re-enable Import button 
+        //On commit (success), delete caportal-import.lock to re-enable Import button 
         //On rollback (fail), leave lock file and show error to CAop in porta i/f (needs manual intervention) 
         return "redirect:/caop/node";
     }
