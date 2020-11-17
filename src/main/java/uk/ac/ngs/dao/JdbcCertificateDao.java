@@ -177,7 +177,7 @@ public class JdbcCertificateDao {
         namedParameters.put("dn", rfc2253DN);
         //log.debug("notafter: ["+namedParameters.get("currentTime")+"]"); 
         String query = "select count(*) from certificate where dn ILIKE :dn and status='VALID' and notafter > :currentTime";
-        return this.jdbcTemplate.queryForInt(query, namedParameters); 
+        return this.jdbcTemplate.queryForObject(query, namedParameters, Integer.class);
     }
 
 
@@ -200,7 +200,7 @@ public class JdbcCertificateDao {
      * @return 
      */
     public int countAll() {
-        return this.jdbcTemplate.queryForInt("select count(*) from certificate", new HashMap<String, String>(0));
+        return this.jdbcTemplate.queryForObject("select count(*) from certificate", new HashMap<String, String>(0), Integer.class);
     }
 
     /**
@@ -242,7 +242,7 @@ public class JdbcCertificateDao {
      */
     public int countBy(Map<WHERE_PARAMS, String> whereByParams) {
         Pair<String, Map<String, Object>> p = this.buildQuery(SELECT_COUNT, whereByParams, null, null, false);
-        return this.jdbcTemplate.queryForInt(p.first, p.second);
+        return this.jdbcTemplate.queryForObject(p.first, p.second, Integer.class);
     }
 
     /**

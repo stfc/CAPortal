@@ -158,7 +158,7 @@ public class JdbcCrrDao {
      */
     public int countBy(Map<WHERE_PARAMS, String> whereByParams){
         Pair<String, Map<String, Object>> p = this.buildQuery(SELECT_COUNT, whereByParams, null, null, false);
-        return this.jdbcTemplate.queryForInt(p.first, p.second);  
+        return this.jdbcTemplate.queryForObject(p.first, p.second, Integer.class);
     }
 
     /**
@@ -278,7 +278,7 @@ public class JdbcCrrDao {
         // instance (thus lock on the shared class object). 
         synchronized (JdbcCrrDao.class) {
             // I have no idea why we have to add 256 - back compatiblity with OpenCA ?
-            return this.jdbcTemplate.getJdbcOperations().queryForLong("select max(crr_key) from crr") + 256;
+            return this.jdbcTemplate.getJdbcOperations().queryForObject("select max(crr_key) from crr", Long.class) + 256;
         }
     } 
     

@@ -170,7 +170,7 @@ public class JdbcRequestDao {
      */
     public int countBy(Map<WHERE_PARAMS, String> whereByParams){
         Pair<String, Map<String, Object>> p = this.buildQuery(SELECT_COUNT, whereByParams, null, null, false);
-        return this.jdbcTemplate.queryForInt(p.first, p.second); 
+        return this.jdbcTemplate.queryForObject(p.first, p.second, Integer.class);
     }
 
     /*public List<RequestRow> findByPublicKeyNotDeleted(String public_key){
@@ -193,7 +193,7 @@ public class JdbcRequestDao {
         Map<String, Object> namedParameters = new HashMap<String, Object>();
         namedParameters.put("public_key", public_key);
         //return this.jdbcTemplate.query(query, namedParameters, new RequestRowMapper()); 
-        return this.jdbcTemplate.queryForInt(query, namedParameters);
+        return this.jdbcTemplate.queryForObject(query, namedParameters, Integer.class);
     }
 
     /**
@@ -264,7 +264,7 @@ public class JdbcRequestDao {
                 " where dn ILIKE :dn and (status='NEW' or status = 'APPROVED' or status = 'RENEW')"; 
         Map<String, Object> namedParameters = new HashMap<String, Object>();
         namedParameters.put("dn", rfc2253DN);
-        return this.jdbcTemplate.queryForInt(query, namedParameters); 
+        return this.jdbcTemplate.queryForObject(query, namedParameters, Integer.class);
     }
     
 
@@ -383,7 +383,7 @@ public class JdbcRequestDao {
      */
     public long getNextPrimaryKey() {
         synchronized (JdbcRequestDao.class) {
-            Long current = this.jdbcTemplate.getJdbcOperations().queryForLong("select max(req_key) from request");
+            Long current = this.jdbcTemplate.getJdbcOperations().queryForObject("select max(req_key) from request", Long.class);
             return current + 256;
         }
     }

@@ -106,7 +106,7 @@ public class JdbcCaUserAuthDao {
         if(jdbcTemplate == null){
             throw new NullPointerException("jdbcTemplate is null - call setDataSource()"); 
         }
-        return this.jdbcTemplate.queryForInt("select count(*) from certificate", new HashMap<String, String>(0)); 
+        return this.jdbcTemplate.queryForObject("select count(*) from certificate", new HashMap<String, String>(0), Integer.class);
     }
     
 }

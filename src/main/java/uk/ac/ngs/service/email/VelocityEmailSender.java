@@ -13,17 +13,19 @@
 package uk.ac.ngs.service.email;
 
 import java.util.Map;
+import java.util.Properties;
 import javax.mail.internet.MimeMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.velocity.VelocityEngineUtils;
+//import org.springframework.ui.velocity.VelocityEngineUtils;
 
 /**
  * Sends an email using a named Velocity template for the message body.
@@ -37,6 +39,17 @@ public class VelocityEmailSender implements Sender {
 
     private final VelocityEngine velocityEngine;
     private final JavaMailSender mailSender;
+
+    @Bean
+    public VelocityEngine velocityEngine() throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty("input.encoding", "UTF-8");
+        properties.setProperty("output.encoding", "UTF-8");
+        properties.setProperty("resource.loader", "class");
+        properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        VelocityEngine velocityEngine = new VelocityEngine(properties);
+        return velocityEngine;
+    }
 
     /**
      * Constructor
@@ -62,9 +75,9 @@ public class VelocityEmailSender implements Sender {
                 message.setTo(msg.getTo());
                 message.setFrom(msg.getFrom());
                 message.setSubject(msg.getSubject());
-                String body = VelocityEngineUtils.mergeTemplateIntoString(
-                        velocityEngine, templateFileName, hTemplateVariables);
-
+                //String body = VelocityEngineUtils.mergeTemplate(
+                //        velocityEngine, templateFileName, hTemplateVariables);
+                String body = "";
                //logger.info("body={}", body);
                 message.setText(body, true);
             }
