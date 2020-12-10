@@ -12,12 +12,6 @@
  */
 package uk.ac.ngs.validation;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -29,12 +23,19 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- * Validate a PKCS#10 certification request (CSR) PEM <code>String</code>.  
- * 
+ * Validate a PKCS#10 certification request (CSR) PEM <code>String</code>.
+ * <p>
  * Typical usage outside of the Spring context requires you create an
  * {@link org.springframework.validation.Errors} implementation. You can use the
- * Spring MapBindingResult as shown below:  
+ * Spring MapBindingResult as shown below:
  * <code>
  * PKCS10Validator validator = new PKCS10Validator(validationConfigParams);
  * Errors errors = new MapBindingResult(new HashMap<String, String>(), "csrPemStrRequest");
@@ -49,8 +50,8 @@ public class PKCS10Validator implements Validator {
     // In future we could inject the required parameters 
     private final SignatureAlgorithmIdentifierFinder algFinder = new DefaultSignatureAlgorithmIdentifierFinder();
     private final AlgorithmIdentifier algIdExpected = algFinder.find("SHA1WITHRSAENCRYPTION"); // or "SHA1withRSA", "SHA1withRSAEncryption" 
-    private final PKCS10Parser csrParser = new PKCS10Parser(); 
-    private final CsrRequestValidationConfigParams validationConfigParams; 
+    private final PKCS10Parser csrParser = new PKCS10Parser();
+    private final CsrRequestValidationConfigParams validationConfigParams;
 
     // http://stackoverflow.com/questions/12146298/spring-mvc-how-to-perform-validation
     // http://www.dzone.com/tutorials/java/spring/spring-form-validation-1.html
@@ -58,11 +59,12 @@ public class PKCS10Validator implements Validator {
 
 
     /**
-     * Construct a new instance and specify allowed values in the given {@link CsrRequestValidationConfigParams} 
-     * @param validationConfigParams 
+     * Construct a new instance and specify allowed values in the given {@link CsrRequestValidationConfigParams}
+     *
+     * @param validationConfigParams
      */
-    public PKCS10Validator(CsrRequestValidationConfigParams validationConfigParams){
-       this.validationConfigParams = validationConfigParams; 
+    public PKCS10Validator(CsrRequestValidationConfigParams validationConfigParams) {
+        this.validationConfigParams = validationConfigParams;
     }
 
     @Override
@@ -123,7 +125,7 @@ public class PKCS10Validator implements Validator {
                 return;
             }
 
-        }catch (InvalidKeyException ex) {
+        } catch (InvalidKeyException ex) {
             Logger.getLogger(PKCS10Validator.class.getName()).log(Level.WARNING, null, ex);
             e.reject("pkcs10.validation.invalidkeyspecexception", "Invalid PKCS10 key");
         } catch (NoSuchAlgorithmException ex) {

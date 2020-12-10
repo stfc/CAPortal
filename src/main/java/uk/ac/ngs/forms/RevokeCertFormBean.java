@@ -16,16 +16,17 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
 /**
- * Form submission bean for revoking a certificate. 
- * @author David Meredith  
+ * Form submission bean for revoking a certificate.
+ *
+ * @author David Meredith
  */
 public class RevokeCertFormBean {
 
-    @Min(value=0, message="0 is minimum")
-    private long cert_key; 
+    @Min(value = 0, message = "0 is minimum")
+    private long cert_key;
 
-    @Pattern(message="Value required (Invalid chars \" ' ; `)", regexp="^[^\"';`]+$") 
-    private String reason; 
+    @Pattern(message = "Value required (Invalid chars \" ' ; `)", regexp = "^[^\"';`]+$")
+    private String reason;
 
     /**
      * @return the cert_key
@@ -55,6 +56,5 @@ public class RevokeCertFormBean {
         this.reason = reason;
     }
 
-    
-    
+
 }

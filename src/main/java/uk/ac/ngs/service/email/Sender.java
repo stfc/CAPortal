@@ -13,22 +13,24 @@
 
 package uk.ac.ngs.service.email;
 
-import java.util.Map;
 import org.springframework.mail.SimpleMailMessage;
 
+import java.util.Map;
+
 /**
- * Sends and email message. 
+ * Sends and email message.
+ *
  * @author David Meredith
  */
 public interface Sender {
-    
-   /**
-     * Sends e-mail using a named template file (e.g. Velocity template) for the 
+
+    /**
+     * Sends e-mail using a named template file (e.g. Velocity template) for the
      * body and the properties passed in as variables.
      *
-     * @param msg                 The e-mail message to be sent, except for the body.
-     * @param hTemplateVariables  Variables to use when processing the template.
-     * @param templateFileName The name of the template file in which to bind variables. 
+     * @param msg                The e-mail message to be sent, except for the body.
+     * @param hTemplateVariables Variables to use when processing the template.
+     * @param templateFileName   The name of the template file in which to bind variables.
      */
-    public void send(SimpleMailMessage msg, Map<String, Object> hTemplateVariables, String templateFileName); 
+    void send(SimpleMailMessage msg, Map<String, Object> hTemplateVariables, String templateFileName);
 }

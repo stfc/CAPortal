@@ -12,81 +12,90 @@
  */
 package uk.ac.ngs.forms;
 
-import java.io.Serializable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 //import org.hibernate.validator.constraints.NotEmpty;
 
 /**
- * Search certificate form bean. 
- * @author David Meredith
+ * Search certificate form bean.
  *
+ * @author David Meredith
  */
 public class SearchCertFormBean implements Serializable {
 
-    @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$") 
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
     private String ra;
-    
-    @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-    private String name; 
-    
-    @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-    private String emailAddress; 
-    
-    private Boolean searchNullEmailAddress = false; 
-    
+
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String name;
+
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String emailAddress;
+
+    private Boolean searchNullEmailAddress = false;
+
     //@Pattern(message="Invalid chars, valid: a-zA-Z0-9_ .-,@=", regexp="[a-zA-Z0-9_\\-,@.%\\s=/\\\\]*")
-    @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-    private String dn; 
-    
-    @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String dn;
+
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
     private String role;
-    
-    @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-    private String data;        
-    
-    @Min(value=0, message="0 is minimum")
-    private Integer serial; 
-    
-    @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-    private String status; 
-    
-    @Min(value=0, message="0 is minimum")
-    private Integer showRowCount = 10; 
-   
-    @Min(value=0, message="0 is minimum")
-    private Integer startRow = 0; 
-     
-    private Boolean notExpired = true; 
-    
+
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String data;
+
+    @Min(value = 0, message = "0 is minimum")
+    private Integer serial;
+
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String status;
+
+    @Min(value = 0, message = "0 is minimum")
+    private Integer showRowCount = 10;
+
+    @Min(value = 0, message = "0 is minimum")
+    private Integer startRow = 0;
+
+    private Boolean notExpired = true;
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getEmailAddress() {
         return emailAddress;
     }
+
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
     }
+
     public String getDn() {
         return dn;
     }
+
     public void setDn(String dn) {
         this.dn = dn;
     }
+
     public String getRole() {
         return role;
     }
+
     public void setRole(String role) {
         this.role = role;
     }
+
     public Integer getSerial() {
         return serial;
     }
+
     public void setSerial(Integer serial) {
         this.serial = serial;
     }
@@ -188,5 +197,5 @@ public class SearchCertFormBean implements Serializable {
     public void setRa(String ra) {
         this.ra = ra;
     }
-    
+
 }

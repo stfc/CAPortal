@@ -12,12 +12,6 @@
  */
 package uk.ac.ngs.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +19,13 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import uk.ac.ngs.domain.RalistRow;
+
+import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO for the CA DB
@@ -39,7 +40,7 @@ public class JdbcRalistDao {
     private static final Log log = LogFactory.getLog(JdbcRalistDao.class);
     private static final String LIMIT_ROWS = "LIMIT :limit ";
     private static final String OFFSET_ROWS = "OFFSET :offset ";
-    private static final String ORDER_BY = "order by order_id "; 
+    private static final String ORDER_BY = "order by order_id ";
     public static final String SQL_SELECT_ALL = "select ra_id, order_id, ou, l, active from ralist ";
 
     /**
@@ -89,23 +90,23 @@ public class JdbcRalistDao {
     }*/
 
     /**
-     * Return all the rows in the <code>ralist</code> table according to 
+     * Return all the rows in the <code>ralist</code> table according to
      * whether the row is active (or not).
      *
-     * @param active true or false (null for any active state)  
-     * @param limit to this many rows (null is for no limit)
+     * @param active true or false (null for any active state)
+     * @param limit  to this many rows (null is for no limit)
      * @param offset results by this number of rows (null for no offset)
      * @return
      */
     public List<RalistRow> findAllByActive(Boolean active, Integer limit, Integer offset) {
         Map<String, Object> namedParameters = new HashMap<String, Object>();
         String query = SQL_SELECT_ALL;
-        if(active != null){
-          query += "where active = :active " ;   
-          namedParameters.put("active", active); 
+        if (active != null) {
+            query += "where active = :active ";
+            namedParameters.put("active", active);
         }
-        query += ORDER_BY; 
-        
+        query += ORDER_BY;
+
         // limit/offset 
         if (limit != null) {
             query += LIMIT_ROWS;

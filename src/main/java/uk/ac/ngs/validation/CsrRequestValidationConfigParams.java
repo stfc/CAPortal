@@ -12,70 +12,71 @@
  */
 package uk.ac.ngs.validation;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
 import uk.ac.ngs.dao.JdbcRalistDao;
 import uk.ac.ngs.domain.RalistRow;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Defines valid lookup values for various PKCS10 (CSR) parameters. 
- * This class is a common dependency when validating CSRs - the values 
- * defined in this class are compared against the requested CSR parameters. 
- * 
- * @author David Meredith 
+ * Defines valid lookup values for various PKCS10 (CSR) parameters.
+ * This class is a common dependency when validating CSRs - the values
+ * defined in this class are compared against the requested CSR parameters.
+ *
+ * @author David Meredith
  */
 public class CsrRequestValidationConfigParams {
-   
-    private String countryOID; 
-    private String orgNameOID; 
-    private int minModulus = 2048; 
-    private int minExponent = 5; 
+
+    private String countryOID;
+    private String orgNameOID;
+    private int minModulus = 2048;
+    private int minExponent = 5;
     private JdbcRalistDao ralistDao;
 
     /**
-     * Create an instance. 
+     * Create an instance.
      * If calling <code>getValidLocalities()</code> or <code>getValidOrgUnits</code>
-     * then <code>setRalistDao()</code> must be called. 
-     * 
+     * then <code>setRalistDao()</code> must be called.
+     *
      * @param countryOID The supported country for the 'C' RDN in a CSR DN
      * @param orgNameOID The supported organisation name for 'O' RDN in a CSR
      */
-    public CsrRequestValidationConfigParams(String countryOID, String orgNameOID){
-      this.countryOID = countryOID; 
-      this.orgNameOID = orgNameOID; 
+    public CsrRequestValidationConfigParams(String countryOID, String orgNameOID) {
+        this.countryOID = countryOID;
+        this.orgNameOID = orgNameOID;
     }
 
     /**
      * @return A list of known/valid RA Localities
      */
-    public List<String> getValidLocalities(){
-        if(ralistDao == null){
-            throw new NullPointerException("ralistDao is null - use class setter"); 
+    public List<String> getValidLocalities() {
+        if (ralistDao == null) {
+            throw new NullPointerException("ralistDao is null - use class setter");
         }
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
         List<String> locArray = new ArrayList<String>(rows.size());
         for (RalistRow row : rows) {
-            locArray.add(row.getL().trim()); 
+            locArray.add(row.getL().trim());
         }
-        return locArray; 
+        return locArray;
     }
 
     /**
-     * @return A list of known/valid RA Organisation Units  
+     * @return A list of known/valid RA Organisation Units
      */
-    public List<String> getValidOrgUnits(){
-        if(ralistDao == null){
-            throw new NullPointerException("ralistDao is null - use class setter"); 
+    public List<String> getValidOrgUnits() {
+        if (ralistDao == null) {
+            throw new NullPointerException("ralistDao is null - use class setter");
         }
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
         List<String> ouArray = new ArrayList<String>(rows.size());
         for (RalistRow row : rows) {
-            ouArray.add(row.getOu().trim()); 
+            ouArray.add(row.getOu().trim());
         }
-        return ouArray; 
+        return ouArray;
     }
-    
+
     /**
      * @param ralistDao the ralistDao to set
      */
@@ -140,6 +141,5 @@ public class CsrRequestValidationConfigParams {
         this.minExponent = minExponent;
     }
 
-    
-    
+
 }

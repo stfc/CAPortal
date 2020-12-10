@@ -12,15 +12,8 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,6 +29,11 @@ import uk.ac.ngs.security.CaUser;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
 
+import javax.inject.Inject;
+import java.util.*;
+
+//import org.springframework.security.core.GrantedAuthority;
+
 /**
  * @author David Meredith
  */
@@ -50,12 +48,10 @@ public class RaOpHome {
     private JdbcCrrDao jdbcCrrDao;
 
     public RaOpHome() {
-        log.debug(RaOpHome.class.getName()+" ***created dave***"); 
+        log.debug(RaOpHome.class.getName() + " ***created dave***");
     }
 
 
-    
-    
     @ModelAttribute
     public void populateModel(Model model) {
         log.debug("raop populateModel");
@@ -99,13 +95,13 @@ public class RaOpHome {
         // Fetch a list of pending CRRs for the RA 
         Map<JdbcCrrDao.WHERE_PARAMS, String> crrWhereParams = new HashMap<JdbcCrrDao.WHERE_PARAMS, String>();
         crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.STATUS_EQ, "NEW"); //NEW,APPROVED,ARCHIVED,DELETED 
-        crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.DN_LIKE, "%L="+L+",OU="+OU+"%"); 
+        crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.DN_LIKE, "%L=" + L + ",OU=" + OU + "%");
         List<CrrRow> crrRows = jdbcCrrDao.findBy(crrWhereParams, null, null);
-        log.debug("crrRows size: ["+crrRows.size()+"]"); 
-        crrRows = jdbcCrrDao.setSubmitDateFromData(crrRows); 
+        log.debug("crrRows size: [" + crrRows.size() + "]");
+        crrRows = jdbcCrrDao.setSubmitDateFromData(crrRows);
         model.addAttribute("crr_reqrows", crrRows);
 
-        model.addAttribute("lastPageRefreshDate", new Date()); 
+        model.addAttribute("lastPageRefreshDate", new Date());
     }
 
     /**

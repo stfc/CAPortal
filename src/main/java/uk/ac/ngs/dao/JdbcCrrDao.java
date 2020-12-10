@@ -12,19 +12,6 @@
  */
 package uk.ac.ngs.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +21,16 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import uk.ac.ngs.common.Pair;
 import uk.ac.ngs.domain.CrrRow;
+
+import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * DAO for the <code>crr</code> DB table.
@@ -48,38 +45,38 @@ public class JdbcCrrDao {
     private static final Log log = LogFactory.getLog(JdbcCrrDao.class);
     private final static Pattern DATA_SUBMIT_DATE_PATTERN = Pattern.compile("^\\s*SUBMIT_DATE\\s*=\\s*(.+)$", Pattern.MULTILINE);
     /*
-     * Define SQL query fragments used to build the DAOs queries. 
+     * Define SQL query fragments used to build the DAOs queries.
      */
     public static final String SELECT_PROJECT = "select crr_key, cert_key, submit_date, "
             + "format, data, dn, cn, email, ra, rao, status, reason, loa from crr ";
     public static final String SELECT_COUNT = "select count(*) from crr ";
-    private static final String SELECT_BY_ID = SELECT_PROJECT+"where crr_key = :crr_key "; 
-      private final DateFormat utcDateFormat = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy zzz");
+    private static final String SELECT_BY_ID = SELECT_PROJECT + "where crr_key = :crr_key ";
+    private final DateFormat utcDateFormat = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy zzz");
     private final static Pattern DATA_RAOP_PATTERN = Pattern.compile("RAOP\\s?=\\s?([0-9]+)\\s*$", Pattern.MULTILINE);
     private final static Pattern DATA_DELETED_DATE_PATTERN = Pattern.compile("DELETED_DATE\\s?=\\s?([^\\n]+)$", Pattern.MULTILINE);
 
-     // Both these formats have/may be used by different tools that build the 
+    // Both these formats have/may be used by different tools that build the
     // CSR data column (OpenCA, CAServer) 
     private final DateFormat dataNotBeforeDateFormat1 = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy zzz");
     private final DateFormat dataNotBeforeDateFormat2 = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy");
 
 
-    public JdbcCrrDao(){
+    public JdbcCrrDao() {
         this.utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
-    
+
     /**
-     * Keys for defining 'where' parameters and values for building queries.  
+     * Keys for defining 'where' parameters and values for building queries.
      * <p>
      * If the key ends with '_LIKE' then the where clause is appended with a SQL
-     * 'like' clause (e.g. <code>key like 'value'</code>). 
-     * If the key ends with '_EQ' then the where clause is appended  with a SQL 
-     * '=' clause (e.g. <code>key = 'value'</code>). 
+     * 'like' clause (e.g. <code>key like 'value'</code>).
+     * If the key ends with '_EQ' then the where clause is appended  with a SQL
+     * '=' clause (e.g. <code>key = 'value'</code>).
      */
-    public static enum WHERE_PARAMS {
+    public enum WHERE_PARAMS {
 
         DN_HAS_RA_LIKE, RA_EQ, STATUS_EQ, DN_LIKE, DATA_LIKE, CN_LIKE
-    };
+    }
 
     /**
      * Set the JDBC dataSource.
@@ -96,12 +93,12 @@ public class JdbcCrrDao {
         public CrrRow mapRow(ResultSet rs, int rowNum) throws SQLException {
             CrrRow row = new CrrRow();
             long lValcrr_key = rs.getLong("crr_key");
-            if(!rs.wasNull()){
-                row.setCrr_key(lValcrr_key); 
+            if (!rs.wasNull()) {
+                row.setCrr_key(lValcrr_key);
             }
-            long lValcert_key = rs.getLong("cert_key"); 
-            if(!rs.wasNull()){
-                row.setCert_key(lValcert_key); 
+            long lValcert_key = rs.getLong("cert_key");
+            if (!rs.wasNull()) {
+                row.setCert_key(lValcert_key);
             }
             row.setSubmit_date(rs.getString("submit_date"));
             row.setFormat(rs.getString("format"));
@@ -119,10 +116,11 @@ public class JdbcCrrDao {
     }
 
     /**
-     * Find the specified revocation request in the <code>crr</code> table with 
-     * the given <code>crr_key</code>. 
+     * Find the specified revocation request in the <code>crr</code> table with
+     * the given <code>crr_key</code>.
+     *
      * @param crr_key
-     * @return or null if no row is found.  
+     * @return or null if no row is found.
      */
     public CrrRow findById(long crr_key) {
         Map<String, Object> namedParameters = new HashMap<String, Object>();
@@ -134,29 +132,30 @@ public class JdbcCrrDao {
             return null;
         }
     }
-    
+
     /**
-     * Search for revocation requests using the search criteria specified in the given 
-     * where-by parameter map. 
-     * Multiple whereByParams are appended together using 'and' statements. 
-     * 
-     * @param whereByParams Search-by parameters used in where clause of SQL query. 
-     * @param limit Limit the returned row count to this many rows or null not to specify a limit.   
-     * @param offset Return rows from this row number or null not to specify an offset.  
-     * @return 
+     * Search for revocation requests using the search criteria specified in the given
+     * where-by parameter map.
+     * Multiple whereByParams are appended together using 'and' statements.
+     *
+     * @param whereByParams Search-by parameters used in where clause of SQL query.
+     * @param limit         Limit the returned row count to this many rows or null not to specify a limit.
+     * @param offset        Return rows from this row number or null not to specify an offset.
+     * @return
      */
     public List<CrrRow> findBy(Map<WHERE_PARAMS, String> whereByParams, Integer limit, Integer offset) {
         Pair<String, Map<String, Object>> p = this.buildQuery(SELECT_PROJECT, whereByParams, limit, offset, true);
-        log.debug("query: "+p.first); 
+        log.debug("query: " + p.first);
         return this.jdbcTemplate.query(p.first, p.second, new CrrRowMapper());
     }
 
     /**
-     * Count the total number of revocation requests using the search criteria specified 
-     * in the given where-by parameter map. 
-     * @see #findBy(java.util.Map, java.lang.Integer, java.lang.Integer)  
+     * Count the total number of revocation requests using the search criteria specified
+     * in the given where-by parameter map.
+     *
+     * @see #findBy(java.util.Map, java.lang.Integer, java.lang.Integer)
      */
-    public int countBy(Map<WHERE_PARAMS, String> whereByParams){
+    public int countBy(Map<WHERE_PARAMS, String> whereByParams) {
         Pair<String, Map<String, Object>> p = this.buildQuery(SELECT_COUNT, whereByParams, null, null, false);
         return this.jdbcTemplate.queryForObject(p.first, p.second, Integer.class);
     }
@@ -176,10 +175,10 @@ public class JdbcCrrDao {
                 Matcher matcher = DATA_SUBMIT_DATE_PATTERN.matcher(data);
                 if (matcher.find()) {
                     // TODO create a date here instead of string 
-                    String dateTimeString = matcher.group(1); 
+                    String dateTimeString = matcher.group(1);
                     Date d = null;
                     try {
-                           d = dataNotBeforeDateFormat1.parse(dateTimeString);
+                        d = dataNotBeforeDateFormat1.parse(dateTimeString);
                     } catch (ParseException ex) {
                     }
                     if (d == null) {
@@ -189,9 +188,9 @@ public class JdbcCrrDao {
                         }
                     }
                     if (d == null) {
-                        log.error("Error - can't parse CSR Data column NOTBEFORE attribute ["+dateTimeString+"]");
+                        log.error("Error - can't parse CSR Data column NOTBEFORE attribute [" + dateTimeString + "]");
                     }
-                    row.setDataSubmit_Date(d); 
+                    row.setDataSubmit_Date(d);
                     //row.setDataSubmit_Date(dateTimeString);
                 }
             }
@@ -199,14 +198,14 @@ public class JdbcCrrDao {
         return rows;
     }
 
-    
+
     /**
-     * Update the 'crr' table with the values from the given CrrRow. 
-     * The given CrrRow must have a populated <code>crr_key</code> value to 
-     * identify the correct row in the DB. 
-     * 
-     * @param crr Extracts values from this crr to update the db. 
-     * @return Number of rows updated (should always be 1) 
+     * Update the 'crr' table with the values from the given CrrRow.
+     * The given CrrRow must have a populated <code>crr_key</code> value to
+     * identify the correct row in the DB.
+     *
+     * @param crr Extracts values from this crr to update the db.
+     * @return Number of rows updated (should always be 1)
      */
     public int updateCrrRow(CrrRow crr) {
         if (crr.getCrr_key() <= 0) {
@@ -221,32 +220,31 @@ public class JdbcCrrDao {
     }
 
 
-   
     /**
-     * Update the given data string according to the value of the given status and RAOP id. 
-     * A new RAOP key-value pair is appended after the last RAOP entry. 
-     * 
+     * Update the given data string according to the value of the given status and RAOP id.
+     * A new RAOP key-value pair is appended after the last RAOP entry.
+     *
      * @param data
      * @param newStatus
      * @param raopId
-     * @return updated string (never null) 
+     * @return updated string (never null)
      */
-    public String updateDataCol_StatusRaop(String data, String newStatus, long raopId){
-        if(data == null) {
-            data = "-----END HEADER-----"; 
+    public String updateDataCol_StatusRaop(String data, String newStatus, long raopId) {
+        if (data == null) {
+            data = "-----END HEADER-----";
         }
         // Always Update/add RAOP 
-        Matcher raopMatcher = DATA_RAOP_PATTERN.matcher(data); 
+        Matcher raopMatcher = DATA_RAOP_PATTERN.matcher(data);
         if (raopMatcher.find()) {
             // append a new 'RAOP = raopId' line after the last found RAOP line
-            int lastIndex = raopMatcher.end(); 
+            int lastIndex = raopMatcher.end();
             while (raopMatcher.find()) {
                 lastIndex = raopMatcher.end();
             }
-            String dataStart = data.substring(0, lastIndex); 
-            String dataMiddle = "\nRAOP = "+raopId; 
-            String dataEnd = data.substring(lastIndex, data.length()); 
-            data = dataStart+dataMiddle+dataEnd; 
+            String dataStart = data.substring(0, lastIndex);
+            String dataMiddle = "\nRAOP = " + raopId;
+            String dataEnd = data.substring(lastIndex);
+            data = dataStart + dataMiddle + dataEnd;
             // We don't replace all as we want to maintain a history  
             //data = raopMatcher.replaceAll("RAOP = " + raopId);
         } else {
@@ -266,12 +264,12 @@ public class JdbcCrrDao {
         // no other status supported yet
         return data;
     }
-    
 
 
     /**
-     * Get the next 'crr' table public key. 
-     * @return 
+     * Get the next 'crr' table public key.
+     *
+     * @return
      */
     public long getNextCrr_key() {
         // We need to synch on the same lock regardless of the JdbcCrrDao 
@@ -280,15 +278,15 @@ public class JdbcCrrDao {
             // I have no idea why we have to add 256 - back compatiblity with OpenCA ?
             return this.jdbcTemplate.getJdbcOperations().queryForObject("select max(crr_key) from crr", Long.class) + 256;
         }
-    } 
-    
+    }
+
     /**
-     * Insert a new row into the 'crr' table using the values from the given CrrRow. 
-     * Important: the crr_key (PK) must be set to a value that is not already in use 
-     * (the row PK is set by the calling client and not a db sequence -  
+     * Insert a new row into the 'crr' table using the values from the given CrrRow.
+     * Important: the crr_key (PK) must be set to a value that is not already in use
+     * (the row PK is set by the calling client and not a db sequence -
      * this is an inherited legacy issue).
-     * 
-     * @param crr 
+     *
+     * @param crr
      * @return the number of rows affected (should always be 1)
      */
     public int insertCrrRow(CrrRow crr) {
@@ -298,7 +296,7 @@ public class JdbcCrrDao {
         Map<String, Object> namedParameters = this.buildParameterMap(crr);
         String INSERT_CRR = "insert into crr (crr_key, cert_key, submit_date, format, data, dn, cn, email, ra, rao, status, reason, loa) "
                 + "values(:crr_key, :cert_key, :submit_date, :format, :data, :dn, :cn, :email, :ra, :rao, :status, :reason, :loa)";
-        
+
         return this.jdbcTemplate.update(INSERT_CRR, namedParameters);
     }
 
@@ -319,7 +317,7 @@ public class JdbcCrrDao {
         namedParameters.put("crr_key", crr.getCrr_key());
         return namedParameters;
     }
-    
+
 
     /**
      * Build up the query using the given where by parameters in the map and
@@ -327,35 +325,35 @@ public class JdbcCrrDao {
      * parameter-binding/execution.
      */
     protected Pair<String, Map<String, Object>> buildQuery(String selectStatement,
-            Map<WHERE_PARAMS, String> whereByParams, Integer limit, Integer offset, boolean orderby) {
+                                                           Map<WHERE_PARAMS, String> whereByParams, Integer limit, Integer offset, boolean orderby) {
 
         String whereClause = "";
         Map<String, Object> namedParameters = new HashMap<String, Object>();
         if (whereByParams != null && !whereByParams.isEmpty()) {
             StringBuilder whereBuilder = new StringBuilder("where ");
-             if (whereByParams.containsKey(WHERE_PARAMS.RA_EQ)) {
+            if (whereByParams.containsKey(WHERE_PARAMS.RA_EQ)) {
                 whereBuilder.append("ra = :ra and ");
-                namedParameters.put("ra", whereByParams.get(WHERE_PARAMS.RA_EQ)); 
-             }
+                namedParameters.put("ra", whereByParams.get(WHERE_PARAMS.RA_EQ));
+            }
             if (whereByParams.containsKey(WHERE_PARAMS.DN_HAS_RA_LIKE)) {
                 whereBuilder.append("dn like :dnhasralike and ");
-                namedParameters.put("dnhasralike", whereByParams.get(WHERE_PARAMS.DN_HAS_RA_LIKE)); 
+                namedParameters.put("dnhasralike", whereByParams.get(WHERE_PARAMS.DN_HAS_RA_LIKE));
             }
             if (whereByParams.containsKey(WHERE_PARAMS.STATUS_EQ)) {
                 whereBuilder.append("status = :status and ");
                 namedParameters.put("status", whereByParams.get(WHERE_PARAMS.STATUS_EQ));
             }
-            if(whereByParams.containsKey(WHERE_PARAMS.DN_LIKE)){
+            if (whereByParams.containsKey(WHERE_PARAMS.DN_LIKE)) {
                 whereBuilder.append("dn like :dn and ");
-                namedParameters.put("dn", whereByParams.get(WHERE_PARAMS.DN_LIKE)); 
+                namedParameters.put("dn", whereByParams.get(WHERE_PARAMS.DN_LIKE));
             }
-            if(whereByParams.containsKey(WHERE_PARAMS.CN_LIKE)){
+            if (whereByParams.containsKey(WHERE_PARAMS.CN_LIKE)) {
                 whereBuilder.append("cn like :cn and ");
-                namedParameters.put("cn", whereByParams.get(WHERE_PARAMS.CN_LIKE)); 
+                namedParameters.put("cn", whereByParams.get(WHERE_PARAMS.CN_LIKE));
             }
-            if(whereByParams.containsKey(WHERE_PARAMS.DATA_LIKE)){
-                whereBuilder.append("data like :data and "); 
-                namedParameters.put("data", whereByParams.get(WHERE_PARAMS.DATA_LIKE)); 
+            if (whereByParams.containsKey(WHERE_PARAMS.DATA_LIKE)) {
+                whereBuilder.append("data like :data and ");
+                namedParameters.put("data", whereByParams.get(WHERE_PARAMS.DATA_LIKE));
             }
             // Always trim leading/trailing whitespace and remove trailling and (if any) 
             whereClause = whereBuilder.toString().trim();
@@ -366,10 +364,10 @@ public class JdbcCrrDao {
         }
         // Build up the sql statement. 
         String sql = selectStatement + whereClause;
-        if(orderby){
-            sql = sql + " order by crr_key"; 
+        if (orderby) {
+            sql = sql + " order by crr_key";
         }
-        
+
         if (limit != null) {
             sql = sql + " LIMIT :limit";
             namedParameters.put("limit", limit);

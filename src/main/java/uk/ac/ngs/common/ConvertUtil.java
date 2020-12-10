@@ -12,8 +12,11 @@
  */
 package uk.ac.ngs.common;
 
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -22,7 +25,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * Utility class for base64 encoding and decoding of PublicKeys. The class also
@@ -43,7 +45,7 @@ public class ConvertUtil {
         try {
             java.security.MessageDigest d = java.security.MessageDigest.getInstance("SHA-1");
             d.reset();
-            d.update(originalValue.getBytes("UTF-8"));
+            d.update(originalValue.getBytes(StandardCharsets.UTF_8));
             byte[] b = d.digest();
 
             StringBuilder sb = new StringBuilder(b.length * 2);
@@ -55,8 +57,6 @@ public class ConvertUtil {
                 sb.append(Integer.toHexString(v));
             }
             return sb.toString().toUpperCase();
-        } catch (UnsupportedEncodingException ex) {
-            log.log(Level.INFO, ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
             log.log(Level.INFO, ex.getMessage());
         }
@@ -250,7 +250,7 @@ public class ConvertUtil {
     }
 
     private static String convertToCA_DB_Format(String modulusHexString,
-            String exponentAsHex, String exponentAsDecimal, int modulusBitLength) {
+                                                String exponentAsHex, String exponentAsDecimal, int modulusBitLength) {
 
         int length = modulusHexString.length();
         String keyFormatString = "Modulus (" + modulusBitLength + " bit):\n" + "    ";

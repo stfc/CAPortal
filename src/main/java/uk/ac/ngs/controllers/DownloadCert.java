@@ -12,17 +12,6 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -36,8 +25,20 @@ import uk.ac.ngs.dao.JdbcCertificateDao;
 import uk.ac.ngs.domain.CertificateRow;
 import uk.ac.ngs.forms.RequestDownloadCertFormBean;
 
+import javax.inject.Inject;
+import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * 
  * @author David Meredith
  */
 @Controller
@@ -47,11 +48,12 @@ public class DownloadCert {
     private static final Log log = LogFactory.getLog(DownloadCert.class);
     private final static Pattern DATA_CERT_PATTERN = Pattern.compile("-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----", Pattern.DOTALL);
     private JdbcCertificateDao certDao;
-    private final static Pattern DATA_OWNEREMAIL_PATTERN = Pattern.compile("OWNEREMAIL\\s?=\\s?([^\\n]+)$", Pattern.MULTILINE); 
-        
+    private final static Pattern DATA_OWNEREMAIL_PATTERN = Pattern.compile("OWNEREMAIL\\s?=\\s?([^\\n]+)$", Pattern.MULTILINE);
+
 
     /**
      * Invoked initially to add the 'requestDownloadCertFormBean' model attribute.
+     *
      * @return
      */
     @ModelAttribute("requestDownloadCertFormBean")
@@ -60,7 +62,7 @@ public class DownloadCert {
     }
 
     /**
-     * Handle GETs to '/pub/downloadCert' (i.e. the controllers base url). 
+     * Handle GETs to '/pub/downloadCert' (i.e. the controllers base url).
      */
     @RequestMapping(method = RequestMethod.GET)
     public String handleBaseUrlGetRequest() {
@@ -93,24 +95,24 @@ public class DownloadCert {
         }
         // Check the email, must be same as either 'certificate.email' column  
         // or the OWNEREMAIL in the 'certificate.data' column 
-        boolean validEmailProvided = false; 
+        boolean validEmailProvided = false;
 
         // First check against the OWNEREMAIL=someemail@world.com data col attribute
         Matcher ownerEmailMatcher = DATA_OWNEREMAIL_PATTERN.matcher(cert.getData());
-        if(ownerEmailMatcher.find()){
-            String owneremail = ownerEmailMatcher.group(1); 
-            if(owneremail != null){
-               if(owneremail.trim().equalsIgnoreCase(requestDownloadCertFormBean.getEmail())){
-                   validEmailProvided = true; 
-               }
+        if (ownerEmailMatcher.find()) {
+            String owneremail = ownerEmailMatcher.group(1);
+            if (owneremail != null) {
+                if (owneremail.trim().equalsIgnoreCase(requestDownloadCertFormBean.getEmail())) {
+                    validEmailProvided = true;
+                }
             }
         }
         // Second check against the 'certificate.email' column   
         if (requestDownloadCertFormBean.getEmail().equalsIgnoreCase(cert.getEmail())) {
-            validEmailProvided = true; 
+            validEmailProvided = true;
         }
-        
-        if(!validEmailProvided){
+
+        if (!validEmailProvided) {
             modelMap.put("errorMessage", "Given email does not match our records");
             return null;
         }
@@ -126,17 +128,15 @@ public class DownloadCert {
             modelMap.put("certdata", pemString);
             try {
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                InputStream is = new ByteArrayInputStream(pemString.getBytes("UTF-8"));
+                InputStream is = new ByteArrayInputStream(pemString.getBytes(StandardCharsets.UTF_8));
                 X509Certificate certObj = (X509Certificate) cf.generateCertificate(is);
                 modelMap.put("certObj", certObj);
             } catch (CertificateException ex) {
                 log.error(ex);
-            } catch (UnsupportedEncodingException ex) {
-                log.error(ex);
             }
         }
         modelMap.addAttribute("cert", cert);
-        modelMap.addAttribute("successMessage", "Certificate ["+requestDownloadCertFormBean.getCertId()+"] Downloaded OK"); 
+        modelMap.addAttribute("successMessage", "Certificate [" + requestDownloadCertFormBean.getCertId() + "] Downloaded OK");
         return null;
     }
 

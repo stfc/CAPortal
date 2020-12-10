@@ -12,26 +12,13 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.ac.ngs.common.Pair;
@@ -45,15 +32,20 @@ import uk.ac.ngs.forms.SearchCertFormBean;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.util.*;
+
 /**
- * Controller for the "/raop/searchcert" page certificate searches. 
+ * Controller for the "/raop/searchcert" page certificate searches.
  * <p>
  * The controller handles pagination through certificate domain object results.
- * Searches can be submitted via GET or POST - both do the same validation.  
+ * Searches can be submitted via GET or POST - both do the same validation.
  * On submission of a form POST, posted params are validated and the request
- * is re-directed to the GET handler with the appropriate GET request params 
+ * is re-directed to the GET handler with the appropriate GET request params
  * for the search. This way, a similar code path is used to execute DB searches
- * (same apart from the GET/POST entry point). 
+ * (same apart from the GET/POST entry point).
  * <p>
  *
  * @author David Meredith
@@ -68,23 +60,23 @@ public class SearchCert {
     private JdbcCertificateDao certDao;
     private JdbcRalistDao ralistDao;
     /**
-     * Name of the model attribute used to bind form POSTs.  
+     * Name of the model attribute used to bind form POSTs.
      */
-    public static final String SEARCH_CERT_FORM_BEAN_SESSIONSCOPE = "searchCertFormBean"; 
+    public static final String SEARCH_CERT_FORM_BEAN_SESSIONSCOPE = "searchCertFormBean";
     /**
-     * Name of the model attribute used to bind GET request search parameters. 
+     * Name of the model attribute used to bind GET request search parameters.
      */
-    public static final String SEARCH_CERT_FORM_BEAN_GET_REQUESTSCOPE = "searchCertFormBean_REQUESTSCOPE"; 
+    public static final String SEARCH_CERT_FORM_BEAN_GET_REQUESTSCOPE = "searchCertFormBean_REQUESTSCOPE";
     /**
-     * Name of model attribute that stores search results in session. Can be 
-     * accessed in JSP using <code>${sessionScope.certSearchPageHolder}</code> 
+     * Name of model attribute that stores search results in session. Can be
+     * accessed in JSP using <code>${sessionScope.certSearchPageHolder}</code>
      */
-    public static final String CERT_PAGE_LIST_HOLDER_SESSIONSCOPE = "certSearchPageHolder"; 
-    
+    public static final String CERT_PAGE_LIST_HOLDER_SESSIONSCOPE = "certSearchPageHolder";
+
     /**
-     * Name of the model attribute that stores the list of RAs.  
+     * Name of the model attribute that stores the list of RAs.
      */
-    public static final String RA_ARRAY_REQUESTSCOPE = "ralistArray"; 
+    public static final String RA_ARRAY_REQUESTSCOPE = "ralistArray";
 
     /**
      * ModelAttribute annotations defined on a method in a controller are
@@ -97,37 +89,37 @@ public class SearchCert {
     public void populateModel(Model model, HttpSession session) {
         //log.debug("populateModel");
         // Populate model with an empty list if session var is not present (e.g. session expired) 
-    	PartialPagedListHolder<CertificateRow> pagedListHolder; 
-    	Object testNotNull = session.getAttribute(SearchCert.CERT_PAGE_LIST_HOLDER_SESSIONSCOPE);
-    	if(testNotNull == null){
-    		pagedListHolder = new PartialPagedListHolder<CertificateRow>(new ArrayList<CertificateRow>(0));
+        PartialPagedListHolder<CertificateRow> pagedListHolder;
+        Object testNotNull = session.getAttribute(SearchCert.CERT_PAGE_LIST_HOLDER_SESSIONSCOPE);
+        if (testNotNull == null) {
+            pagedListHolder = new PartialPagedListHolder<CertificateRow>(new ArrayList<CertificateRow>(0));
             session.setAttribute(SearchCert.CERT_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
-    	} else {
-    		pagedListHolder = (PartialPagedListHolder<CertificateRow>)testNotNull; 
-    	}	
+        } else {
+            pagedListHolder = (PartialPagedListHolder<CertificateRow>) testNotNull;
+        }
 
-         // Populate the RA list pull down 
-        List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null); 
+        // Populate the RA list pull down
+        List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
         List<String> raArray = new ArrayList<String>(rows.size());
-        String userDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn(); 
-        String l = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.L); 
-        String ou = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.OU);  
-        
+        String userDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn();
+        String l = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.L);
+        String ou = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.OU);
+
         // add user's RA as first option 
-        if(l != null && ou != null){ 
+        if (l != null && ou != null) {
             // BUG - have had trouble submitting RA values that contain whitespace, 
             // so have replaced whitespace in ra with underscore 
-            raArray.add(ou+ "_"+l); 
+            raArray.add(ou + "_" + l);
         }
         // then add the 'all' option second 
-        raArray.add("all");  
+        raArray.add("all");
         // then add all other RAs
         for (RalistRow row : rows) {
             // BUG - have had trouble submitting RA values that contain whitespace, 
             // so have replaced whitespace in ra with underscore 
-            raArray.add(row.getOu()+"_"+row.getL()); 
+            raArray.add(row.getOu() + "_" + row.getL());
         }
-        model.addAttribute(RA_ARRAY_REQUESTSCOPE, raArray.toArray()); 
+        model.addAttribute(RA_ARRAY_REQUESTSCOPE, raArray.toArray());
     }
 
     /**
@@ -142,13 +134,14 @@ public class SearchCert {
         return new SearchCertFormBean();
     }
 
-    @ModelAttribute(SEARCH_CERT_FORM_BEAN_GET_REQUESTSCOPE) 
-    public SearchCertFormBean createGetRequestFormBean(){
-        return new SearchCertFormBean(); 
+    @ModelAttribute(SEARCH_CERT_FORM_BEAN_GET_REQUESTSCOPE)
+    public SearchCertFormBean createGetRequestFormBean() {
+        return new SearchCertFormBean();
     }
 
     /**
      * Add the 'gotoPageFormBean' to the model if not present.
+     *
      * @return
      */
     @ModelAttribute("gotoPageFormBean")
@@ -170,13 +163,13 @@ public class SearchCert {
     // binder.setValidator(new FooValidator()); }
     //@RequestMapping(value = "/search", method = RequestMethod.POST)
 
-    
+
     /**
      * Handle POSTs to "/raop/searchcert" to do a certificate search.
-     * The method processes the form input and then redirects to the "/search" 
-     * URL (handled in this controller) with URL encoded GET params that define 
-     * the search parameters. 
-     * 
+     * The method processes the form input and then redirects to the "/search"
+     * URL (handled in this controller) with URL encoded GET params that define
+     * the search parameters.
+     *
      * @return "redirect:/raop/searchcert/search
      */
     @RequestMapping(method = RequestMethod.POST)
@@ -190,16 +183,16 @@ public class SearchCert {
             return "raop/searchcert";
         }
         // When we submit a new search via post, re-set the start row to zero. 
-        searchCertFormBean.setStartRow(0); 
-        
+        searchCertFormBean.setStartRow(0);
+
         // Store a success message for rendering on the next request after redirect
         // I have had issues with using flash attributes - if the given 
         // searchCertFormBean contains spaces in some of its values, then 
         // the flash attribute does not always render after redirecting to the view
         //redirectAttrs.addFlashAttribute("message", "Search Submitted OK");
-        
+
         // Copy our post model attributes to redirect attributes in URL 
-        redirectAttrs.addAllAttributes(this.getRedirectParams(searchCertFormBean)); 
+        redirectAttrs.addAllAttributes(this.getRedirectParams(searchCertFormBean));
         // Now submit to our GET '/search' handler method to run the query. 
         // Note, I do not manually append request attributes as commented out 
         // in the return redirect: because Spring Views can? be cached based on 
@@ -208,28 +201,28 @@ public class SearchCert {
         // http://forum.springsource.org/showthread.php?86633-Spring-3-annotated-controllers-redirection-strings-and-appending-parameters-to-URL
         return "redirect:/raop/searchcert/search";//+"?"+this.buildGetRequestParams(searchCertFormBean); 
     }
-   
+
     /**
-     * Handle GETs to "/raop/searchcert/search?search=params&for=dbquery" 
-     * to perform a DB search.  
+     * Handle GETs to "/raop/searchcert/search?search=params&for=dbquery"
+     * to perform a DB search.
      * <p>
-     * Processes the known GET params and submits a query to the DB. Unknown 
-     * GET request parameters are ignored. Binding/validation of GET params 
-     * is done via Spring @ModelAttribute binding with the given SearchCertFormBean. 
-     * If only a partial query is specified, e.g. "/search?name=some cn", 
-     * default values as defined in SearchCertFormBean are applied. After successful 
-     * binding/validation/query, the SEARCH_CERT_FORM_BEAN_SESSIONSCOPE model attribute 
-     * is updated.  
-     * 
+     * Processes the known GET params and submits a query to the DB. Unknown
+     * GET request parameters are ignored. Binding/validation of GET params
+     * is done via Spring @ModelAttribute binding with the given SearchCertFormBean.
+     * If only a partial query is specified, e.g. "/search?name=some cn",
+     * default values as defined in SearchCertFormBean are applied. After successful
+     * binding/validation/query, the SEARCH_CERT_FORM_BEAN_SESSIONSCOPE model attribute
+     * is updated.
+     *
      * @return "raop/searchcert"
      */
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public String submitSearchViaGet(
-            @Valid @ModelAttribute(SEARCH_CERT_FORM_BEAN_GET_REQUESTSCOPE) 
-                    SearchCertFormBean searchCertFormBeanGetReq, BindingResult result, 
+            @Valid @ModelAttribute(SEARCH_CERT_FORM_BEAN_GET_REQUESTSCOPE)
+                    SearchCertFormBean searchCertFormBeanGetReq, BindingResult result,
             RedirectAttributes redirectAttrs, SessionStatus sessionStatus,
             Model model, HttpSession session) {
-        
+
         //@RequestMapping(method=RequestMethod.GET, params={"gosearch"}) 
         if (result.hasErrors()) {
             log.warn("binding and validation errors on submitViaGet");
@@ -238,21 +231,21 @@ public class SearchCert {
         // Update our session-scoped @ModelAttribute form bean (SEARCH_CERT_FORM_BEAN_SESSIONSCOPE) 
         // with the request-scoped @ModelAttribute get-request form bean 
         // (SEARCH_CERT_FORM_BEAN_GET_REQUESTSCOPE),  then run the DB search. 
-        model.addAttribute(SEARCH_CERT_FORM_BEAN_SESSIONSCOPE, searchCertFormBeanGetReq); 
-        this.runSearchUpdateResultsInSession(searchCertFormBeanGetReq, session); 
+        model.addAttribute(SEARCH_CERT_FORM_BEAN_SESSIONSCOPE, searchCertFormBeanGetReq);
+        this.runSearchUpdateResultsInSession(searchCertFormBeanGetReq, session);
         model.addAttribute("searchOk", "Search Submitted/Refreshed OK");
         return "raop/searchcert";
     }
 
     /**
-     * Use the given SearchCertFormBean to submit the DB search and put the results 
-     * in session under the CERT_PAGE_LIST_HOLDER session attribute.  
+     * Use the given SearchCertFormBean to submit the DB search and put the results
+     * in session under the CERT_PAGE_LIST_HOLDER session attribute.
      */
-    private void runSearchUpdateResultsInSession(SearchCertFormBean searchCertFormBean, HttpSession session){
+    private void runSearchUpdateResultsInSession(SearchCertFormBean searchCertFormBean, HttpSession session) {
         // reset the last search date and limit/offset vals. 
         session.setAttribute("lastCertSearchDate_session", new Date());
         int limit = searchCertFormBean.getShowRowCount();
-        int startRow = searchCertFormBean.getStartRow(); 
+        int startRow = searchCertFormBean.getStartRow();
         Pair<List<CertificateRow>, Integer> results =
                 this.submitCertificateSearch(searchCertFormBean, limit, startRow);
         List<CertificateRow> rows = results.first;
@@ -306,7 +299,7 @@ public class SearchCert {
             params.put("showRowCount", searchCertFormBean.getShowRowCount().toString());
         }
         if (searchCertFormBean.getRa() != null) {
-            params.put("ra", searchCertFormBean.getRa().toString());
+            params.put("ra", searchCertFormBean.getRa());
         }
         return params;
     }
@@ -390,6 +383,7 @@ public class SearchCert {
     /**
      * Handle POSTs to "/raop/searchcert/goto" to paginate to a specific row
      * in the results list.
+     *
      * @return "redirect:/raop/searchcert/search?search=params&for=dbquery"
      */
     @RequestMapping(value = "/goto", method = RequestMethod.POST)
@@ -416,19 +410,20 @@ public class SearchCert {
         }
 
         // Update requested start row and re-submit the search as a GET request  
-        sessionSearchCertFormBean.setStartRow(startRow);  
-        redirectAttrs.addAllAttributes(this.getRedirectParams(sessionSearchCertFormBean)); 
+        sessionSearchCertFormBean.setStartRow(startRow);
+        redirectAttrs.addAllAttributes(this.getRedirectParams(sessionSearchCertFormBean));
         return "redirect:/raop/searchcert/search"; //+"?"+this.buildGetRequestParams(sessionSearchCertFormBean);  
     }
 
     /**
-     * Handle GETs to '/raop/searchcert/page?page=next|prev|first|last'.  
+     * Handle GETs to '/raop/searchcert/page?page=next|prev|first|last'.
      * Used for paging through the certificate list when clicking Next,Prev,First,Last links.
+     *
      * @return "redirect:/raop/searchcert/search?multiple=search&params=go here"
      */
     @RequestMapping(value = "page", method = RequestMethod.GET)
     public String handlePageRequest(@RequestParam(required = false) String page,
-            HttpSession session, RedirectAttributes redirectAttrs) {
+                                    HttpSession session, RedirectAttributes redirectAttrs) {
         //String page = request.getParameter("page");
         //http://balusc.blogspot.co.uk/2008/10/effective-datatable-paging-and-sorting.html
 
@@ -462,12 +457,12 @@ public class SearchCert {
                 if (startRow > pagedListHolder.getTotalRows()) {
                     startRow = pagedListHolder.getRow();
                 }
-                if(startRow < 0){
+                if (startRow < 0) {
                     startRow = 0;
-                } 
+                }
             }
-            searchCertFormBean.setStartRow(startRow); 
-            redirectAttrs.addAllAttributes(this.getRedirectParams(searchCertFormBean)); 
+            searchCertFormBean.setStartRow(startRow);
+            redirectAttrs.addAllAttributes(this.getRedirectParams(searchCertFormBean));
             return "redirect:/raop/searchcert/search";//+"?"+this.buildGetRequestParams(searchCertFormBean);  
         }
         return "/raop/searchcert";
@@ -478,8 +473,8 @@ public class SearchCert {
      * rows found that match the search criteria defined by SearchCertFormBean.
      *
      * @param searchCertFormBean Used to specify search criteria.
-     * @param limit Limits the number of search results.
-     * @param offset Offset the results by this many rows.
+     * @param limit              Limits the number of search results.
+     * @param offset             Offset the results by this many rows.
      * @return <code>Pair.first</code> holds the list of certificate rows (from
      * offset to limit), while <code>Pair.second</code> is the total number of
      * matching rows found in the DB.
@@ -494,7 +489,7 @@ public class SearchCert {
             List<CertificateRow> rows = new ArrayList<CertificateRow>(0);
             if (row != null) {
                 rows.add(row);
-                row.setData(null); 
+                row.setData(null);
             }
             return Pair.create(rows, rows.size());
         } else {
@@ -503,8 +498,8 @@ public class SearchCert {
             int totalRows = this.certDao.countBy(params);
             // Nullify the Data property before we add the rows to HTTP session to keep
             // the memory requirements low. 
-            for(CertificateRow row : rows){
-                row.setData(null); 
+            for (CertificateRow row : rows) {
+                row.setData(null);
             }
             return Pair.create(rows, totalRows);
         }
@@ -516,9 +511,9 @@ public class SearchCert {
      */
     private Map<JdbcCertificateDao.WHERE_PARAMS, String> getSearchParams(SearchCertFormBean searchCertFormBean) {
 
-        Map<JdbcCertificateDao.WHERE_PARAMS, String> params = 
+        Map<JdbcCertificateDao.WHERE_PARAMS, String> params =
                 new EnumMap<JdbcCertificateDao.WHERE_PARAMS, String>(JdbcCertificateDao.WHERE_PARAMS.class);
-        
+
         if (StringUtils.hasText(searchCertFormBean.getName())) {
             params.put(JdbcCertificateDao.WHERE_PARAMS.CN_LIKE, this.prepareLikeValue(searchCertFormBean.getName()));
         }
@@ -527,46 +522,46 @@ public class SearchCert {
         }
         // if search null email address checkbox is true, then we want to search 
         // for email values that are null
-        if(searchCertFormBean.getSearchNullEmailAddress()) {
-            params.put(JdbcCertificateDao.WHERE_PARAMS.EMAIL_EQ, null); 
+        if (searchCertFormBean.getSearchNullEmailAddress()) {
+            params.put(JdbcCertificateDao.WHERE_PARAMS.EMAIL_EQ, null);
         } else {
             if (StringUtils.hasText(searchCertFormBean.getEmailAddress())) {
                 params.put(JdbcCertificateDao.WHERE_PARAMS.EMAIL_LIKE, this.prepareLikeValue(searchCertFormBean.getEmailAddress()));
             }
-        } 
+        }
         if (StringUtils.hasText(searchCertFormBean.getRole()) && !"all".equals(searchCertFormBean.getRole())) {
             params.put(JdbcCertificateDao.WHERE_PARAMS.ROLE_LIKE, this.prepareLikeValue(searchCertFormBean.getRole()));
         }
         if (StringUtils.hasText(searchCertFormBean.getStatus()) && !"all".equals(searchCertFormBean.getStatus())) {
             params.put(JdbcCertificateDao.WHERE_PARAMS.STATUS_LIKE, this.prepareLikeValue(searchCertFormBean.getStatus()));
         }
-        if(StringUtils.hasText(searchCertFormBean.getData())) {
-            params.put(JdbcCertificateDao.WHERE_PARAMS.DATA_LIKE, this.prepareLikeValue(searchCertFormBean.getData())); 
+        if (StringUtils.hasText(searchCertFormBean.getData())) {
+            params.put(JdbcCertificateDao.WHERE_PARAMS.DATA_LIKE, this.prepareLikeValue(searchCertFormBean.getData()));
         }
         if (searchCertFormBean.getNotExpired()) {
             params.put(JdbcCertificateDao.WHERE_PARAMS.NOTAFTER_GREATERTHAN_CURRENTTIME, null);
         }
-        String ra = searchCertFormBean.getRa(); 
+        String ra = searchCertFormBean.getRa();
         if (StringUtils.hasText(ra) && !"all".equals(ra)) {
             // TODO - ra like search (note ra column is all null in DB, so specifying a value will not work!) 
-            String ou_l[] = ra.split("_"); 
-            if(ou_l != null && ou_l.length >= 1){
+            String[] ou_l = ra.split("_");
+            if (ou_l != null && ou_l.length >= 1) {
                 // typical ra input: 'CLRC DL'  (converted to 'L=DL,OU=CLRC') 
-                String raSearch; 
-                if(ou_l.length == 1){
+                String raSearch;
+                if (ou_l.length == 1) {
                     // assume search string is L only 
-                    raSearch = "L="+ou_l[0]; 
+                    raSearch = "L=" + ou_l[0];
                 } else {
-                    raSearch = "L="+ou_l[1]+",OU="+ou_l[0]; 
+                    raSearch = "L=" + ou_l[1] + ",OU=" + ou_l[0];
                 }
-                log.debug(" raSearch is: "+raSearch);
+                log.debug(" raSearch is: " + raSearch);
                 params.put(JdbcCertificateDao.WHERE_PARAMS.DN_HAS_RA_LIKE, this.prepareLikeValue(raSearch));
             }
         }
         return params;
     }
 
-    
+
     private String prepareLikeValue(String value) {
         value = value.trim();
         if (!value.endsWith("%")) {
@@ -587,7 +582,7 @@ public class SearchCert {
     public void setSecurityContextService(SecurityContextService securityContextService) {
         this.securityContextService = securityContextService;
     }
-    
+
     @Inject
     public void setRalistDao(JdbcRalistDao ralistDao) {
         this.ralistDao = ralistDao;

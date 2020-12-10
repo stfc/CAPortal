@@ -12,15 +12,6 @@
  */
 package uk.ac.ngs.service;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.Security;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -42,17 +33,21 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.security.*;
+
 
 /**
- * Dirty util/builder class to create a PKCS#10 CSR request PEM string and the 
- * accompanying encrypted PKCS#8 private key PEM string. 
+ * Dirty util/builder class to create a PKCS#10 CSR request PEM string and the
+ * accompanying encrypted PKCS#8 private key PEM string.
  * <p/>
- * This really is a dirty shortcut class and it could certainly be re-written 
+ * This really is a dirty shortcut class and it could certainly be re-written
  * with properly extracted interfaces and methods.
  * <p/>
- * On class construction, the BouncyCastle security provider is loaded with:  
+ * On class construction, the BouncyCastle security provider is loaded with:
  * <code>Security.addProvider(new BouncyCastleProvider());</code>
- * 
+ *
  * @author David Meredith
  */
 //@Service
@@ -63,16 +58,17 @@ public class CsrAndPrivateKeyPemStringBuilder {
     }
 
     /**
-     * Get the PKCS#10 PEM string and encrypted PKCS#8 PEM string. 
+     * Get the PKCS#10 PEM string and encrypted PKCS#8 PEM string.
+     *
      * @param subject
-     * @param email Added as a Subject Alt Name extension if not null 
+     * @param email   Added as a Subject Alt Name extension if not null
      * @param pw
-     * @return First element contains the PKCS#10 PEM, second element contains the private key. 
+     * @return First element contains the PKCS#10 PEM, second element contains the private key.
      * @throws IOException
      * @throws NoSuchAlgorithmException
      * @throws NoSuchProviderException
      * @throws OperatorCreationException
-     * @throws PKCSException 
+     * @throws PKCSException
      */
     public String[] getPkcs10_Pkcs8_AsPemStrings(X500Name subject, String email, String pw)
             throws IOException, NoSuchAlgorithmException,
@@ -94,9 +90,9 @@ public class CsrAndPrivateKeyPemStringBuilder {
                 = new JcaPKCS10CertificationRequestBuilder(subject, kp.getPublic());
 
         ExtensionsGenerator extGen = new ExtensionsGenerator();
-        if(email != null){
-           extGen.addExtension(Extension.subjectAlternativeName, false,
-                new GeneralNames(new GeneralName(GeneralName.rfc822Name, email)));
+        if (email != null) {
+            extGen.addExtension(Extension.subjectAlternativeName, false,
+                    new GeneralNames(new GeneralName(GeneralName.rfc822Name, email)));
         }
 
         requestBuilder.addAttribute(

@@ -19,13 +19,13 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Read mutable properties from a prop file. 
- * Properties can be changed at runtime and the new/updated values will be returned. 
- * Supported properties include: 
+ * Read mutable properties from a prop file.
+ * Properties can be changed at runtime and the new/updated values will be returned.
+ * Supported properties include:
  * <ul>
  *   <li>'hostname.service.values' = A comma separated list of valid service values</li>
  * </ul>
- * 
+ *
  * @author David Meredith
  */
 public class MutableConfigParams {
@@ -37,10 +37,11 @@ public class MutableConfigParams {
     }
 
     /**
-     * Get the value of the specified property name from the properties file. 
+     * Get the value of the specified property name from the properties file.
+     *
      * @param propertyName
      * @return property value or null if not found
-     * @throws IOException if there is a problem loading the properties file 
+     * @throws IOException if there is a problem loading the properties file
      */
     public String getProperty(String propertyName) throws IOException {
         Properties prop = new Properties();

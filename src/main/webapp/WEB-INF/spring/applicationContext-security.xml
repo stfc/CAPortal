@@ -69,7 +69,7 @@ Spring Security context
         <!-- Specify regex to return whole DN string -->
         <!--<x509 subject-principal-regex="(.*)" />-->
         
-        <x509 user-service-ref="caX509AuthMan"/>
+        <x509 user-service-ref="caJdbcUserDetailsService"/>
          
 
         <!-- Uncomment to limit the number of sessions a user can have -->
@@ -112,14 +112,14 @@ Spring Security context
     </beans:bean>-->
 
     <!-- Redirect to /denied page to display the access denied info -->
-    <beans:bean id="authenticationEntryPoint"
-      class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-     <beans:property name="loginFormUrl" value="/denied"/>
+    <beans:bean class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint" id="authenticationEntryPoint">
+        <beans:constructor-arg value="/denied"/>
     </beans:bean>
     
      
     <!--<beans:bean id="caAuthMan" class="uk.ac.ngs.security.CaJdbcUserDetailsService"/>-->
     <beans:bean id="caX509AuthMan" class="uk.ac.ngs.security.CaX509JdbcPreAuthUserDetails"/>
+    <beans:bean id="caJdbcUserDetailsService" class="uk.ac.ngs.security.CaJdbcUserDetailsService"/>
      
 
 	<!--  

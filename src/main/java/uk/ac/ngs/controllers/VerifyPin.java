@@ -12,8 +12,6 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.security.NoSuchAlgorithmException;
-import javax.validation.Valid;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,15 +25,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.ac.ngs.forms.VerifyPinFormBean;
 
+import javax.validation.Valid;
+import java.security.NoSuchAlgorithmException;
+
 /**
- * Controller for the '/raop/verifyPin' page.  
- * @author David Meredith  
+ * Controller for the '/raop/verifyPin' page.
+ *
+ * @author David Meredith
  */
 @Controller
 @RequestMapping("/raop/verifyPin")
 public class VerifyPin {
-     private static final Log log = LogFactory.getLog(VerifyPin.class);
-
+    private static final Log log = LogFactory.getLog(VerifyPin.class);
 
 
     @ModelAttribute
@@ -50,57 +51,59 @@ public class VerifyPin {
     }
 
     /**
-     * Handle GET requests to <pre>/raop/verifypin</pre>. 
+     * Handle GET requests to <pre>/raop/verifypin</pre>.
+     *
      * @return 'raop/verifyPin'
      */
     @RequestMapping(method = RequestMethod.GET)
     public String handleGetRequest(ModelMap model, RedirectAttributes redirectAttributes) {
-        
+
         // populateModel() adds pin to model from the optional RequestParam GET param 
-        if(model.get("pin") != null){
-            redirectAttributes.addAttribute("pin", model.get("pin")); 
-            log.debug("pin in get: "+model.get("pin")); 
+        if (model.get("pin") != null) {
+            redirectAttributes.addAttribute("pin", model.get("pin"));
+            log.debug("pin in get: " + model.get("pin"));
         }
         return "raop/verifyPin";
     }
 
 
     /**
-     * Handle POSTs to <pre>/raop/verifypin</pre>. 
-     * @return 'raop/verifyPin' on error or 'redirect:/raop/verifyPin' on success  
+     * Handle POSTs to <pre>/raop/verifypin</pre>.
+     *
+     * @return 'raop/verifyPin' on error or 'redirect:/raop/verifyPin' on success
      */
     @RequestMapping(method = RequestMethod.POST)
     public String handlePost(
             @Valid VerifyPinFormBean verifyPinFormBean, BindingResult result,
             ModelMap model, RedirectAttributes redirectAttributes) throws NoSuchAlgorithmException {
-        
+
         if (result.hasErrors()) {
             return "raop/verifyPin";
-        } 
-        String pinHash = verifyPinFormBean.getPin(); 
-        String pinPlain = verifyPinFormBean.getPinVerification(); 
-        
+        }
+        String pinHash = verifyPinFormBean.getPin();
+        String pinPlain = verifyPinFormBean.getPinVerification();
+
         // Try and recreate the pinHash using SHA-1 
-        boolean verifiedOK = false; 
-        
+        boolean verifiedOK = false;
+
         // First do a regular sha1hex hash 
-        if(DigestUtils.sha1Hex(pinPlain).equalsIgnoreCase(pinHash)){
-            verifiedOK = true; 
-        } 
+        if (DigestUtils.sha1Hex(pinPlain).equalsIgnoreCase(pinHash)) {
+            verifiedOK = true;
+        }
         // if it did not verify, try appending null char and the string 'exit' 
         // followed by newline which simulates a known OpenCA bug (OpenCA 
         // erroneously appends these extra chars when calculating the original hash)
-        if(!verifiedOK && DigestUtils.sha1Hex(pinPlain+"\u0000exit\n").equalsIgnoreCase(pinHash)){
-            verifiedOK = true; 
+        if (!verifiedOK && DigestUtils.sha1Hex(pinPlain + "\u0000exit\n").equalsIgnoreCase(pinHash)) {
+            verifiedOK = true;
         }
-        
-        if(verifiedOK){
-            redirectAttributes.addFlashAttribute("verifiedOk", "Pin Verified OK"); 
+
+        if (verifiedOK) {
+            redirectAttributes.addFlashAttribute("verifiedOk", "Pin Verified OK");
         } else {
-            redirectAttributes.addFlashAttribute("notVerifiedOk", "Pin Did Not Verify"); 
-        }        
-        
-        redirectAttributes.addAttribute("pin", verifyPinFormBean.getPin()); 
+            redirectAttributes.addFlashAttribute("notVerifiedOk", "Pin Did Not Verify");
+        }
+
+        redirectAttributes.addAttribute("pin", verifyPinFormBean.getPin());
         return "redirect:/raop/verifyPin";
     }
 
@@ -128,5 +131,5 @@ public class VerifyPin {
             return null;
         }
     }*/
-    
+
 }

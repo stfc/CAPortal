@@ -12,19 +12,20 @@
  */
 package uk.ac.ngs.service.email;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import uk.ac.ngs.common.CertUtil;
 import uk.ac.ngs.domain.CSR_Flags;
+
+import javax.inject.Inject;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Send CA specific e-mails such as RA and User NEW/RENEW notifications.
@@ -43,7 +44,7 @@ public class EmailService {
     private String emailRaEmailChangeTemplate;
     private String emailRaNewEmailChangeTemplate;
     private String emailUserNewUserCertTemplate;
-    private String emailUserNewHostCertTemplate; 
+    private String emailUserNewHostCertTemplate;
     private String emailAdminsRoleChangeTemplate;
     private String emailAdminsOnErrorTemplate;
     private String emailAdminsOnNewRaTemplate;
@@ -53,15 +54,16 @@ public class EmailService {
     }
 
     /**
-     * Email the user of their new host cert request. 
-     * @param requestorCN The CN/name of the requestor. 
-     * @param requestedDN the requested cert DN
+     * Email the user of their new host cert request.
+     *
+     * @param requestorCN    The CN/name of the requestor.
+     * @param requestedDN    the requested cert DN
      * @param recipientEmail
      * @param raCNs
-     * @param raEmails 
+     * @param raEmails
      */
     public void sendRequestorOnNewHost(String requestorCN, String requestedDN,
-            String recipientEmail, String raCNs, String raEmails){
+                                       String recipientEmail, String raCNs, String raEmails) {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(recipientEmail);
         Map<String, Object> vars = new HashMap<String, Object>();
@@ -75,23 +77,24 @@ public class EmailService {
             this.mailSender.send(msg, vars, this.emailUserNewHostCertTemplate);
         } catch (MailException ex) {
             log.error("MailSender " + ex.getMessage());
-        } 
+        }
     }
 
     /**
-     * Email the user of their CSR request. 
-     * @param dn DN of the new CSR
+     * Email the user of their CSR request.
+     *
+     * @param dn             DN of the new CSR
      * @param recipientEmail
      * @param raCNs
-     * @param raEmails 
+     * @param raEmails
      */
-    public void sendRequestorOnNewUser(String dn, 
-            String recipientEmail, String raCNs, String raEmails) {
+    public void sendRequestorOnNewUser(String dn,
+                                       String recipientEmail, String raCNs, String raEmails) {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(recipientEmail);
         Map<String, Object> vars = new HashMap<String, Object>();
 
-        vars.put("cn", CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.CN)); 
+        vars.put("cn", CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.CN));
         vars.put("dn", dn);
         vars.put("raCNs", raCNs);
         vars.put("raEmails", raEmails);
@@ -105,10 +108,11 @@ public class EmailService {
 
 
     /**
-     * Email the portal admins on occurence of an error. 
+     * Email the portal admins on occurence of an error.
+     *
      * @param adminEmails
-     * @param cause The causal exception (if known)
-     * @param url The url that caused the exception (if known) 
+     * @param cause       The causal exception (if known)
+     * @param url         The url that caused the exception (if known)
      */
     public void sendAdminsOnError(Set<String> adminEmails, Exception cause, String url) {
         StringBuilder emailDebug = new StringBuilder("Emailing following Admins on Error [");
@@ -122,20 +126,20 @@ public class EmailService {
             msg.setSubject("UK CA Portal error notification");
             Map<String, Object> vars = new HashMap<String, Object>();
             vars.put("basePortalUrl", basePortalUrl);
-            if(cause != null) {
+            if (cause != null) {
                 vars.put("exception", cause);
-                vars.put("message", cause.getMessage()); 
+                vars.put("message", cause.getMessage());
                 StringWriter sw = new StringWriter();
                 cause.printStackTrace(new PrintWriter(sw));
-                vars.put("stacktrace", sw.toString()); 
+                vars.put("stacktrace", sw.toString());
             } else {
                 vars.put("exception", "unknown");
                 vars.put("message", "unknown");
                 vars.put("stacktrace", "unknown");
-            } 
-            if(url != null) {
+            }
+            if (url != null) {
                 vars.put("url", url);
-            } 
+            }
             try {
                 this.mailSender.send(msg, vars, this.emailAdminsOnErrorTemplate);
             } catch (MailException ex) {
@@ -145,15 +149,16 @@ public class EmailService {
         emailDebug.append("]");
         log.warn(emailDebug);
     }
-    
+
     /**
-     * Email the RAs of the pending revocation request. 
+     * Email the RAs of the pending revocation request.
+     *
      * @param requestedRevokeDN
-     * @param raEmails 
+     * @param raEmails
      * @param crrId
      */
-    public void sendRaEmailOnRevoke(String requestedRevokeDN, Set<String> raEmails, 
-            long crrId) {
+    public void sendRaEmailOnRevoke(String requestedRevokeDN, Set<String> raEmails,
+                                    long crrId) {
         StringBuilder emailDebug = new StringBuilder("Emailing following RAs on REVOKE [");
         for (String raEmail : raEmails) {
             emailDebug.append(raEmail);
@@ -166,7 +171,7 @@ public class EmailService {
             Map<String, Object> vars = new HashMap<String, Object>();
             vars.put("param1", requestedRevokeDN);
             vars.put("basePortalUrl", basePortalUrl);
-            vars.put("revoke_cert_key", crrId); 
+            vars.put("revoke_cert_key", crrId);
             try {
                 this.mailSender.send(msg, vars, this.emailRaRevokeTemplate);
             } catch (MailException ex) {
@@ -178,15 +183,15 @@ public class EmailService {
     }
 
     /**
-     * Email the RAs of the pending CSR NEW request. 
-     * 
+     * Email the RAs of the pending CSR NEW request.
+     *
      * @param profile
      * @param requestedDN
-     * @param raEmails 
-     * @param req_key  
+     * @param raEmails
+     * @param req_key
      */
-    public void sendRaEmailOnCsrNew(CSR_Flags.Profile profile, String requestedDN, 
-            Set<String> raEmails, long req_key) {
+    public void sendRaEmailOnCsrNew(CSR_Flags.Profile profile, String requestedDN,
+                                    Set<String> raEmails, long req_key) {
         StringBuilder emailDebug = new StringBuilder("Emailing following RAs on NEW [");
 
         for (String raEmail : raEmails) {
@@ -200,7 +205,7 @@ public class EmailService {
             Map<String, Object> vars = new HashMap<String, Object>();
             vars.put("param1", requestedDN);
             vars.put("basePortalUrl", basePortalUrl);
-            vars.put("req_key", req_key); 
+            vars.put("req_key", req_key);
             try {
                 if (CSR_Flags.Profile.UKHOST.equals(profile)) {
                     this.mailSender.send(msg, vars, this.emailRaNewHostTemplate);
@@ -223,8 +228,8 @@ public class EmailService {
      * @param req_key
      * @param emailUpdated
      */
-    public void sendRaEmailOnCsrRenew(String requestedRenewDN, Set<String> raEmails, 
-            long req_key, boolean emailUpdated) {
+    public void sendRaEmailOnCsrRenew(String requestedRenewDN, Set<String> raEmails,
+                                      long req_key, boolean emailUpdated) {
         StringBuilder emailDebug = new StringBuilder("Emailing following RAs on RENEW [");
         for (String raEmail : raEmails) {
             emailDebug.append(raEmail);
@@ -237,12 +242,12 @@ public class EmailService {
             Map<String, Object> vars = new HashMap<String, Object>();
             vars.put("param1", requestedRenewDN);
             vars.put("basePortalUrl", basePortalUrl);
-            vars.put("req_key", req_key); 
-            if(emailUpdated){
+            vars.put("req_key", req_key);
+            if (emailUpdated) {
                 vars.put("emailUpdatedTxt", "Important - this renewal requests "
-                        + "a change of email - please ensure email is valid when approving."); 
+                        + "a change of email - please ensure email is valid when approving.");
             } else {
-                vars.put("emailUpdatedTxt", "This renewal does not include a change of email address."); 
+                vars.put("emailUpdatedTxt", "This renewal does not include a change of email address.");
             }
             try {
                 this.mailSender.send(msg, vars, this.emailRaRenewTemplate);
@@ -253,25 +258,25 @@ public class EmailService {
         emailDebug.append("]");
         log.debug(emailDebug);
     }
-    
+
     /**
-     * Email both the old and new email addresses on change of email. 
-     * 
-     * @param certDn DN of the certificate that is being updated  
+     * Email both the old and new email addresses on change of email.
+     *
+     * @param certDn      DN of the certificate that is being updated
      * @param requesterDn DN of the user making the change request
-     * @param oldEmail Previous email address
-     * @param newEmail New email address   
-     * @param cert_key  PK of cert being updated
+     * @param oldEmail    Previous email address
+     * @param newEmail    New email address
+     * @param cert_key    PK of cert being updated
      */
-    public void sendEmailToOldAndNewOnEmailChange(String certDn, String requesterDn, 
-            String oldEmail, String newEmail, long cert_key) {
+    public void sendEmailToOldAndNewOnEmailChange(String certDn, String requesterDn,
+                                                  String oldEmail, String newEmail, long cert_key) {
         log.debug("sendRaEmailOnEmailChange method");
         StringBuilder emailDebug = new StringBuilder("Emailing old and new email addresses [");
         //sends email to both old and new email addresses
         Set<String> oldNewEmails = new HashSet<String>(); // use set so duplicates aren't added
         oldNewEmails.add(oldEmail);
         oldNewEmails.add(newEmail);
-            
+
         for (String email : oldNewEmails) {
             emailDebug.append(email);
             emailDebug.append("; ");
@@ -283,7 +288,7 @@ public class EmailService {
             vars.put("cert_dn", certDn);
             vars.put("requester_dn", requesterDn);
             vars.put("basePortalUrl", basePortalUrl);
-            vars.put("req_key", cert_key); 
+            vars.put("req_key", cert_key);
             vars.put("old_email", oldEmail);
             vars.put("new_email", newEmail);
             try {
@@ -297,15 +302,15 @@ public class EmailService {
     }
 
     /**
-     * Email new address only - called if email address had not previously been set.  
-     * 
-     * @param certDn DN of the certificate that is being updated  
+     * Email new address only - called if email address had not previously been set.
+     *
+     * @param certDn      DN of the certificate that is being updated
      * @param requesterDn DN of the user making the change request
-     * @param newEmail New email address
-     * @param cert_key PK of cert being updated
+     * @param newEmail    New email address
+     * @param cert_key    PK of cert being updated
      */
-    public void sendEmailToNewEmailOnChange(String certDn, String requesterDn, 
-            String newEmail, long cert_key) {
+    public void sendEmailToNewEmailOnChange(String certDn, String requesterDn,
+                                            String newEmail, long cert_key) {
         log.debug("sendEmailToNewEmailOnChange method");
         StringBuilder emailDebug = new StringBuilder("Emailing new email address [");
         emailDebug.append(newEmail);
@@ -317,28 +322,27 @@ public class EmailService {
         vars.put("cert_dn", certDn);
         vars.put("requester_dn", requesterDn);
         vars.put("basePortalUrl", basePortalUrl);
-        vars.put("req_key", cert_key); 
+        vars.put("req_key", cert_key);
         vars.put("new_email", newEmail);
         try {
             this.mailSender.send(msg, vars, this.emailRaNewEmailChangeTemplate);
         } catch (MailException ex) {
             log.error("MailSender " + ex.getMessage());
         }
-        
+
         emailDebug.append("]");
         log.debug(emailDebug);
     }
-    
+
     /**
-     * 
      * Email Update on Role Change - Called when User Role is Changed
-     * 
-     * @param certDn DN of the certificate that is being updated
-     * @param role New Role of Certificate
-     * @param cert_key Key of the updated Certificate
+     *
+     * @param certDn    DN of the certificate that is being updated
+     * @param role      New Role of Certificate
+     * @param cert_key  Key of the updated Certificate
      * @param userEmail E-mail address of local RA Manager / CA Manager
      */
-    public void sendAdminEmailOnRoleChange(String certDn, String role, long cert_key, String userEmail){
+    public void sendAdminEmailOnRoleChange(String certDn, String role, long cert_key, String userEmail) {
         log.debug("sendAdminEmailOnRoleChange method");
         StringBuilder emailDebug = new StringBuilder("Emailing new role [");
         emailDebug.append(role);
@@ -349,18 +353,18 @@ public class EmailService {
         Map<String, Object> vars = new HashMap<String, Object>();
         vars.put("cert_dn", certDn);
         vars.put("basePortalUrl", basePortalUrl);
-        vars.put("req_key", cert_key); 
+        vars.put("req_key", cert_key);
         vars.put("new_role", role);
         try {
             this.mailSender.send(msg, vars, this.emailAdminsRoleChangeTemplate);
         } catch (MailException ex) {
             log.error("MailSender " + ex.getMessage());
         }
-        
+
         emailDebug.append("]");
         log.debug(emailDebug);
     }
-    
+
     @Inject
     public void setSender(Sender mailSender) {
         this.mailSender = mailSender;
@@ -401,17 +405,15 @@ public class EmailService {
     public void setEmailRaRevokeTemplate(String emailRaRevokeTemplate) {
         this.emailRaRevokeTemplate = emailRaRevokeTemplate;
     }
-    
+
     /**
-     *
      * @param emailRaEmailChange the emailRaEmailChange
      */
     public void setEmailRaEmailChangeTemplate(String emailRaEmailChange) {
         this.emailRaEmailChangeTemplate = emailRaEmailChange;
     }
-    
+
     /**
-     *
      * @param emailRaNewEmailChange the emailRaNewEmailChange
      */
     public void setEmailRaNewEmailChangeTemplate(String emailRaNewEmailChange) {
@@ -419,7 +421,7 @@ public class EmailService {
     }
 
     /**
-     * @param url the url that will be used to construct links back to the portal 
+     * @param url the url that will be used to construct links back to the portal
      */
     public void setBasePortalUrl(String url) {
         this.basePortalUrl = url;
@@ -445,12 +447,12 @@ public class EmailService {
     /*public void setEmailUserRoleChangeTemplate(String emailUserRoleChangeTemplate){
         this.emailAdminsRoleChangeTemplate = emailUserRoleChangeTemplate;
     }*/
-    
+
     /**
      * @param emailAdminsOnErrorTemplate the emailAdminsOnErrorTemplate to set
      */
-    public void setEmailAdminsOnErrorTemplate(String emailAdminsOnErrorTemplate){
-        this.emailAdminsOnErrorTemplate = emailAdminsOnErrorTemplate; 
+    public void setEmailAdminsOnErrorTemplate(String emailAdminsOnErrorTemplate) {
+        this.emailAdminsOnErrorTemplate = emailAdminsOnErrorTemplate;
     }
 
 }

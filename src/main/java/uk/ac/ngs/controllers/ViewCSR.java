@@ -12,18 +12,6 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -45,14 +33,20 @@ import uk.ac.ngs.security.CaUser;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CsrManagerService;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Page controller for the '/raop/viewcsr' page mapping.
- * Users with 'ROLE_RAOP' can view the CSR via a GET request and approve/delete 
- * the CSR using a {@link RequestRow} form POST. Note, a user with a ROLE_RAOP can perform these 
- * actions for any RA, including foreign RAs (i.e. not the RA's home RA). 
+ * Users with 'ROLE_RAOP' can view the CSR via a GET request and approve/delete
+ * the CSR using a {@link RequestRow} form POST. Note, a user with a ROLE_RAOP can perform these
+ * actions for any RA, including foreign RAs (i.e. not the RA's home RA).
  * <p>
- * This behaviour could be restricted in future so that RAs can only 
- * approve/delete requests from their home RA. 
+ * This behaviour could be restricted in future so that RAs can only
+ * approve/delete requests from their home RA.
  *
  * @author David Meredith
  */
@@ -63,8 +57,8 @@ public class ViewCSR {
     private static final Log log = LogFactory.getLog(ViewCSR.class);
     private SecurityContextService securityContextService;
     private JdbcRequestDao jdbcRequestDao;
-    private CsrManagerService csrManagerService; 
-    private JdbcCertificateDao certDao; 
+    private CsrManagerService csrManagerService;
+    private JdbcCertificateDao certDao;
     private final static Pattern DATA_PIN_PATTERN = Pattern.compile("PIN\\s?=\\s?(\\w+)$", Pattern.MULTILINE);
     private final static Pattern DATA_OWNERSERIAL_PATTERN = Pattern.compile("OWNERSERIAL\\s?=\\s?(\\w+)$", Pattern.MULTILINE);
     private final static Pattern DATA_NOTBEFORE_PATTERN = Pattern.compile("NOTBEFORE\\s?=\\s?(.+)$", Pattern.MULTILINE);
@@ -76,12 +70,12 @@ public class ViewCSR {
     public void populateModel(
             @RequestParam(value = "requestId", required = false) Integer requestId,
             ModelMap modelMap) {
-       
+
         // initial values 
         modelMap.put(CERTIDs_WITH_SAME_DN_MODELMAPPING, new ArrayList<Long>(0));
         modelMap.put(CSR_REQUESTROW_MODELMAPPING, new RequestRow());
         modelMap.put("lastViewRefreshDate", new Date());
-        modelMap.put("csr_serials_cns_with_same_bulkid", new HashMap<Long, String>(0)); 
+        modelMap.put("csr_serials_cns_with_same_bulkid", new HashMap<Long, String>(0));
 
         if (requestId != null) {
             //log.debug("model csr exits");
@@ -90,69 +84,68 @@ public class ViewCSR {
                 modelMap.put(CSR_REQUESTROW_MODELMAPPING, row);
 
                 // find all certs existing certs that have this DN  
-                Map<JdbcCertificateDao.WHERE_PARAMS, String> whereByParams = 
-                        new EnumMap<JdbcCertificateDao.WHERE_PARAMS, String>(JdbcCertificateDao.WHERE_PARAMS.class); 
-                whereByParams.put(JdbcCertificateDao.WHERE_PARAMS.DN_LIKE, row.getDn());  
-                List<CertificateRow> certRows = certDao.findBy(whereByParams, null, null); 
-                
+                Map<JdbcCertificateDao.WHERE_PARAMS, String> whereByParams =
+                        new EnumMap<JdbcCertificateDao.WHERE_PARAMS, String>(JdbcCertificateDao.WHERE_PARAMS.class);
+                whereByParams.put(JdbcCertificateDao.WHERE_PARAMS.DN_LIKE, row.getDn());
+                List<CertificateRow> certRows = certDao.findBy(whereByParams, null, null);
+
                 // build lists of cert ids 
-                List<Long> statusRevokedCertIds = new ArrayList<Long>(); 
-                List<Long> statusValidExpiredIds = new ArrayList<Long>(); 
-                List<Long> statusValidNotExpiredIds = new ArrayList<Long>(); 
-                List<Long> statusOtherIds = new ArrayList<Long>(); 
-                
+                List<Long> statusRevokedCertIds = new ArrayList<Long>();
+                List<Long> statusValidExpiredIds = new ArrayList<Long>();
+                List<Long> statusValidNotExpiredIds = new ArrayList<Long>();
+                List<Long> statusOtherIds = new ArrayList<Long>();
+
                 for (CertificateRow certRow : certRows) {
-                    if("REVOKED".equals(certRow.getStatus())){
+                    if ("REVOKED".equals(certRow.getStatus())) {
                         // add to REVOKED list 
                         statusRevokedCertIds.add(certRow.getCert_key());
-                    } else if("VALID".equals(certRow.getStatus())){
-                        Calendar cal=Calendar.getInstance(TimeZone.getTimeZone("UTC"));  
-                        Date now = cal.getTime();   
-                        if(now.after(certRow.getNotAfter())){
+                    } else if ("VALID".equals(certRow.getStatus())) {
+                        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                        Date now = cal.getTime();
+                        if (now.after(certRow.getNotAfter())) {
                             // add to VALID/EXPIRED list 
-                            statusValidExpiredIds.add(certRow.getCert_key()); 
+                            statusValidExpiredIds.add(certRow.getCert_key());
                         } else {
-                           // add to VALID/NOT-EXPIRED list 
-                           // Note, here should never be any instances of these 
-                           statusValidNotExpiredIds.add(certRow.getCert_key());  
+                            // add to VALID/NOT-EXPIRED list
+                            // Note, here should never be any instances of these
+                            statusValidNotExpiredIds.add(certRow.getCert_key());
                         }
                     } else {
                         // else add to unknown status list  
-                        statusOtherIds.add(certRow.getCert_key());  
+                        statusOtherIds.add(certRow.getCert_key());
                     }
                 }
-                modelMap.put("revokedCertIdsWithDN", statusRevokedCertIds); 
-                modelMap.put("validExpiredCertIdsWithDN", statusValidExpiredIds); 
-                modelMap.put("validNotExpiredCertIdsWithDN", statusValidNotExpiredIds); 
-                modelMap.put("otherCertIdsWithDN", statusOtherIds); 
+                modelMap.put("revokedCertIdsWithDN", statusRevokedCertIds);
+                modelMap.put("validExpiredCertIdsWithDN", statusValidExpiredIds);
+                modelMap.put("validNotExpiredCertIdsWithDN", statusValidNotExpiredIds);
+                modelMap.put("otherCertIdsWithDN", statusOtherIds);
 
                 // Does this CSR belong to a bulk? (does it have a bulk id)
-                if(row.getBulk() != null){
-                   // Yes, therefore we need to lookup all the other csr rows 
+                if (row.getBulk() != null) {
+                    // Yes, therefore we need to lookup all the other csr rows
                     // that have the same bulkID and same Status values. 
 
                     // Create a map used to define our where clauses (where bulkid = '5' and status = 'valid') 
-                    Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class); 
-                    whereParams.put(JdbcRequestDao.WHERE_PARAMS.BULKID_EQ, ""+row.getBulk()); 
+                    Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class);
+                    whereParams.put(JdbcRequestDao.WHERE_PARAMS.BULKID_EQ, "" + row.getBulk());
                     //whereParams.put(JdbcRequestDao.WHERE_PARAMS.STATUS_EQ, row.getStatus()); 
 
                     // Query the DB for related bulks
-                    List<RequestRow> otherBulks = this.jdbcRequestDao.findBy(whereParams, null, null); 
+                    List<RequestRow> otherBulks = this.jdbcRequestDao.findBy(whereParams, null, null);
                     // Iterate the returned rows and extract the serial numbers/PKs and CNs of those rows
-                    Map<Long, String> csrReq_keysCNsInBulk = new HashMap<Long, String>(0); 
-                    for(RequestRow requestRow : otherBulks){
+                    Map<Long, String> csrReq_keysCNsInBulk = new HashMap<Long, String>(0);
+                    for (RequestRow requestRow : otherBulks) {
                         // store the serial/pk and CN in the map               
-                        csrReq_keysCNsInBulk.put(requestRow.getReq_key(), requestRow.getCn()); 
+                        csrReq_keysCNsInBulk.put(requestRow.getReq_key(), requestRow.getCn());
                     }
                     // put the map into the model under the specified key
-                    modelMap.put("csr_serials_cns_with_same_bulkid", csrReq_keysCNsInBulk); 
+                    modelMap.put("csr_serials_cns_with_same_bulkid", csrReq_keysCNsInBulk);
                 }
-            } 
-        } 
+            }
+        }
     }
 
 
-   
     @RequestMapping(method = RequestMethod.GET)
     public void handleViewCertificate(ModelMap modelMap) {
 
@@ -180,7 +173,7 @@ public class ViewCSR {
                 modelMap.put("ownerserial", ownerserial);
             }
         } else {
-            modelMap.put("pin", ""); 
+            modelMap.put("pin", "");
             modelMap.put("notbefore", "");
             modelMap.put("ownerdn", "");
             modelMap.put("ownerserial", "");
@@ -189,14 +182,15 @@ public class ViewCSR {
 
     /**
      * Handle CSR {@link RequestRow} POSTs to "/raop/viewcsr/approve" to approve the csr.
-     * Note, only the csr.req_key and csr.status need to be POSTed for processing. 
+     * Note, only the csr.req_key and csr.status need to be POSTed for processing.
+     *
      * @param csr
      * @param result
      * @param redirectAttrs
      * @param sessionStatus
      * @param model
      * @param session
-     * @return 
+     * @return
      */
     @RequestMapping(value = "/approve", method = RequestMethod.POST)
     public String approveCSR(
@@ -207,46 +201,47 @@ public class ViewCSR {
             log.warn("binding and validation errors");
             return "raop/viewcsr";
         }
-        
+
         // Get the current CaUser (so we can extract their DN)  
         CaUser caUser = securityContextService.getCaUserDetails();
         long cert_key = caUser.getCertificateRow().getCert_key();
         long csrSerial = csr.getReq_key();
         // Note, MUST re-fetch the csr from the DB, because the viewed csr may be stale and 
         // we don't want to trust this potentially stale status. 
-        csr = this.jdbcRequestDao.findById(csrSerial); 
+        csr = this.jdbcRequestDao.findById(csrSerial);
         // check if host or user certificate (no pin for host request?)  
-        StringBuilder logmessage = new StringBuilder(); 
-        if("NEW".equals(csr.getStatus()) || "RENEW".equals(csr.getStatus())){
-            try {  
+        StringBuilder logmessage = new StringBuilder();
+        if ("NEW".equals(csr.getStatus()) || "RENEW".equals(csr.getStatus())) {
+            try {
                 this.csrManagerService.updateCsrStatus(csrSerial, cert_key, CsrManagerService.CSR_STATUS.APPROVED);
-                logmessage.append("RA approve CSR: RAOP=[").append(cert_key).append("] CSR_ID=[").append(csrSerial).append("]");  
-                log.info(logmessage); 
+                logmessage.append("RA approve CSR: RAOP=[").append(cert_key).append("] CSR_ID=[").append(csrSerial).append("]");
+                log.info(logmessage);
                 redirectAttrs.addFlashAttribute("message", "Approval performed ok [" + csrSerial + "]");
             } catch (IllegalCsrStateTransition ex) {
-               redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());  
+                redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
             }
         } else {
-            logmessage.append("Logic error on RA CSR approve - csr does not have required state: RAOP=[") 
-            .append(cert_key).append("] CSR_ID=[").append(csrSerial).append("] CSR Status=[").append(csr.getStatus()).append("]"); 
-            log.warn(logmessage); 
+            logmessage.append("Logic error on RA CSR approve - csr does not have required state: RAOP=[")
+                    .append(cert_key).append("] CSR_ID=[").append(csrSerial).append("] CSR Status=[").append(csr.getStatus()).append("]");
+            log.warn(logmessage);
             redirectAttrs.addFlashAttribute("errorMessage", "Approval denied CSR ["
-                          + csrSerial+"] has invalid status of ["+csr.getStatus()+"] required NEW or RENEW");
+                    + csrSerial + "] has invalid status of [" + csr.getStatus() + "] required NEW or RENEW");
         }
         return "redirect:/raop/viewcsr?requestId=" + csrSerial;
     }
-    
-   
+
+
     /**
-     * Handle CSR {@link RequestRow} POSTs to "/raop/viewcsr/delete" to delete the csr. 
-     * Note, only the csr.req_key and csr.status need to be POSTed for processing. 
+     * Handle CSR {@link RequestRow} POSTs to "/raop/viewcsr/delete" to delete the csr.
+     * Note, only the csr.req_key and csr.status need to be POSTed for processing.
+     *
      * @param csr
      * @param result
      * @param redirectAttrs
      * @param sessionStatus
      * @param model
      * @param session
-     * @return 
+     * @return
      */
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public String deleteCSR(
@@ -257,34 +252,35 @@ public class ViewCSR {
             log.warn("binding and validation errors");
             return "raop/viewcsr";
         }
-        
+
         // Get the current CaUser (so we can extract their DN)  
         CaUser caUser = securityContextService.getCaUserDetails();
         long cert_key = caUser.getCertificateRow().getCert_key();
         long csrSerial = csr.getReq_key();
         // Note, MUST re-fetch the csr from the DB, because the viewed csr may be stale and 
         // we don't want to trust this potentially stale status. 
-        csr = this.jdbcRequestDao.findById(csrSerial); 
+        csr = this.jdbcRequestDao.findById(csrSerial);
         StringBuilder logmessage = new StringBuilder();
-        if("NEW".equals(csr.getStatus()) || "RENEW".equals(csr.getStatus()) || "APPROVED".equals(csr.getStatus())){
-            try{
-                this.csrManagerService.updateCsrStatus(csrSerial, cert_key, CsrManagerService.CSR_STATUS.DELETED); 
-                logmessage.append("RA delete CSR: RAOP=[").append(cert_key).append("] CSR_ID=[").append(csrSerial); logmessage.append("]");  
+        if ("NEW".equals(csr.getStatus()) || "RENEW".equals(csr.getStatus()) || "APPROVED".equals(csr.getStatus())) {
+            try {
+                this.csrManagerService.updateCsrStatus(csrSerial, cert_key, CsrManagerService.CSR_STATUS.DELETED);
+                logmessage.append("RA delete CSR: RAOP=[").append(cert_key).append("] CSR_ID=[").append(csrSerial);
+                logmessage.append("]");
                 log.info(logmessage);
                 redirectAttrs.addFlashAttribute("message", "Deletion performed ok [" + csrSerial + "]");
-            } catch(IllegalCsrStateTransition ex){
-                redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());  
+            } catch (IllegalCsrStateTransition ex) {
+                redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
             }
         } else {
-            logmessage.append("Logic error on RA CSR delete - csr does not have required state: RAOP=[") 
-            .append(cert_key).append("] CSR_ID=[").append(csrSerial).append("] CSR Status=[").append(csr.getStatus()).append("]"); 
-            log.warn(logmessage); 
+            logmessage.append("Logic error on RA CSR delete - csr does not have required state: RAOP=[")
+                    .append(cert_key).append("] CSR_ID=[").append(csrSerial).append("] CSR Status=[").append(csr.getStatus()).append("]");
+            log.warn(logmessage);
             redirectAttrs.addFlashAttribute("errorMessage", "Deletion denied CSR [" + csrSerial + "]"
-                          + " has invalid status of ["+csr.getStatus()+"] required NEW, RENEW or APPROVED");
+                    + " has invalid status of [" + csr.getStatus() + "] required NEW, RENEW or APPROVED");
         }
         return "redirect:/raop/viewcsr?requestId=" + csrSerial;
     }
-    
+
 
     @Inject
     public void setCsrManagerService(CsrManagerService csrManagerService) {
@@ -308,12 +304,9 @@ public class ViewCSR {
 }
 
 
-
-
-
-     /**
-     * Handle POSTs to "/raop/viewcsr/delete" to delete the current csr
-     */
+/**
+ * Handle POSTs to "/raop/viewcsr/delete" to delete the current csr
+ */
     /*@RequestMapping(value = "/delete", method = RequestMethod.POST)
      public String deleteCSR(
      @Valid @ModelAttribute("csrSerialFormBean") GotoPageNumberFormBean csrSerialFormBean, BindingResult result,

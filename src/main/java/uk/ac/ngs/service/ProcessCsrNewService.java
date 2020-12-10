@@ -12,18 +12,6 @@
  */
 package uk.ac.ngs.service;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -46,6 +34,15 @@ import uk.ac.ngs.domain.RequestRow;
 import uk.ac.ngs.service.email.EmailService;
 import uk.ac.ngs.validation.CsrRequestDbValidator;
 import uk.ac.ngs.validation.CsrRequestValidationConfigParams;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Process Certificate Signing Requests for NEW certificates. Intended to be
@@ -90,14 +87,14 @@ public class ProcessCsrNewService {
      * row in the <tt>request</tt> table on success.
      *
      * @param csrAttributes
-     * @param clientData Identifies the calling client.
+     * @param clientData    Identifies the calling client.
      * @param email
      * @param pin
      * @return Instance indicates success or fail.
      */
     @Transactional
     public ProcessCsrResult processNewHostCSR_CreateOnServer(CsrAttributes csrAttributes,
-            CertificateRow clientData, String email, String pin) {
+                                                             CertificateRow clientData, String email, String pin) {
 
         return this.processCsrNew_Helper(true, null, csrAttributes, clientData, email, pin, CSR_Flags.Profile.UKHOST);
     }
@@ -114,7 +111,7 @@ public class ProcessCsrNewService {
      */
     @Transactional
     public ProcessCsrResult processNewUserCSR_CreateOnServer(CsrAttributes csrAttributes,
-            String email, String pin) {
+                                                             String email, String pin) {
 
         return this.processCsrNew_Helper(true, null, csrAttributes, null, email, pin, CSR_Flags.Profile.UKPERSON);
     }
@@ -124,7 +121,7 @@ public class ProcessCsrNewService {
      * performs validation and inserts a new row in the <tt>request</tt> table
      * on success.
      *
-     * @param csr PKCS#10 PEM string.
+     * @param csr        PKCS#10 PEM string.
      * @param clientData Identifies the calling client.
      * @param email
      * @param pin
@@ -132,7 +129,7 @@ public class ProcessCsrNewService {
      */
     @Transactional
     public ProcessCsrResult processNewHostCSR_Provided(String csr,
-            CertificateRow clientData, String email, String pin) {
+                                                       CertificateRow clientData, String email, String pin) {
         return this.processCsrNew_Helper(false, csr, null, clientData, email, pin, CSR_Flags.Profile.UKHOST);
     }
 
@@ -141,22 +138,22 @@ public class ProcessCsrNewService {
      * performs validation and inserts a new row in the <tt>request</tt> table
      * on success.
      *
-     * @param csr PKCS#10 PEM string.
+     * @param csr   PKCS#10 PEM string.
      * @param email
      * @param pin
      * @return Instance indicates success or fail.
      */
     @Transactional
     public ProcessCsrResult processNewUserCSR_Provided(String csr,
-            String email, String pin) {
+                                                       String email, String pin) {
         ProcessCsrResult ret = this.processCsrNew_Helper(false, csr, null, null, email, pin, CSR_Flags.Profile.UKPERSON);
         return ret;
 
     }
 
     private ProcessCsrResult processCsrNew_Helper(boolean createCsrOnServer,
-            String csr, CsrAttributes csrAttributes,
-            CertificateRow clientData, String email, String pin, CSR_Flags.Profile profile) {
+                                                  String csr, CsrAttributes csrAttributes,
+                                                  CertificateRow clientData, String email, String pin, CSR_Flags.Profile profile) {
         try {
             if (!createCsrOnServer && csr == null) {
                 throw new IllegalArgumentException("Creating CSR on client but no CSR provided");
@@ -167,7 +164,7 @@ public class ProcessCsrNewService {
             if (CSR_Flags.Profile.UKHOST.equals(profile) && clientData == null) {
                 throw new IllegalArgumentException("New HOST csr requested but no callingClient data provided");
             }
-            
+
             String pkcs8StrEnc = null;
             if (createCsrOnServer) {
                 String ou = csrAttributes.ra.trim().split("\\s")[0];
@@ -265,7 +262,7 @@ public class ProcessCsrNewService {
                     raEmails.add(raCert.getEmail());
                 }
             }
-                // if raEmails is empty (possible, since there may not be an RAOP 
+            // if raEmails is empty (possible, since there may not be an RAOP
             // for this RA anymore), then fallback to email the default list
             if (raEmails.isEmpty()) {
                 log.warn("No RAOP exits for [" + csrWrapper.getP10Loc() + " " + csrWrapper.getP10Ou() + "] emailing CA default");
@@ -305,7 +302,7 @@ public class ProcessCsrNewService {
     }
 
     private RequestRow getRequestRow(PKCS10_RequestWrapper csrWrapper,
-            String pin, String email, long req_key) throws IOException {
+                                     String pin, String email, long req_key) throws IOException {
         // Create DB request row  
         // Note the following pre-conditions for our CA DB: 
         // requestRow.setDn() has to be in RFC2253 with this OID structure order: (CN, L, OU, O, C) 
@@ -379,6 +376,7 @@ public class ProcessCsrNewService {
 //    public synchronized void setEmailUserOnNew(boolean emailUserOnNew) {
 //        this.emailUserOnNew = emailUserOnNew;
 //    }
+
     /**
      * @param emailService the emailService to set
      */

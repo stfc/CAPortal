@@ -12,14 +12,6 @@
  */
 package uk.ac.ngs.validation;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -37,16 +29,25 @@ import uk.ac.ngs.domain.CSR_Flags.Csr_Types;
 import uk.ac.ngs.domain.CSR_Flags.Profile;
 import uk.ac.ngs.domain.PKCS10_RequestWrapper;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- * Top level  {@link Validator} for PKCS10 CSR requests. 
- * This class invokes the collaborators passed in the constructor 
- * and should be called before insertion of new CSRs into the DB.  
- * A number of preconditions must be satisfied before the CSR can be inserted 
- * which vary according to the type of CSR wrapped by {@link PKCS10_RequestWrapper}.   
- * 
+ * Top level  {@link Validator} for PKCS10 CSR requests.
+ * This class invokes the collaborators passed in the constructor
+ * and should be called before insertion of new CSRs into the DB.
+ * A number of preconditions must be satisfied before the CSR can be inserted
+ * which vary according to the type of CSR wrapped by {@link PKCS10_RequestWrapper}.
+ * <p>
  * Typical usage outside of the Spring context requires you create an
  * {@link org.springframework.validation.Errors} implementation. You can use the
- * Spring MapBindingResult as shown below:  
+ * Spring MapBindingResult as shown below:
  * <code>
  * CsrRequestDbValidator validator = new CsrRequestDbValidator(dnValidator, csrValidator);
  * Errors errors = new MapBindingResult(new HashMap<String, String>(), "csrPemStrRequest");
@@ -59,36 +60,36 @@ import uk.ac.ngs.domain.PKCS10_RequestWrapper;
 public class CsrRequestDbValidator implements Validator {
 
     private static final Log log = LogFactory.getLog(CsrRequestDbValidator.class);
-    private final PKCS10Parser csrParser = new PKCS10Parser(); 
+    private final PKCS10Parser csrParser = new PKCS10Parser();
     private JdbcRequestDao jdbcRequestDao;
-    private JdbcCertificateDao jdbcCertificateDao; 
-    private Validator csrValidator; 
-    private Validator dnValidator; 
+    private JdbcCertificateDao jdbcCertificateDao;
+    private final Validator csrValidator;
+    private final Validator dnValidator;
     private final EmailValidator emailValidator = new EmailValidator();
-    private MutableConfigParams mutableConfigParams; 
+    private MutableConfigParams mutableConfigParams;
 
 
     /**
-     * Construct a new instance by providing the collaborator {@link Validator} instances. 
-     * <tt>setJdbcRequestDao()</tt> and <tt>setJdbcCertificateDao()</tt>  
-     * must also be called as these are required collaborators. 
-     * 
-     * @param dnValidator Must support validation of {@link PKCS10_RequestWrapper} instances. 
-     * @param csrValidator Must support validation of CSR PEM {@link String} instances.  
+     * Construct a new instance by providing the collaborator {@link Validator} instances.
+     * <tt>setJdbcRequestDao()</tt> and <tt>setJdbcCertificateDao()</tt>
+     * must also be called as these are required collaborators.
+     *
+     * @param dnValidator  Must support validation of {@link PKCS10_RequestWrapper} instances.
+     * @param csrValidator Must support validation of CSR PEM {@link String} instances.
      */
-    public CsrRequestDbValidator(Validator dnValidator, Validator csrValidator){
-        if(dnValidator == null || !dnValidator.supports(PKCS10_RequestWrapper.class)){
+    public CsrRequestDbValidator(Validator dnValidator, Validator csrValidator) {
+        if (dnValidator == null || !dnValidator.supports(PKCS10_RequestWrapper.class)) {
             throw new IllegalArgumentException(
-                    "The supplied [Validator] must support the validation of [PKCS10_RequestWrapper] instances."); 
+                    "The supplied [Validator] must support the validation of [PKCS10_RequestWrapper] instances.");
         }
-        if(csrValidator == null || !csrValidator.supports(String.class)){
+        if (csrValidator == null || !csrValidator.supports(String.class)) {
             throw new IllegalArgumentException(
-                    "The supplied [Validator] must support the validation of PEM [String] instances."); 
+                    "The supplied [Validator] must support the validation of PEM [String] instances.");
         }
-        this.dnValidator = dnValidator; 
-        this.csrValidator = csrValidator; 
+        this.dnValidator = dnValidator;
+        this.csrValidator = csrValidator;
     }
-    
+
     @Override
     public boolean supports(Class<?> type) {
         return PKCS10_RequestWrapper.class.equals(type);
@@ -129,14 +130,14 @@ public class CsrRequestDbValidator implements Validator {
         }
 
         // Validate according to which type of csr request 
-        if(requestWrapper.getCsr_type().equals(CSR_Flags.Csr_Types.NEW)){
-           this.validateCSR_NEW(errors, requestWrapper, req); 
-           
-        } else if(requestWrapper.getCsr_type().equals(CSR_Flags.Csr_Types.RENEW)){
-            this.validateCSR_RENEW(errors, requestWrapper, req); 
-            
+        if (requestWrapper.getCsr_type().equals(CSR_Flags.Csr_Types.NEW)) {
+            this.validateCSR_NEW(errors, requestWrapper, req);
+
+        } else if (requestWrapper.getCsr_type().equals(CSR_Flags.Csr_Types.RENEW)) {
+            this.validateCSR_RENEW(errors, requestWrapper, req);
+
         } else {
-            throw new IllegalStateException("Error - Unknown Csr_Types"); 
+            throw new IllegalStateException("Error - Unknown Csr_Types");
         }
         if (errors.hasErrors()) {
             return;
@@ -145,9 +146,10 @@ public class CsrRequestDbValidator implements Validator {
     }
 
     /**
-     * Validate the client data invariants for NEW/RENEW UKHOST. 
+     * Validate the client data invariants for NEW/RENEW UKHOST.
+     *
      * @param errors
-     * @param csrWrapper 
+     * @param csrWrapper
      */
     private void validateClientDataInvariants(Errors errors, PKCS10_RequestWrapper csrWrapper) {
         // ClientData is required For a NEW UKHOST request 
@@ -160,24 +162,24 @@ public class CsrRequestDbValidator implements Validator {
                 // Note, vaildation of DN is not strictly needed here as its
                 // performed by the injected dnValidator, but this check 
                 // maintains clientData invarient requirements. 
-                errors.reject("pkcs10.validation.request.invalid.clientDN", 
+                errors.reject("pkcs10.validation.request.invalid.clientDN",
                         "Invalid ClientData DN is null or invalid");
             }
             if (!emailValidator.validate(csrWrapper.getClientEmail())) {
-                errors.reject("pkcs10.validation.request.invalid.clientEmail", 
+                errors.reject("pkcs10.validation.request.invalid.clientEmail",
                         "Invalid ClientEmail");
             }
             if (!(csrWrapper.getClientSerial() >= 0)) {
-                errors.reject("pkcs10.validation.request.invalid.clientSerial", 
+                errors.reject("pkcs10.validation.request.invalid.clientSerial",
                         "Invalid ClientSerial is invalid");
             }
         }
     }
 
 
-    private void validateCSR_RENEW(Errors errors, PKCS10_RequestWrapper requestWrapper, 
-            PKCS10CertificationRequest req){
-        
+    private void validateCSR_RENEW(Errors errors, PKCS10_RequestWrapper requestWrapper,
+                                   PKCS10CertificationRequest req) {
+
         // Up to this point, user has passed either SSL or PPPK client auth using 
         // an existing VALID/non-expired cert (requestWrapper.clientData). 
         // 
@@ -200,15 +202,15 @@ public class CsrRequestDbValidator implements Validator {
         // excluding the optional leading email attribute(s), the format of the 
         // clientDN is RFC2253 (comma separators with no spaces) which means the 
         // clientDN MUST ALWAYS contain the csrRFC2253DN. 
-       
+
         // Get the Subject DN string with following structure order: (CN, L, OU, O, C)  
         String csrRFC2253DN = CertUtil.getDbCanonicalDN(req.getSubject().toString());
-        
-        if(!requestWrapper.getClientDN().toLowerCase(Locale.ENGLISH).contains(
-                csrRFC2253DN.toLowerCase(Locale.ENGLISH))){
-            errors.reject("pkcs10.validation.request.renew.csrdn.notmatch.clientdn", 
+
+        if (!requestWrapper.getClientDN().toLowerCase(Locale.ENGLISH).contains(
+                csrRFC2253DN.toLowerCase(Locale.ENGLISH))) {
+            errors.reject("pkcs10.validation.request.renew.csrdn.notmatch.clientdn",
                     "Invalid Renew - Renew CSR DN does not match the clients certificate DN");
-            return; 
+            return;
         }
         // Check that a valid and non-expired certificate exists in our CA DB 
         // with the specified clientDN (i.e. the auth cert's DN - can't renew imaginary certificate). 
@@ -217,45 +219,45 @@ public class CsrRequestDbValidator implements Validator {
         // This is because all DNs in the cert table are in a RFC2253 style (i.e. 
         // comma-separated with no spaces - but host cert DNs may be pre-pended 
         // with emailAddress=<value>) 
-        if( 0 >= this.jdbcCertificateDao.countByStatusIsVALIDNotExpired(csrRFC2253DN, 0)){
-            errors.reject("pkcs10.validation.request.renew.cert.notexist", 
-                    "Invalid Renew - A valid and non-expired certificate with specified DN does not exist"); 
-            return; 
+        if (0 >= this.jdbcCertificateDao.countByStatusIsVALIDNotExpired(csrRFC2253DN, 0)) {
+            errors.reject("pkcs10.validation.request.renew.cert.notexist",
+                    "Invalid Renew - A valid and non-expired certificate with specified DN does not exist");
+            return;
         }
 
         // Are we supporting renewal of bulk certificates? (requires bulk_chain, seq_bulk to be deployed)  
-        boolean doBulkChain; 
-        try { 
+        boolean doBulkChain;
+        try {
             doBulkChain = Boolean.parseBoolean(this.mutableConfigParams.getProperty("support.bulk.on.renew"));
-        } catch(IOException ex){
+        } catch (IOException ex) {
             Logger.getLogger(CsrRequestDbValidator.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);   
+            throw new RuntimeException(ex);
         }
-        if(!doBulkChain) {
+        if (!doBulkChain) {
             // Detect if this a RENEWAL of a bulk certificate and if true, reject.   
             Long bulkId = this.jdbcRequestDao.getBulkIdForCertBy_Dn_Valid_NotExpired(csrRFC2253DN);
-            if(bulkId != null){
-                errors.reject("pkcs10.validation.request.renew.cert.bulkrenew", 
+            if (bulkId != null) {
+                errors.reject("pkcs10.validation.request.renew.cert.bulkrenew",
                         "Invalid Renew - Renewal maps to a bulk certificate and bulk renewals are not supported via the portal"
-                                + " - please contact the helpdesk if you need this feature"); 
-                return; 
+                                + " - please contact the helpdesk if you need this feature");
+                return;
             }
         }
     }
 
-    private void validateCSR_NEW(Errors errors, PKCS10_RequestWrapper requestWrapper, 
-            PKCS10CertificationRequest req){
+    private void validateCSR_NEW(Errors errors, PKCS10_RequestWrapper requestWrapper,
+                                 PKCS10CertificationRequest req) {
         // Note, we do not check for VALID rows in the certificate table using 
         // RFC 1779 style DN (i.e. the 'does PKCS#10 request already exist with an RFC1779 DN' check). 
         // This is because all DNs in the cert table MUST be a RFC2253 style (i.e. 
         // comma-separated with no spaces - but host cert DNs may be pre-pended 
         // with emailAddress=<value>) 
-        
+
         // Get the Subject DN string with following structure order: (CN, L, OU, O, C)  
         String csrRFC2253DN = CertUtil.getDbCanonicalDN(req.getSubject().toString());
-        
-        Profile profile = requestWrapper.getProfile(); 
-        Csr_Types csr_type = requestWrapper.getCsr_type(); 
+
+        Profile profile = requestWrapper.getProfile();
+        Csr_Types csr_type = requestWrapper.getCsr_type();
         if (Profile.UKHOST.equals(profile)) {
             if (CSR_Flags.Csr_Types.NEW.equals(csr_type)) {
                 // For NEW host requests, we WANT to allow existing certs that MAY 
@@ -267,7 +269,7 @@ public class CsrRequestDbValidator implements Validator {
                 // a leading emailAddress attribute, a certificate will be 
                 // found using "dn like '%cannoncialDN'" so CSR will be accepted. 
                 //namedParameters.put("dn", "%" + rfc2253DN);
-                csrRFC2253DN = "%"+csrRFC2253DN; 
+                csrRFC2253DN = "%" + csrRFC2253DN;
             } else {
                 throw new IllegalStateException("Unsupported CSR Type");
             }
@@ -275,24 +277,24 @@ public class CsrRequestDbValidator implements Validator {
         } else {
             throw new IllegalStateException("Unsupported CSR Profile");
         }
-        
-        if(this.jdbcCertificateDao.countByStatusIsVALIDNotExpired(csrRFC2253DN, 0) > 0){
-           // if CSR=NEW, it is an error if a valid cert already exists 
-            errors.reject("pkcs10.validation.request.already.exits.with.dn", 
+
+        if (this.jdbcCertificateDao.countByStatusIsVALIDNotExpired(csrRFC2253DN, 0) > 0) {
+            // if CSR=NEW, it is an error if a valid cert already exists
+            errors.reject("pkcs10.validation.request.already.exits.with.dn",
                     "A Certificate with this DN already exists");
-            return; 
+            return;
         }
-        
+
     }
-    
+
     private void validateCommon(Errors errors, PKCS10_RequestWrapper requestWrapper,
-            PublicKey pubkey, PKCS10CertificationRequest req) {
+                                PublicKey pubkey, PKCS10CertificationRequest req) {
 
         // email is always needed
         if (!emailValidator.validate(requestWrapper.getEmail())) {
-            errors.reject("pkcs10.validation.request.invalid.Email", 
-            "Invalid Email");
-            return; 
+            errors.reject("pkcs10.validation.request.invalid.Email",
+                    "Invalid Email");
+            return;
         }
 
         // Validate the csrPemString for a syntatcially correct PKCS10 
@@ -370,8 +372,8 @@ public class CsrRequestDbValidator implements Validator {
     }
 
     @Inject
-    public void setMutableConfigParams(MutableConfigParams mutableConfigParams){
-       this.mutableConfigParams = mutableConfigParams;  
+    public void setMutableConfigParams(MutableConfigParams mutableConfigParams) {
+        this.mutableConfigParams = mutableConfigParams;
     }
 
 }

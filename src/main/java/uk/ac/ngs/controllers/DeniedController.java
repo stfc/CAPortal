@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/denied")
 public class DeniedController {
-   
+
     /**
      * Handle GETs to '/denied' for Idempotent page refreshes.
      */

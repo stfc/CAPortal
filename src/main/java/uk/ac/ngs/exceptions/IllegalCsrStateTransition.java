@@ -13,7 +13,8 @@
 package uk.ac.ngs.exceptions;
 
 /**
- * Thrown when a CSR request update requests an illegal state transition. 
+ * Thrown when a CSR request update requests an illegal state transition.
+ *
  * @author David Meredith
  */
 public class IllegalCsrStateTransition extends Exception {

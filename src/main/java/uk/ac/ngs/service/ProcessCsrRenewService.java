@@ -12,18 +12,6 @@
  */
 package uk.ac.ngs.service;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -48,11 +36,20 @@ import uk.ac.ngs.service.email.EmailService;
 import uk.ac.ngs.validation.CsrRequestDbValidator;
 import uk.ac.ngs.validation.CsrRequestValidationConfigParams;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Process CSR RENEW requests.
  * Intended to be called from higher level layers, e.g. from Web controllers.
- * TODO: Throw runtime exceptions that are more suitable for business layer, 
- * extract interface once stable. 
+ * TODO: Throw runtime exceptions that are more suitable for business layer,
+ * extract interface once stable.
  *
  * @author David Meredith
  */
@@ -64,20 +61,20 @@ public class ProcessCsrRenewService {
     private CsrRequestValidationConfigParams csrRequestValidationConfigParams;
     private CsrRequestDbValidator csrRequestDbValidator;
     private JdbcRequestDao jdbcRequestDao;
-    private JdbcBulk_ChainDao jdbcBulk_ChainDao; 
-//    private String agent = "Portal";
+    private JdbcBulk_ChainDao jdbcBulk_ChainDao;
+    //    private String agent = "Portal";
 //    private boolean emailRaOnRenew = true;
     private EmailService emailService;
-    private JdbcCertificateDao certDao; 
-    private MutableConfigParams mutableConfigParams; 
+    private JdbcCertificateDao certDao;
+    private MutableConfigParams mutableConfigParams;
 
     /**
      * Process the client provided PKCKS#10 CSR RENEW request. Validates and
      * inserts a new row into the <tt>request</tt> table on success.
      *
-     * @param csr PKCS#10 Certificate Signing Request as PEM string
+     * @param csr          PKCS#10 Certificate Signing Request as PEM string
      * @param renewCertRow User who is renewing their certificate.
-     * @param newEmail Used to request a new email for this renewal. 
+     * @param newEmail     Used to request a new email for this renewal.
      * @return Instance indicates if request succeeded or failed.
      */
     @Transactional
@@ -89,9 +86,9 @@ public class ProcessCsrRenewService {
      * Create a new PKCS#10 CSR RENEW request using the provided password and renewCertRow.
      * Validates and inserts a new row into the <tt>request</tt> table on success.
      *
-     * @param pw A password used to encrypt the returned PKCS#8 private key.
+     * @param pw           A password used to encrypt the returned PKCS#8 private key.
      * @param renewCertRow User who is renewing their certificate.
-     * @param newEmail Used to request a new email for this renewal. 
+     * @param newEmail     Used to request a new email for this renewal.
      * @return Instance indicates if request succeeded or failed.
      */
     @Transactional
@@ -100,19 +97,19 @@ public class ProcessCsrRenewService {
     }
 
     private ProcessCsrResult renewHelper(boolean createKeysOnServer, String pw, String csr,
-            CertificateRow renewCertRow, String newEmail) {
+                                         CertificateRow renewCertRow, String newEmail) {
         try {
             // Get the client cert and details
             long clientSerial = renewCertRow.getCert_key();
             String clientEmail = renewCertRow.getEmail();
             String clientDN = renewCertRow.getDn();
-            String role = renewCertRow.getRole(); 
-            log.info("Self RENEW for [" + clientSerial + "] [" + clientEmail + "] ["+role+"]");
-            
+            String role = renewCertRow.getRole();
+            log.info("Self RENEW for [" + clientSerial + "] [" + clientEmail + "] [" + role + "]");
+
             String ou = uk.ac.ngs.common.CertUtil.extractDnAttribute(clientDN, uk.ac.ngs.common.CertUtil.DNAttributeType.OU);
             String loc = uk.ac.ngs.common.CertUtil.extractDnAttribute(clientDN, uk.ac.ngs.common.CertUtil.DNAttributeType.L);
             String cn = uk.ac.ngs.common.CertUtil.extractDnAttribute(clientDN, uk.ac.ngs.common.CertUtil.DNAttributeType.CN);
-            
+
             // Renewal may optionally request an update to the associated email address. 
             // The email value is recorded in 3 places in the 'request' table: 
             // - 'data' column value includes 'OWNEREMAIL=emailVal' in the text blob
@@ -122,11 +119,11 @@ public class ProcessCsrRenewService {
             // table will be added that includes the updated email value in the 'certifcate.email' column 
             // This is ok for a RENEWAL, because the new cert's signature will be created/bound to 
             // the new email value. 
-            boolean emailUpdate = false; 
-            if(newEmail != null && !"".equals(newEmail.trim()) ) {
-                log.info("Self RENEW requests an email change from ["+ clientEmail + "] to ["+newEmail+"]");
+            boolean emailUpdate = false;
+            if (newEmail != null && !"".equals(newEmail.trim())) {
+                log.info("Self RENEW requests an email change from [" + clientEmail + "] to [" + newEmail + "]");
                 clientEmail = newEmail.trim();
-                emailUpdate = true; 
+                emailUpdate = true;
             }  
             /*
             boolean emailUpdate; 
@@ -137,9 +134,9 @@ public class ProcessCsrRenewService {
                 log.info("Self RENEW requests an email change from ["+ clientEmail + "] to ["+newEmail+"]");
                 emailUpdate = true; 
             }
-            */ 
-            
-            
+            */
+
+
             String pkcs8StrEnc = null;
             if (createKeysOnServer) {
                 X500NameBuilder x500NameBld = new X500NameBuilder(BCStyle.INSTANCE);
@@ -149,13 +146,13 @@ public class ProcessCsrRenewService {
                 x500NameBld.addRDN(BCStyle.L, loc);
                 x500NameBld.addRDN(BCStyle.CN, cn);
                 X500Name subject = x500NameBld.build();
-                
+
                 CsrAndPrivateKeyPemStringBuilder csrFactoryService = new CsrAndPrivateKeyPemStringBuilder();
                 String[] pems = csrFactoryService.getPkcs10_Pkcs8_AsPemStrings(subject, clientEmail, pw); // change clientEmail to newEmail
                 csr = pems[0];
                 pkcs8StrEnc = pems[1];
             }
-            
+
             // Determine renew profile
             CSR_Flags.Profile renewProfile;
             if (renewCertRow.getDn().contains(".")) {
@@ -168,16 +165,16 @@ public class ProcessCsrRenewService {
                     CSR_Flags.Csr_Types.RENEW, renewProfile, csr, clientEmail); // change to newEmail 
             builder.setClientData(clientEmail, clientDN, clientSerial);   // keep as clientEmail 
             PKCS10_RequestWrapper csrWrapper = builder.build();
-            
+
             // Validate
-            if(emailUpdate && clientDN.contains("@")){
+            if (emailUpdate && clientDN.contains("@")) {
                 // Prevent renewal of a cert that contains an email in the DN if 
                 // the renew requests a change of email address (because the DN 
                 // is already bound to the existing email address) 
                 // Temp hack: This needs to go into the validation, not here ! 
                 Errors errors = new MapBindingResult(new HashMap<String, String>(), "csrWrapper");
                 errors.reject("", "Can't renew a certificate and request a change of email if the certificate already contains an email in the DN");
-                return new ProcessCsrResult(errors, csrWrapper); 
+                return new ProcessCsrResult(errors, csrWrapper);
             }
             // Note, validation for renewals compares the calling client's DN with
             // the  DN of the CSR to ensure they are the same, otherwise any valid
@@ -189,30 +186,30 @@ public class ProcessCsrRenewService {
             }
             // Temporary return here while in development
             //if(true){ return "SUCCESS: CSR submitted ok [xxx]"; }
-            
-            String agent = this.mutableConfigParams.getProperty("db.request.row.data.col.version.value"); 
+
+            String agent = this.mutableConfigParams.getProperty("db.request.row.data.col.version.value");
             long req_key = this.jdbcRequestDao.getNextPrimaryKey();
             RequestRow requestRow = this.createRequestRow(csrWrapper, clientEmail, role, req_key, agent); // change to newEmail 
 
             // If we are supporting bulk (bulk_chain and seq_bulk are supported), then map/correlate bulk ids in bulk_chain. 
             boolean doBulkChain = Boolean.parseBoolean(this.mutableConfigParams.getProperty("support.bulk.on.renew"));
-            if(doBulkChain){
-                Long existingBulkId = this.jdbcRequestDao.getBulkIdForCertBy_Dn_Valid_NotExpired(  requestRow.getDn()  );  
-                if(existingBulkId != null) {
-                    log.info("Self RENEW is for a bulk cert oldBulkId is ["+existingBulkId+"]"); // e.g. 1234567946 
-                    Long newId = this.jdbcBulk_ChainDao.getCreateNewIdForOldId( existingBulkId );
-                    requestRow.setBulk(newId); 
+            if (doBulkChain) {
+                Long existingBulkId = this.jdbcRequestDao.getBulkIdForCertBy_Dn_Valid_NotExpired(requestRow.getDn());
+                if (existingBulkId != null) {
+                    log.info("Self RENEW is for a bulk cert oldBulkId is [" + existingBulkId + "]"); // e.g. 1234567946
+                    Long newId = this.jdbcBulk_ChainDao.getCreateNewIdForOldId(existingBulkId);
+                    requestRow.setBulk(newId);
                 } else {
-                    log.info("Self RENEW is not for a bulk cert");  
+                    log.info("Self RENEW is not for a bulk cert");
                 }
             }
-            
+
             // Insert new request row
             this.csrManagerService.insertCsr(requestRow);
             log.info("Self RENEW created new CSR renew request [" + req_key + "] for client DN:[" + clientDN + "] serial:[" + clientSerial + "]");
-           
-            boolean emailRaOnRenew = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.ra.on.renew")); 
-       
+
+            boolean emailRaOnRenew = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.ra.on.renew"));
+
             if (emailRaOnRenew) {
                 Set<String> raEmails = new HashSet<String>(0); // use set so duplicates aren't added
                 // Find all the RA email addresses, iterate and send
@@ -224,39 +221,39 @@ public class ProcessCsrRenewService {
                 }
                 // if raEmails is empty (possible, since there may not be an RAOP 
                 // for this RA anymore), then fallback to email the default list
-                if(raEmails.isEmpty()){
-                    log.warn("No RAOP exits for ["+csrWrapper.getP10Loc()+" "+csrWrapper.getP10Ou()+"] emailing CA default");
-                    String[] allemails = this.mutableConfigParams.getProperty("email.admin.addresses").split(",");  
+                if (raEmails.isEmpty()) {
+                    log.warn("No RAOP exits for [" + csrWrapper.getP10Loc() + " " + csrWrapper.getP10Ou() + "] emailing CA default");
+                    String[] allemails = this.mutableConfigParams.getProperty("email.admin.addresses").split(",");
                     raEmails.addAll(Arrays.asList(allemails));
                 }
-                
+
                 this.emailService.sendRaEmailOnCsrRenew(csrWrapper.getP10Req().getSubject().toString(), raEmails, req_key, emailUpdate);
             }
             return new ProcessCsrResult(req_key, csrWrapper, pkcs8StrEnc);
-            
+
         } catch (IOException ex) {
             Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex); 
+            throw new RuntimeException(ex);
         } catch (InvalidKeyException ex) {
             Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex); 
+            throw new RuntimeException(ex);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex); 
+            throw new RuntimeException(ex);
         } catch (NoSuchProviderException ex) {
             Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex); 
+            throw new RuntimeException(ex);
         } catch (OperatorCreationException ex) {
             Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex); 
+            throw new RuntimeException(ex);
         } catch (PKCSException ex) {
             Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex); 
+            throw new RuntimeException(ex);
         }
     }
 
     private RequestRow createRequestRow(PKCS10_RequestWrapper csrWrapper,
-            String email, String role, long req_key, String agent) throws IOException {
+                                        String email, String role, long req_key, String agent) throws IOException {
         // Create DB request row 
         // Note the following pre-conditions for our CA DB: 
         // requestRow.setDn() has to be in RFC2253 with this OID structure order: (CN, L, OU, O, C) 
@@ -311,9 +308,9 @@ public class ProcessCsrRenewService {
     }
 
 
-    @Inject 
-    public void setJdbcBulk_ChainDao(JdbcBulk_ChainDao jdbcBulk_ChainDao){
-        this.jdbcBulk_ChainDao = jdbcBulk_ChainDao; 
+    @Inject
+    public void setJdbcBulk_ChainDao(JdbcBulk_ChainDao jdbcBulk_ChainDao) {
+        this.jdbcBulk_ChainDao = jdbcBulk_ChainDao;
     }
 
     /**
@@ -340,15 +337,15 @@ public class ProcessCsrRenewService {
     public void setEmailService(EmailService emailService) {
         this.emailService = emailService;
     }
-    
+
     @Inject
     public void setJdbcCertificateDao(JdbcCertificateDao dao) {
         this.certDao = dao;
     }
 
     @Inject
-    public void setMutableConfigParams(MutableConfigParams mutableConfigParams){
-       this.mutableConfigParams = mutableConfigParams;  
+    public void setMutableConfigParams(MutableConfigParams mutableConfigParams) {
+        this.mutableConfigParams = mutableConfigParams;
     }
 
 }

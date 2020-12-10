@@ -13,37 +13,36 @@
 
 package uk.ac.ngs.forms;
 
-import java.io.Serializable;
 import uk.ac.ngs.domain.RequestRow;
 
+import java.io.Serializable;
+
 /**
- *
  * @author djm76
  */
 public class RequestRowViewWrapper implements Serializable {
-        private final boolean checked; 
-        private RequestRow requestRow; 
+    private final boolean checked;
+    private RequestRow requestRow;
 
-        public RequestRowViewWrapper(boolean checked, RequestRow requestRow) {
-            this.checked = checked;
-            this.requestRow = requestRow;
-        }
+    public RequestRowViewWrapper(boolean checked, RequestRow requestRow) {
+        this.checked = checked;
+        this.requestRow = requestRow;
+    }
 
-        /**
-         * @return the checked
-         */
-        public boolean getChecked() {
-            return checked;
-        }
+    /**
+     * @return the checked
+     */
+    public boolean getChecked() {
+        return checked;
+    }
 
-        
 
-        /**
-         * @return the requestRow
-         */
-        public RequestRow getRequestRow() {
-            return requestRow;
-        } 
+    /**
+     * @return the requestRow
+     */
+    public RequestRow getRequestRow() {
+        return requestRow;
+    }
 
     /**
      * @param requestRow the requestRow to set

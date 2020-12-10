@@ -12,44 +12,45 @@
  */
 package uk.ac.ngs.forms;
 
-import java.io.Serializable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 /**
- * Form bean for submitting CSR searches. 
+ * Form bean for submitting CSR searches.
+ *
  * @author David Meredith
  */
-public class SearchCsrFormBean implements Serializable{
-  
-   @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$") 
-   private String ra;
+public class SearchCsrFormBean implements Serializable {
 
-   @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-   private String name; 
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String ra;
 
-   @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-   private String dn; 
-   
-   @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-   private String data; 
-   
-   @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-   private String status; 
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String name;
 
-   @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
-   private String emailAddress; 
-    
-   private Boolean searchNullEmailAddress = false; 
-   
-   @Min(value=0, message="0 is minimum")
-   private Integer req_key; 
-   
-   @Min(value=0, message="0 is minimum")
-   private Integer showRowCount = 10; 
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String dn;
 
-    @Min(value=0, message="0 is minimum")
-    private Integer startRow = 0; 
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String data;
+
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String status;
+
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
+    private String emailAddress;
+
+    private Boolean searchNullEmailAddress = false;
+
+    @Min(value = 0, message = "0 is minimum")
+    private Integer req_key;
+
+    @Min(value = 0, message = "0 is minimum")
+    private Integer showRowCount = 10;
+
+    @Min(value = 0, message = "0 is minimum")
+    private Integer startRow = 0;
 
     /**
      * @return the ra
@@ -163,10 +164,11 @@ public class SearchCsrFormBean implements Serializable{
         this.searchNullEmailAddress = searchNullEmailAddress;
     }
 
-    
+
     public String getEmailAddress() {
         return emailAddress;
     }
+
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
     }
@@ -184,5 +186,5 @@ public class SearchCsrFormBean implements Serializable{
     public void setStartRow(Integer startRow) {
         this.startRow = startRow;
     }
-    
+
 }

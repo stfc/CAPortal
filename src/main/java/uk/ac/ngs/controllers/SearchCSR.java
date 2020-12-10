@@ -12,26 +12,13 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.ac.ngs.common.Pair;
@@ -45,15 +32,20 @@ import uk.ac.ngs.forms.SearchCsrFormBean;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.util.*;
+
 /**
- * Controller for the "/raop/searchcsr" page for CSR searches. 
+ * Controller for the "/raop/searchcsr" page for CSR searches.
  * <p>
  * The controller handles pagination through CSR domain object results.
- * Searches can be submitted via GET or POST - both do the same validation.  
+ * Searches can be submitted via GET or POST - both do the same validation.
  * On submission of a form POST, posted params are validated and the request
- * is re-directed to the GET handler with the appropriate GET request params 
+ * is re-directed to the GET handler with the appropriate GET request params
  * for the search. This way, a similar code path is used to execute DB searches
- * (same apart from the GET/POST entry point). 
+ * (same apart from the GET/POST entry point).
  *
  * @author David Meredith
  */
@@ -65,25 +57,25 @@ public class SearchCSR {
     private static final Log log = LogFactory.getLog(SearchCSR.class);
     private JdbcRequestDao jdbcRequestDao;
     private JdbcRalistDao ralistDao;
-    private SecurityContextService securityContextService; 
-    
+    private SecurityContextService securityContextService;
+
     /**
-     * Name of the model attribute used to bind form POSTs.  
+     * Name of the model attribute used to bind form POSTs.
      */
-    public static final String SEARCH_CSR_FORM_BEAN_SESSIONSCOPE = "searchCsrFormBean"; 
+    public static final String SEARCH_CSR_FORM_BEAN_SESSIONSCOPE = "searchCsrFormBean";
     /**
-     * Name of model attribute that stores search results in session. 
-     * Accessed in JSP using <code>${sessionScope.csrSearchPageHolder}</code> 
+     * Name of model attribute that stores search results in session.
+     * Accessed in JSP using <code>${sessionScope.csrSearchPageHolder}</code>
      */
-    public static final String CSR_PAGE_LIST_HOLDER_SESSIONSCOPE = "csrSearchPageHolder"; 
+    public static final String CSR_PAGE_LIST_HOLDER_SESSIONSCOPE = "csrSearchPageHolder";
     /**
-     * Name of the model attribute that stores the list of RAs.  
+     * Name of the model attribute that stores the list of RAs.
      */
-    public static final String RA_ARRAY_REQUESTSCOPE = "ralistArray"; 
+    public static final String RA_ARRAY_REQUESTSCOPE = "ralistArray";
     /**
-     * Name of the model attribute used to bind GET request search parameters. 
+     * Name of the model attribute used to bind GET request search parameters.
      */
-    public static final String SEARCH_CSR_FORM_BEAN_GET_REQUESTSCOPE = "searchCsrFormBean_REQUESTSCOPE"; 
+    public static final String SEARCH_CSR_FORM_BEAN_GET_REQUESTSCOPE = "searchCsrFormBean_REQUESTSCOPE";
 
     /**
      * ModelAttribute annotations defined on a method in a controller are
@@ -95,35 +87,35 @@ public class SearchCSR {
     @ModelAttribute
     public void populateModel(Model model, HttpSession session) {
         // Populate model with an empty list if session var is not present (e.g. session expired) 
-        PartialPagedListHolder<RequestRow> pagedListHolder = 
+        PartialPagedListHolder<RequestRow> pagedListHolder =
                 (PartialPagedListHolder<RequestRow>) session.getAttribute(SearchCSR.CSR_PAGE_LIST_HOLDER_SESSIONSCOPE);
         if (pagedListHolder == null) {
             pagedListHolder = new PartialPagedListHolder<RequestRow>(new ArrayList<RequestRow>(0));
             session.setAttribute(SearchCSR.CSR_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
         }
         // Populate the RA list pull down 
-        List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null); 
+        List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
         List<String> raArray = new ArrayList<String>();
-        String userDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn(); 
-        String l = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.L); 
-        String ou = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.OU);  
-        
+        String userDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn();
+        String l = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.L);
+        String ou = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.OU);
+
         // add user's RA as first option 
-        if(l != null && ou != null){ 
+        if (l != null && ou != null) {
             // BUG - have had trouble submitting RA values that contain whitespace, 
             // so have replaced whitespace in ra with underscore 
-            raArray.add(ou+"_"+l); 
+            raArray.add(ou + "_" + l);
         }
         // then add the 'all' option second 
-        raArray.add("all");  
+        raArray.add("all");
         // then add all other RAs
         for (RalistRow row : rows) {
             // BUG - have had trouble submitting RA values that contain whitespace, 
             // so have replaced whitespace in ra with underscore 
-            String raval = row.getOu()+"_"+row.getL(); 
-            raArray.add(raval); 
+            String raval = row.getOu() + "_" + row.getL();
+            raArray.add(raval);
         }
-        model.addAttribute(RA_ARRAY_REQUESTSCOPE, raArray.toArray()); 
+        model.addAttribute(RA_ARRAY_REQUESTSCOPE, raArray.toArray());
     }
 
     /**
@@ -136,9 +128,9 @@ public class SearchCSR {
         return new SearchCsrFormBean();
     }
 
-    @ModelAttribute(SEARCH_CSR_FORM_BEAN_GET_REQUESTSCOPE) 
-    public SearchCsrFormBean createGetRequestFormBean(){
-        return new SearchCsrFormBean(); 
+    @ModelAttribute(SEARCH_CSR_FORM_BEAN_GET_REQUESTSCOPE)
+    public SearchCsrFormBean createGetRequestFormBean() {
+        return new SearchCsrFormBean();
     }
 
     /**
@@ -148,9 +140,10 @@ public class SearchCSR {
     public GotoPageNumberFormBean createGotoFormBean() {
         return new GotoPageNumberFormBean();
     }
-    
+
     /**
      * Handle GET requests to <pre>/raop/searchcsr</pre> for Idempotent page refreshes.
+     *
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
@@ -161,10 +154,10 @@ public class SearchCSR {
 
     /**
      * Handle POSTs to "/raop/searchcsr" to do a CSR search.
-     * The method processes the form input and then redirects to the "/search" 
-     * URL (handled in this controller) with URL encoded GET params that define 
-     * the search parameters. 
-     * 
+     * The method processes the form input and then redirects to the "/search"
+     * URL (handled in this controller) with URL encoded GET params that define
+     * the search parameters.
+     *
      * @return "redirect:/raop/searchcsr/search?multiple=search&params=go here"
      */
     /*@RequestMapping(method = RequestMethod.POST)
@@ -191,7 +184,6 @@ public class SearchCSR {
         String url = "/raop/searchcsr/search?"+this.buildGetRequestParams(searchCsrFormBean); 
         return "redirect:"+url; 
     }*/
-
     @RequestMapping(method = RequestMethod.POST)
     public String submitSearch(
             @Valid SearchCsrFormBean searchCsrFormBean, BindingResult result,
@@ -203,17 +195,17 @@ public class SearchCSR {
             return "raop/searchcsr";
         }
 
-        searchCsrFormBean.setStartRow(0); 
-        log.debug("adding message search submitted ok: ["+searchCsrFormBean.getRa()+"]"); 
+        searchCsrFormBean.setStartRow(0);
+        log.debug("adding message search submitted ok: [" + searchCsrFormBean.getRa() + "]");
 
         // Now submit to our GET /search handler to run the query 
         // http://forum.springsource.org/showthread.php?86633-Spring-3-annotated-controllers-redirection-strings-and-appending-parameters-to-URL
         //String url = "/raop/searchcsr/search?"+this.buildGetRequestParams(searchCsrFormBean); 
-        redirectAttrs.addAllAttributes(this.getParams(searchCsrFormBean)); 
+        redirectAttrs.addAllAttributes(this.getParams(searchCsrFormBean));
         // Store a success message for rendering on the next request after redirect
         //redirectAttrs.addFlashAttribute("message", "Search Submitted OK");
-        
-        return "redirect:/raop/searchcsr/search"; 
+
+        return "redirect:/raop/searchcsr/search";
     }
 
     /*@RequestMapping(method = RequestMethod.POST)
@@ -246,9 +238,9 @@ public class SearchCSR {
         this.populateParams(mav, searchCsrFormBean);  
         return mav; 
     }*/
-   
+
     private Map<String, Object> getParams(SearchCsrFormBean searchCsrFormBean) {
-        Map<String, Object> mav = new HashMap<String, Object>(); 
+        Map<String, Object> mav = new HashMap<String, Object>();
         if (StringUtils.hasText(searchCsrFormBean.getName())) {
             mav.put("name", searchCsrFormBean.getName());
         }
@@ -281,31 +273,29 @@ public class SearchCSR {
         }
         return mav;
     }
-      
-     
 
 
     /**
-     * Handle GETs to "/raop/searchcsr/search?search=params&for=dbquery" 
-     * to perform a DB search.  
+     * Handle GETs to "/raop/searchcsr/search?search=params&for=dbquery"
+     * to perform a DB search.
      * <p>
-     * Processes the known GET params and submits a query to the DB. Unknown 
-     * GET request parameters are ignored. Binding/validation of GET params 
-     * is done via Spring @ModelAttribute binding with the given SearchCsrFormBean. 
-     * If only a partial query is specified, e.g. "/search?name=some cn", 
-     * default values as defined in SearchCsrFormBean are applied. After successful 
-     * binding/validation/query, the SEARCH_CSR_FORM_BEAN_SESSIONSCOPE model attribute 
-     * is updated.  
-     * 
+     * Processes the known GET params and submits a query to the DB. Unknown
+     * GET request parameters are ignored. Binding/validation of GET params
+     * is done via Spring @ModelAttribute binding with the given SearchCsrFormBean.
+     * If only a partial query is specified, e.g. "/search?name=some cn",
+     * default values as defined in SearchCsrFormBean are applied. After successful
+     * binding/validation/query, the SEARCH_CSR_FORM_BEAN_SESSIONSCOPE model attribute
+     * is updated.
+     *
      * @return "raop/searchcsr"
      */
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public String submitSearchViaGet(
-            @Valid @ModelAttribute(SEARCH_CSR_FORM_BEAN_GET_REQUESTSCOPE) 
-                    SearchCsrFormBean searchCsrFormBeanGetReq, BindingResult result, 
+            @Valid @ModelAttribute(SEARCH_CSR_FORM_BEAN_GET_REQUESTSCOPE)
+                    SearchCsrFormBean searchCsrFormBeanGetReq, BindingResult result,
             RedirectAttributes redirectAttrs, SessionStatus sessionStatus,
             Model model, HttpSession session) {
-        
+
         if (result.hasErrors()) {
             log.warn("binding and validation errors on submitSearchViaGet");
             return "raop/searchcsr";
@@ -314,30 +304,30 @@ public class SearchCSR {
         // Update our session-scoped @ModelAttribute form bean (SEARCH_CSR_FORM_BEAN_SESSIONSCOPE) 
         // with the request-scoped @ModelAttribute get-request form bean 
         // (SEARCH_CSR_FORM_BEAN_GET_REQUESTSCOPE),  then run the DB search. 
-        model.addAttribute(SEARCH_CSR_FORM_BEAN_SESSIONSCOPE, searchCsrFormBeanGetReq); 
-        this.runSearchUpdateResultsInSession(searchCsrFormBeanGetReq, session); 
-        log.debug("ra value in session: ["+searchCsrFormBeanGetReq.getRa()+"]"); 
+        model.addAttribute(SEARCH_CSR_FORM_BEAN_SESSIONSCOPE, searchCsrFormBeanGetReq);
+        this.runSearchUpdateResultsInSession(searchCsrFormBeanGetReq, session);
+        log.debug("ra value in session: [" + searchCsrFormBeanGetReq.getRa() + "]");
         model.addAttribute("searchOk", "Search Submitted/Refreshed OK");
         return "raop/searchcsr";
     }
 
     /**
-     * Use the given SearchCsrFormBean to submit the DB search and put the results 
-     * in session under the CSR_PAGE_LIST_HOLDER_SESSIONSCOPE attribute.  
+     * Use the given SearchCsrFormBean to submit the DB search and put the results
+     * in session under the CSR_PAGE_LIST_HOLDER_SESSIONSCOPE attribute.
      */
-     private void runSearchUpdateResultsInSession(SearchCsrFormBean searchCsrFormBean, HttpSession session){
+    private void runSearchUpdateResultsInSession(SearchCsrFormBean searchCsrFormBean, HttpSession session) {
         session.setAttribute("lastCSRSearchDate_session", new Date());
         int limit = searchCsrFormBean.getShowRowCount();
-        int startRow = searchCsrFormBean.getStartRow(); 
-        Pair<List<RequestRow>, Integer> pair = this.submitCsrSearch(searchCsrFormBean, limit, startRow); 
-        List<RequestRow> rows = pair.first; 
-        int totalRows = pair.second;  
+        int startRow = searchCsrFormBean.getStartRow();
+        Pair<List<RequestRow>, Integer> pair = this.submitCsrSearch(searchCsrFormBean, limit, startRow);
+        List<RequestRow> rows = pair.first;
+        int totalRows = pair.second;
 
         PartialPagedListHolder<RequestRow> pagedListHolder = new PartialPagedListHolder<RequestRow>(rows, totalRows);
-        pagedListHolder.setPageSize(limit); 
-        pagedListHolder.setRow(startRow); 
-        session.setAttribute(SearchCSR.CSR_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder); 
-     }
+        pagedListHolder.setPageSize(limit);
+        pagedListHolder.setRow(startRow);
+        session.setAttribute(SearchCSR.CSR_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
+    }
 
      /*private String buildGetRequestParams(SearchCsrFormBean searchCsrFormBean){
          //try {
@@ -417,6 +407,7 @@ public class SearchCSR {
 
     /**
      * Handle POSTs to "/raop/searchcsr/goto" to paginate to a specific row.
+     *
      * @return "redirect:/raop/searchcsr/search?search=params&for=dbquery"
      */
     @RequestMapping(value = "/goto", method = RequestMethod.POST)
@@ -447,20 +438,21 @@ public class SearchCSR {
         }
 
         // Update requested start row and re-submit the search as a GET request  
-        sessionSearchCsrFormBean.setStartRow(startRow);  
-        redirectAttrs.addAllAttributes(this.getParams(sessionSearchCsrFormBean)); 
+        sessionSearchCsrFormBean.setStartRow(startRow);
+        redirectAttrs.addAllAttributes(this.getParams(sessionSearchCsrFormBean));
         return "redirect:/raop/searchcsr/search";//+"?"+this.buildGetRequestParams(sessionSearchCsrFormBean);
     }
 
-    
+
     /**
      * Handle GETs to "/raop/searchcsr/page" with URL parameters. Used for paging
      * through the csr list when clicking Next,Prev,First,Last links.
+     *
      * @return "redirect:/raop/searchcsr/search?multiple=search&params=go here"
      */
     @RequestMapping(value = "page", method = RequestMethod.GET)
     public String handlePageRequest(@RequestParam(required = false) String page,
-            HttpSession session, RedirectAttributes redirectAttrs) {
+                                    HttpSession session, RedirectAttributes redirectAttrs) {
 
         // Get the search data from session. 
         SearchCsrFormBean searchCsrFormBean =
@@ -468,7 +460,7 @@ public class SearchCSR {
         PartialPagedListHolder<RequestRow> pagedListHolder =
                 (PartialPagedListHolder<RequestRow>) session.getAttribute(SearchCSR.CSR_PAGE_LIST_HOLDER_SESSIONSCOPE);
 
-       if ("next".equals(page) || "prev".equals(page) || "first".equals(page) || "last".equals(page)) {
+        if ("next".equals(page) || "prev".equals(page) || "first".equals(page) || "last".equals(page)) {
             int limit = searchCsrFormBean.getShowRowCount(); //pagedListHolder.getPageSize();
             int startRow = 0;
 
@@ -492,95 +484,95 @@ public class SearchCSR {
                 if (startRow > pagedListHolder.getTotalRows()) {
                     startRow = pagedListHolder.getRow();
                 }
-                if(startRow < 0){
+                if (startRow < 0) {
                     startRow = 0;
-                } 
+                }
             }
-            searchCsrFormBean.setStartRow(startRow);  
-            redirectAttrs.addAllAttributes(this.getParams(searchCsrFormBean)); 
+            searchCsrFormBean.setStartRow(startRow);
+            redirectAttrs.addAllAttributes(this.getParams(searchCsrFormBean));
             return "redirect:/raop/searchcsr/search";//+"?"+this.buildGetRequestParams(searchCsrFormBean); 
-       }
+        }
         return "redirect:/raop/searchcsr";
     }
 
-    
+
     /**
      * Query the DB for a list of request rows and for the total number of
      * rows found that match the search criteria defined by SearchCsrFormBean.
      *
      * @param searchCsrFormBean Used to specify search criteria.
-     * @param limit Limits the number of search results.
-     * @param offset Offset the results by this many rows.
+     * @param limit             Limits the number of search results.
+     * @param offset            Offset the results by this many rows.
      * @return <code>Pair.first</code> holds the list of request rows (from
      * offset to limit), while <code>Pair.second</code> is the total number of
      * matching rows found in the DB.
      */
-     private Pair<List<RequestRow>, Integer> submitCsrSearch(
+    private Pair<List<RequestRow>, Integer> submitCsrSearch(
             SearchCsrFormBean searchCsrFormBean, Integer limit, Integer offset) {
-     
-         if (searchCsrFormBean.getReq_key() != null) {
-             RequestRow row = this.jdbcRequestDao.findById(searchCsrFormBean.getReq_key());
-             List<RequestRow> rows = new ArrayList<RequestRow>(0);
-             if (row != null) {
-                 rows.add(row);
-                 row.setData(null);
-             }
-             return Pair.create(rows, rows.size());
-         } else {
-             // select RA from pulldown and perform search 
-             Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new 
-                     EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class);
-             
-             String ra = searchCsrFormBean.getRa();
-             if (StringUtils.hasText(ra) && !"all".equals(ra)) {
-                 // BUG - have had trouble submitting RA values that contain whitespace, 
-                 // so have replaced whitespace in ra with underscore - so here revert back 
-                 // to whitespace to do the search. See where the raList is set. 
-                 whereParams.put(JdbcRequestDao.WHERE_PARAMS.RA_EQ, ra.replaceAll("_", " "));
-             }
-             String status = searchCsrFormBean.getStatus();
-             if (StringUtils.hasText(status) && !"all".equals(status)) {
-                 if("NEW_or_RENEW".equals(status)){
-                     // The value of status for STATUS_EQ_NEW_or_RENEW is ignored 
-                     // here, it is actually set as NEW or RENEW manually in the DAO 
-                     // as a shortcut/hack. 
-                     whereParams.put(JdbcRequestDao.WHERE_PARAMS.STATUS_EQ_NEW_or_RENEW, status);
-                 } else {
-                     whereParams.put(JdbcRequestDao.WHERE_PARAMS.STATUS_EQ, status);
-                 }
-             }
-             String name = searchCsrFormBean.getName(); 
-             if(StringUtils.hasText(name)){ 
-                 whereParams.put(JdbcRequestDao.WHERE_PARAMS.CN_LIKE, this.prepareLikeValue(name)); 
-             }
-             String dn = searchCsrFormBean.getDn(); 
-             if(StringUtils.hasText(dn)){
-                 whereParams.put(JdbcRequestDao.WHERE_PARAMS.DN_LIKE, this.prepareLikeValue(dn)); 
-             }
-             // if search null email address checkbox is true, then we want to search 
-             // for email values that are null
-             if (searchCsrFormBean.getSearchNullEmailAddress()) {
-                 whereParams.put(JdbcRequestDao.WHERE_PARAMS.EMAIL_EQ, null);
-             } else {
-                 if (StringUtils.hasText(searchCsrFormBean.getEmailAddress())) {
-                     whereParams.put(JdbcRequestDao.WHERE_PARAMS.EMAIL_LIKE, this.prepareLikeValue(searchCsrFormBean.getEmailAddress()));
-                 }
-             } 
-             String data = searchCsrFormBean.getData(); 
-             if(StringUtils.hasText(data)){
-                 whereParams.put(JdbcRequestDao.WHERE_PARAMS.DATA_LIKE, this.prepareLikeValue(data)); 
-             } 
-             List<RequestRow> rows = this.jdbcRequestDao.findBy(whereParams, limit, offset);
-             rows = this.jdbcRequestDao.setDataNotBefore(rows);
-             int totalRows = jdbcRequestDao.countBy(whereParams);
-             // Nullify the Data property before we add the rows to HTTP session to keep
-             // the memory requirements low. 
-             for (RequestRow row : rows) {
-                 row.setData(null);
-             }
-             return Pair.create(rows, totalRows);
-         }
-     }
+
+        if (searchCsrFormBean.getReq_key() != null) {
+            RequestRow row = this.jdbcRequestDao.findById(searchCsrFormBean.getReq_key());
+            List<RequestRow> rows = new ArrayList<RequestRow>(0);
+            if (row != null) {
+                rows.add(row);
+                row.setData(null);
+            }
+            return Pair.create(rows, rows.size());
+        } else {
+            // select RA from pulldown and perform search
+            Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new
+                    EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class);
+
+            String ra = searchCsrFormBean.getRa();
+            if (StringUtils.hasText(ra) && !"all".equals(ra)) {
+                // BUG - have had trouble submitting RA values that contain whitespace,
+                // so have replaced whitespace in ra with underscore - so here revert back
+                // to whitespace to do the search. See where the raList is set.
+                whereParams.put(JdbcRequestDao.WHERE_PARAMS.RA_EQ, ra.replaceAll("_", " "));
+            }
+            String status = searchCsrFormBean.getStatus();
+            if (StringUtils.hasText(status) && !"all".equals(status)) {
+                if ("NEW_or_RENEW".equals(status)) {
+                    // The value of status for STATUS_EQ_NEW_or_RENEW is ignored
+                    // here, it is actually set as NEW or RENEW manually in the DAO
+                    // as a shortcut/hack.
+                    whereParams.put(JdbcRequestDao.WHERE_PARAMS.STATUS_EQ_NEW_or_RENEW, status);
+                } else {
+                    whereParams.put(JdbcRequestDao.WHERE_PARAMS.STATUS_EQ, status);
+                }
+            }
+            String name = searchCsrFormBean.getName();
+            if (StringUtils.hasText(name)) {
+                whereParams.put(JdbcRequestDao.WHERE_PARAMS.CN_LIKE, this.prepareLikeValue(name));
+            }
+            String dn = searchCsrFormBean.getDn();
+            if (StringUtils.hasText(dn)) {
+                whereParams.put(JdbcRequestDao.WHERE_PARAMS.DN_LIKE, this.prepareLikeValue(dn));
+            }
+            // if search null email address checkbox is true, then we want to search
+            // for email values that are null
+            if (searchCsrFormBean.getSearchNullEmailAddress()) {
+                whereParams.put(JdbcRequestDao.WHERE_PARAMS.EMAIL_EQ, null);
+            } else {
+                if (StringUtils.hasText(searchCsrFormBean.getEmailAddress())) {
+                    whereParams.put(JdbcRequestDao.WHERE_PARAMS.EMAIL_LIKE, this.prepareLikeValue(searchCsrFormBean.getEmailAddress()));
+                }
+            }
+            String data = searchCsrFormBean.getData();
+            if (StringUtils.hasText(data)) {
+                whereParams.put(JdbcRequestDao.WHERE_PARAMS.DATA_LIKE, this.prepareLikeValue(data));
+            }
+            List<RequestRow> rows = this.jdbcRequestDao.findBy(whereParams, limit, offset);
+            rows = this.jdbcRequestDao.setDataNotBefore(rows);
+            int totalRows = jdbcRequestDao.countBy(whereParams);
+            // Nullify the Data property before we add the rows to HTTP session to keep
+            // the memory requirements low.
+            for (RequestRow row : rows) {
+                row.setData(null);
+            }
+            return Pair.create(rows, totalRows);
+        }
+    }
 
     private String prepareLikeValue(String value) {
         value = value.trim();

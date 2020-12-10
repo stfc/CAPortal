@@ -15,33 +15,35 @@ package uk.ac.ngs.validation;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
- 
+
 /**
- * Validate emails. 
- * @author David Meredith 
+ * Validate emails.
+ *
+ * @author David Meredith
  */
 public class EmailValidator {
- 
-	private final Pattern pattern;
-	private Matcher matcher;
- 
-	private static final String EMAIL_PATTERN = 
-		"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
- 
-	public EmailValidator() {
-		pattern = Pattern.compile(EMAIL_PATTERN);
-	}
- 
+
+    private final Pattern pattern;
+    private Matcher matcher;
+
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+    public EmailValidator() {
+        pattern = Pattern.compile(EMAIL_PATTERN);
+    }
+
     /**
-     * Validate the given email. 
+     * Validate the given email.
+     *
      * @param email
-     * @return true if valid otherwise false 
+     * @return true if valid otherwise false
      */
-	public boolean validate(final String email) {
-        if(email == null) return false; 
-		matcher = pattern.matcher(email);
-		return matcher.matches();
-	}
+    public boolean validate(final String email) {
+        if (email == null) return false;
+        matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
 
     /*
     Regex explanation: 

@@ -12,9 +12,6 @@
  */
 package uk.ac.ngs.service.email;
 
-import java.util.Map;
-import java.util.Properties;
-import javax.mail.internet.MimeMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.VelocityEngine;
@@ -25,6 +22,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
+
+import javax.mail.internet.MimeMessage;
+import java.util.Map;
+import java.util.Properties;
 //import org.springframework.ui.velocity.VelocityEngineUtils;
 
 /**
@@ -59,15 +60,15 @@ public class VelocityEmailSender implements Sender {
      */
     @Autowired
     public VelocityEmailSender(VelocityEngine velocityEngine,
-            JavaMailSender mailSender) {
+                               JavaMailSender mailSender) {
         this.velocityEngine = velocityEngine;
         this.mailSender = mailSender;
     }
 
     @Override
     public void send(final SimpleMailMessage msg,
-            final Map<String, Object> hTemplateVariables, final String templateFileName) {
-        
+                     final Map<String, Object> hTemplateVariables, final String templateFileName) {
+
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             @Override
             public void prepare(MimeMessage mimeMessage) throws Exception {
@@ -78,7 +79,7 @@ public class VelocityEmailSender implements Sender {
                 //String body = VelocityEngineUtils.mergeTemplate(
                 //        velocityEngine, templateFileName, hTemplateVariables);
                 String body = "";
-               //logger.info("body={}", body);
+                //logger.info("body={}", body);
                 message.setText(body, true);
             }
         };

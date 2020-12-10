@@ -12,13 +12,6 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -33,8 +26,17 @@ import uk.ac.ngs.domain.CrrRow;
 import uk.ac.ngs.domain.RequestRow;
 import uk.ac.ngs.security.SecurityContextService;
 
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * Controller for importing and exporting CSRs/CRRs.  
+ * Controller for importing and exporting CSRs/CRRs.
+ *
  * @author David Meredith
  */
 @Controller
@@ -45,7 +47,7 @@ public class CaOpNode {
     private SecurityContextService securityContextService;
     private JdbcRequestDao jdbcRequestDao;
     private JdbcCrrDao jdbcCrrDao;
-    private MutableConfigParams mutableConfigParams; 
+    private MutableConfigParams mutableConfigParams;
 
     @ModelAttribute
     public void populateModel(ModelMap model) throws IOException {
@@ -68,7 +70,7 @@ public class CaOpNode {
         Map<JdbcRequestDao.WHERE_PARAMS, String> csrWhereParams = new EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class);
         csrWhereParams.put(JdbcRequestDao.WHERE_PARAMS.STATUS_EQ, "APPROVED");
         List<RequestRow> csrRows = this.jdbcRequestDao.findBy(csrWhereParams, null, null);
-        csrRows = this.jdbcRequestDao.setDataNotBefore(csrRows); 
+        csrRows = this.jdbcRequestDao.setDataNotBefore(csrRows);
         return csrRows;
     }
 
@@ -76,7 +78,7 @@ public class CaOpNode {
         Map<JdbcCrrDao.WHERE_PARAMS, String> crrWhereParams = new EnumMap<JdbcCrrDao.WHERE_PARAMS, String>(JdbcCrrDao.WHERE_PARAMS.class);
         crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.STATUS_EQ, "APPROVED");
         List<CrrRow> crrRows = this.jdbcCrrDao.findBy(crrWhereParams, null, null);
-        crrRows = this.jdbcCrrDao.setSubmitDateFromData(crrRows); 
+        crrRows = this.jdbcCrrDao.setSubmitDateFromData(crrRows);
         //crrRows.get(0).getCert_key()
         return crrRows;
     }
@@ -84,23 +86,23 @@ public class CaOpNode {
 
     private boolean disableExportButton() throws IOException {
         // Disable if a tarball is detected (can't overwrite) 
-        String exportFilePath = this.mutableConfigParams.getProperty("node.export.file"); 
-        File exportFile = new File(exportFilePath); 
+        String exportFilePath = this.mutableConfigParams.getProperty("node.export.file");
+        File exportFile = new File(exportFilePath);
         return exportFile.exists();
     }
 
     private boolean disableImportButton() {
         // does import.lock file exist? 
-            // if exists return true to disable button 
-            // if not exists, return false to enable button 
-            return false;
+        // if exists return true to disable button
+        // if not exists, return false to enable button
+        return false;
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public String handleGetRequest(){
-        return "/caop/node"; 
+    public String handleGetRequest() {
+        return "/caop/node";
     }
-    
+
     @RequestMapping(value = "/export", method = RequestMethod.POST)
     public String nodeExport() {
         log.debug("export requested");
@@ -134,7 +136,7 @@ public class CaOpNode {
     }
 
     @Inject
-    public void setMutableConfigParams(MutableConfigParams mutableConfigParams){
-       this.mutableConfigParams = mutableConfigParams;  
+    public void setMutableConfigParams(MutableConfigParams mutableConfigParams) {
+        this.mutableConfigParams = mutableConfigParams;
     }
 }

@@ -12,14 +12,6 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -34,16 +26,17 @@ import uk.ac.ngs.domain.CrrRow;
 import uk.ac.ngs.domain.RaopListRow;
 import uk.ac.ngs.domain.RequestRow;
 import uk.ac.ngs.security.CaUser;
-
-//import uk.ac.ngs.security.CaUser;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
 
+import javax.inject.Inject;
+import java.util.*;
+
+//import uk.ac.ngs.security.CaUser;
+
 /**
- * 
  * @author Josh Hadley
  * @author David Meredith
- * 
  */
 @Controller
 @RequestMapping("/caop")
@@ -53,7 +46,7 @@ public class CaOpBaseController {
     private JdbcRaopListDao jdbcRaopListDao;
     private JdbcRequestDao jdbcRequestDao;
     private JdbcCrrDao jdbcCrrDao;
-    
+
     @ModelAttribute
     public void populateModel(Model model) {
         log.debug("caop populateModel");
@@ -90,18 +83,18 @@ public class CaOpBaseController {
         // Fetch a list of pending CRRs for the RA 
         Map<JdbcCrrDao.WHERE_PARAMS, String> crrWhereParams = new HashMap<JdbcCrrDao.WHERE_PARAMS, String>();
         crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.STATUS_EQ, "APPROVED"); //NEW,APPROVED,ARCHIVED,DELETED 
-        crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.DN_LIKE, "%L="+L+",OU="+OU+"%"); 
+        crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.DN_LIKE, "%L=" + L + ",OU=" + OU + "%");
         List<CrrRow> crrRows = jdbcCrrDao.findBy(crrWhereParams, null, null);
-        log.debug("crrRows size: ["+crrRows.size()+"]"); 
-        crrRows = jdbcCrrDao.setSubmitDateFromData(crrRows); 
+        log.debug("crrRows size: [" + crrRows.size() + "]");
+        crrRows = jdbcCrrDao.setSubmitDateFromData(crrRows);
         model.addAttribute("crr_reqrows", crrRows);
 
-        model.addAttribute("lastPageRefreshDate", new Date()); 
-    }  
+        model.addAttribute("lastPageRefreshDate", new Date());
+    }
 
     /**
      * Respond to /caop render by returning its name.
-     * 
+     *
      * @return caop/home
      */
     @RequestMapping(method = RequestMethod.GET)

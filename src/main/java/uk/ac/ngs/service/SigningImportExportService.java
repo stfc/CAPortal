@@ -12,8 +12,9 @@
  */
 package uk.ac.ngs.service;
 
-import java.io.File;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
 
 /**
  * Service class to manage import/export of signing data to/from the DB.

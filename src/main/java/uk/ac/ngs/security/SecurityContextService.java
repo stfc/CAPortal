@@ -12,12 +12,6 @@
  */
 package uk.ac.ngs.security;
 
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.Authentication;
@@ -29,8 +23,16 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import uk.ac.ngs.dao.JdbcCertificateDao;
 import uk.ac.ngs.domain.CertificateRow;
 
+import javax.inject.Inject;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * Stateless service to return the user's current authentication information.  
+ * Stateless service to return the user's current authentication information.
+ *
  * @author David Meredith
  */
 public class SecurityContextService {
@@ -38,9 +40,10 @@ public class SecurityContextService {
 
     private final static Pattern DATA_ROLE_PATTERN = Pattern.compile("^\\s*ROLE\\s*=\\s*(.+)$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
     private JdbcCertificateDao jdbcCertDao;
-     
+
     /**
-     * Get the current user's CaUser object or null if the user has not been authenticated. 
+     * Get the current user's CaUser object or null if the user has not been authenticated.
+     *
      * @return
      */
     public CaUser getCaUserDetails() {
@@ -57,8 +60,9 @@ public class SecurityContextService {
     }
 
     /**
-     * Get the current users's user name or null if the user has not been authenticated. 
-     * @return user name (DN) 
+     * Get the current users's user name or null if the user has not been authenticated.
+     *
+     * @return user name (DN)
      */
     public String getUserName() {
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -87,7 +91,7 @@ public class SecurityContextService {
     } 
     return hasRole;
   }*/
-    
+
     public X509Certificate getCredentials() {
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             return (X509Certificate) SecurityContextHolder.getContext().getAuthentication().getCredentials();
@@ -96,38 +100,38 @@ public class SecurityContextService {
         }
     }
 
-            // org.springframework.security.web.authentication.WebAuthenticationDetails
-            //Object details = SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    // org.springframework.security.web.authentication.WebAuthenticationDetails
+    //Object details = SecurityContextHolder.getContext().getAuthentication().getDetails();
 
 
     /**
-     * If there is a currently authenticated principal, update the granted 
+     * If there is a currently authenticated principal, update the granted
      * authorities and the current Authentication token in the Spring security context.
-     * If there is no currently authenticated principal, do nothing. 
-     * A RuntimeException is thrown and the current authentication context 
-     * is removed if: 
+     * If there is no currently authenticated principal, do nothing.
+     * A RuntimeException is thrown and the current authentication context
+     * is removed if:
      * <ul>
      *   <li>The Authentication token Principle is not of the expected type (e.g. CaUser instance)</li>
      *   <li>The Credentials are not of the expected type (e.g. X509Certificate).</li>
      * </ul>
      */
     public void refreshCurrentAuthenticationToken() {
-        CaUser caUser = this.getCaUserDetails(); 
-        if(caUser == null){
-            return; 
+        CaUser caUser = this.getCaUserDetails();
+        if (caUser == null) {
+            return;
         }
-        
+
         X509Certificate cred = this.getCredentials();
         if (cred == null) {
             SecurityContextHolder.getContext().setAuthentication(null);
-            throw new RuntimeException("Credentials are null"); 
+            throw new RuntimeException("Credentials are null");
         }
         long cert_key = this.getCaUserDetails().getCertificateRow().getCert_key();
         if (cert_key <= 0) {
             SecurityContextHolder.getContext().setAuthentication(null);
-            throw new RuntimeException("cert_key has unexpected value ["+cert_key+"]"); 
+            throw new RuntimeException("cert_key has unexpected value [" + cert_key + "]");
         }
-        
+
         // User may have been revoked in the DB so update the Spring  
         // authentication context using the newly revoked cert status changes. 
         //long cert_key = caUser.getCertificateRow().getCert_key();
@@ -142,9 +146,8 @@ public class SecurityContextService {
 
         // Update the currently authenticated principal
         Authentication token = new PreAuthenticatedAuthenticationToken(principle, cred, newAuths);
-        SecurityContextHolder.getContext().setAuthentication(token);         
+        SecurityContextHolder.getContext().setAuthentication(token);
     }
-    
 
 
     public List<GrantedAuthority> getGrantedAuthorities(CertificateRow cr) {
@@ -175,7 +178,7 @@ public class SecurityContextService {
             if ("User".equalsIgnoreCase(role)) {
                 SimpleGrantedAuthority co = new SimpleGrantedAuthority("ROLE_CERTOWNER");
                 auths.add(co);
-                
+
             } else if ("RA Operator".equalsIgnoreCase(role)) {
                 SimpleGrantedAuthority co = new SimpleGrantedAuthority("ROLE_CERTOWNER");
                 auths.add(co);
@@ -187,9 +190,9 @@ public class SecurityContextService {
         }
         return auths;
     }
-    
 
-     /**
+
+    /**
      * Extract the value from the 'ROLE = role_value' serialized in data field
      * of the given row.
      *
@@ -204,7 +207,7 @@ public class SecurityContextService {
             }
         }
         return null;
-    } 
+    }
 
 
     @Inject
@@ -212,6 +215,5 @@ public class SecurityContextService {
         this.jdbcCertDao = jdbcCertDao;
     }
 
-    
 
 }

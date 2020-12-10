@@ -13,11 +13,6 @@
 
 package uk.ac.ngs.controllers;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -29,8 +24,15 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.ac.ngs.common.MutableConfigParams;
 import uk.ac.ngs.service.email.EmailService;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Controller to handle all exceptions that have not been handled already. 
+ * Controller to handle all exceptions that have not been handled already.
+ *
  * @author David Meredith
  */
 @ControllerAdvice
@@ -39,31 +41,31 @@ public class GlobalControllerExceptionHandler {
     private static final Log log = LogFactory.getLog(GlobalControllerExceptionHandler.class);
     private EmailService emailService;
     private MutableConfigParams mutableConfigParams;
-    
+
     @ExceptionHandler(value = Exception.class)
     public ModelAndView defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
         // If the exception is annotated with @ResponseStatus rethrow it and let
         // the framework handle it, see: http://spring.io/blog/2013/11/01/exception-handling-in-spring-mvc 
-        if (AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class) != null){
+        if (AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class) != null) {
             throw e;
         }
-        if(e instanceof HttpRequestMethodNotSupportedException){
-            throw e; 
+        if (e instanceof HttpRequestMethodNotSupportedException) {
+            throw e;
         }
-        
+
         // log the error 
         log.error("Global Exception handled with no @ResponsStatus: ");
-        log.error(e); 
+        log.error(e);
 
         // send notification email 
         boolean emailOnError = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.admins.on.error"));
-        if(emailOnError){
+        if (emailOnError) {
             Set<String> adminEmails = new HashSet<String>(); // use set so duplicates aren't added 
             String[] allemails = this.mutableConfigParams.getProperty("email.admin.addresses").split(",");
-            adminEmails.addAll(Arrays.asList(allemails)); 
-            this.emailService.sendAdminsOnError(adminEmails, e, req.getRequestURL().toString()); 
+            adminEmails.addAll(Arrays.asList(allemails));
+            this.emailService.sendAdminsOnError(adminEmails, e, req.getRequestURL().toString());
         }
-        
+
         // Otherwise setup and send the user to a default error-view.
         ModelAndView mav = new ModelAndView();
         mav.addObject("exception", e);
@@ -84,5 +86,5 @@ public class GlobalControllerExceptionHandler {
     public void setMutableConfigParams(MutableConfigParams mutableConfigParams) {
         this.mutableConfigParams = mutableConfigParams;
     }
-    
+
 }

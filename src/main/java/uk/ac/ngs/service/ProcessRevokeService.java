@@ -12,14 +12,6 @@
  */
 package uk.ac.ngs.service;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,12 +26,16 @@ import uk.ac.ngs.forms.RevokeCertFormBean;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.email.EmailService;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.*;
+
 /**
- * Process CSR REVOKE requests. 
+ * Process CSR REVOKE requests.
  * Intended to be called from higher level layers, e.g. from Web controllers.
- * TODO: Throw runtime exceptions that are more suitable for business layer, 
- * extract interface once stable. 
- * 
+ * TODO: Throw runtime exceptions that are more suitable for business layer,
+ * extract interface once stable.
+ *
  * @author David Meredith
  */
 @Service
@@ -50,11 +46,11 @@ public class ProcessRevokeService {
     private CrrManagerService crrService;
     private SecurityContextService securityContextService;
     private EmailService emailService;
-    private MutableConfigParams mutableConfigParams; 
+    private MutableConfigParams mutableConfigParams;
 
     /**
-     * Immutable transfer object that defines the result (success or fail) of a 
-     * service layer revocation operation. 
+     * Immutable transfer object that defines the result (success or fail) of a
+     * service layer revocation operation.
      */
     public static class ProcessRevokeResult {
 
@@ -63,22 +59,25 @@ public class ProcessRevokeService {
         private final Long crrId;
 
         /**
-         * Construct an instance to signify a <b>success</b>. 
-         * @param crrId 
+         * Construct an instance to signify a <b>success</b>.
+         *
+         * @param crrId
          */
         public ProcessRevokeResult(Long crrId) {
             this.success = true;
             this.errors = new MapBindingResult(new HashMap<String, String>(), "revokeRequest");
             this.crrId = crrId;
         }
+
         /**
-         * Construct an instance to signify a <b>fail</b>. 
-         * @param errors 
+         * Construct an instance to signify a <b>fail</b>.
+         *
+         * @param errors
          */
         public ProcessRevokeResult(Errors errors) {
             this.errors = errors;
             this.success = false;
-            this.crrId = null; 
+            this.crrId = null;
         }
 
         public Errors getErrors() {
@@ -96,11 +95,11 @@ public class ProcessRevokeService {
 
     /**
      * Request a full certificate revocation (requires either a HOME RA or a CAOP).
-     * If successful, a new <tt>crr</tt> row is created with status APPROVED. 
-     * 
-     * @param revokeCertFormBean Revoke data 
-     * @param clientData Client/calling RA 
-     * @return 
+     * If successful, a new <tt>crr</tt> row is created with status APPROVED.
+     *
+     * @param revokeCertFormBean Revoke data
+     * @param clientData         Client/calling RA
+     * @return
      */
     @Transactional
     public ProcessRevokeResult fullRevokeCertificate(
@@ -133,12 +132,12 @@ public class ProcessRevokeService {
 
     /**
      * Request a certificate revocation request (i.e. any RA can request revoke, not just home RA)
-     * If successful, a new <tt>crr</tt> row is created with status NEW. 
-     * 
-     * @param revokeCertFormBean Revoke data 
-     * @param clientData Client/calling RA 
-     * @return 
-     * @throws java.io.IOException 
+     * If successful, a new <tt>crr</tt> row is created with status NEW.
+     *
+     * @param revokeCertFormBean Revoke data
+     * @param clientData         Client/calling RA
+     * @return
+     * @throws java.io.IOException
      */
     @Transactional
     public ProcessRevokeResult requestRevokeCertificate(
@@ -162,9 +161,9 @@ public class ProcessRevokeService {
         // revoke with status NEW 
         long crrId = this.crrService.revokeCertificate(revoke_cert_key, ra_cert_key,
                 revokeCertFormBean.getReason(), CrrManagerService.CRR_STATUS.NEW);
-     
+
         // Email the home RAs 
-        boolean emailRaOnRevoke = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.ra.on.revoke")); 
+        boolean emailRaOnRevoke = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.ra.on.revoke"));
         if (emailRaOnRevoke) {
             String loc = CertUtil.extractDnAttribute(revokeCert.getDn(), CertUtil.DNAttributeType.L);
             String ou = CertUtil.extractDnAttribute(revokeCert.getDn(), CertUtil.DNAttributeType.OU);
@@ -181,12 +180,12 @@ public class ProcessRevokeService {
             // for this RA anymore), then fallback to email the default list
             if (raEmails.isEmpty()) {
                 log.warn("No RAOP exits for [" + loc + " " + ou + "] emailing CA default");
-                  String[] allemails = this.mutableConfigParams.getProperty("email.admin.addresses").split(",");  
-                  raEmails.addAll(Arrays.asList(allemails));
+                String[] allemails = this.mutableConfigParams.getProperty("email.admin.addresses").split(",");
+                raEmails.addAll(Arrays.asList(allemails));
             }
             this.emailService.sendRaEmailOnRevoke(revokeCert.getDn(), raEmails, crrId);
         }
-        
+
         return new ProcessRevokeResult(crrId);
     }
 
@@ -197,11 +196,8 @@ public class ProcessRevokeService {
         } else {
             String viewCertDN = cert.getDn();
             String raOpDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn();
-            if (CertUtil.hasSameRA(raOpDN, viewCertDN)) {
-                return true;
-            }
+            return CertUtil.hasSameRA(raOpDN, viewCertDN);
         }
-        return false;
     }
 
     private boolean isCertRevokable(CertificateRow cert) {
@@ -241,7 +237,7 @@ public class ProcessRevokeService {
     }
 
     @Inject
-    public void setMutableConfigParams(MutableConfigParams mutableConfigParams){
-       this.mutableConfigParams = mutableConfigParams;  
+    public void setMutableConfigParams(MutableConfigParams mutableConfigParams) {
+        this.mutableConfigParams = mutableConfigParams;
     }
 }

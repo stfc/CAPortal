@@ -12,10 +12,6 @@
  */
 package uk.ac.ngs.validation;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.routines.DomainValidator;
@@ -30,20 +26,25 @@ import uk.ac.ngs.domain.CSR_Flags;
 import uk.ac.ngs.domain.CSR_Flags.Profile;
 import uk.ac.ngs.domain.PKCS10_RequestWrapper;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
 /**
  * Validate the encoded Subject DN of the CSR (PKCS#10) PEM string provided
- * by {@link PKCS10_RequestWrapper}. Different DN attributes and value formats 
- * are valid according to the type of {@link PKCS10_RequestWrapper}. 
+ * by {@link PKCS10_RequestWrapper}. Different DN attributes and value formats
+ * are valid according to the type of {@link PKCS10_RequestWrapper}.
  * <p>
- * The DN must be RFC2253 with the OIDs in REVERSE structure order, i.e. starting 
- * with C and ending with CN with following order (C, O, OU, L, CN):   
+ * The DN must be RFC2253 with the OIDs in REVERSE structure order, i.e. starting
+ * with C and ending with CN with following order (C, O, OU, L, CN):
  * <tt>C=UK,O=eScience,OU=CLRC,L=DL,CN=some valid body</tt>
- * This OID structure order is required by the UK CA. 
- * 
+ * This OID structure order is required by the UK CA.
+ *
  * @author David Meredith
  */
 public class PKCS10SubjectDNValidator implements Validator {
-     private static final Log log = LogFactory.getLog(PKCS10SubjectDNValidator.class);
+    private static final Log log = LogFactory.getLog(PKCS10SubjectDNValidator.class);
     // For list of RDN names and corresponding OID see: 
     // http://technet.microsoft.com/en-us/library/cc772812%28WS.10%29.aspx
     private final ASN1ObjectIdentifier cn = new ASN1ObjectIdentifier("2.5.4.3");
@@ -58,12 +59,13 @@ public class PKCS10SubjectDNValidator implements Validator {
     private final Pattern negatedHostServiceCN_Pattern = Pattern.compile("[^a-z\\-]");
     private final PKCS10Parser csrParser = new PKCS10Parser();
     private final CsrRequestValidationConfigParams validationParams;
-    private final EmailValidator emailValidator = new EmailValidator(); 
-    private MutableConfigParams mutableConfigParams; 
+    private final EmailValidator emailValidator = new EmailValidator();
+    private MutableConfigParams mutableConfigParams;
 
     /**
-     * Construct a new instance. 
-     * @param validationParams Checks are made against the valid values stored in this object. 
+     * Construct a new instance.
+     *
+     * @param validationParams Checks are made against the valid values stored in this object.
      */
     public PKCS10SubjectDNValidator(CsrRequestValidationConfigParams validationParams) {
         this.validationParams = validationParams;
@@ -71,6 +73,7 @@ public class PKCS10SubjectDNValidator implements Validator {
 
     /**
      * Supported object type: {@link PKCS10_RequestWrapper}.
+     *
      * @param type
      * @return
      */
@@ -80,15 +83,15 @@ public class PKCS10SubjectDNValidator implements Validator {
     }
 
     /**
-     * Validate the given {@link PKCS10_RequestWrapper} object. 
+     * Validate the given {@link PKCS10_RequestWrapper} object.
      * Important: the error messages added to {@code Errors} may reflect
-     * the provided (untrusted) values in the message. In a web context, the 
+     * the provided (untrusted) values in the message. In a web context, the
      * calling/client code MUST ensure these error messages are correctly
      * escaped/encoded as per:
-     * @see https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet
      *
-     * @param o Must be a {@link PKCS10_RequestWrapper} instance
+     * @param o      Must be a {@link PKCS10_RequestWrapper} instance
      * @param errors
+     * @see https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet
      */
     @Override
     public void validate(Object o, Errors errors) {
@@ -108,8 +111,8 @@ public class PKCS10SubjectDNValidator implements Validator {
         RDN[] rdn = x500name.getRDNs();
 
         // validate expected RDN length 
-        if (rdn.length != 5 && rdn.length != 6) { 
-            errors.reject("pkcs10.validation.invalid.rdnlength", 
+        if (rdn.length != 5 && rdn.length != 6) {
+            errors.reject("pkcs10.validation.invalid.rdnlength",
                     "Invalid number of OIDs, expected (C, O, OU, L, CN, [E])");
             return;
         }
@@ -122,7 +125,7 @@ public class PKCS10SubjectDNValidator implements Validator {
                 || !ou.equals(rdn[2].getFirst().getType())
                 || !loc.equals(rdn[3].getFirst().getType())
                 || !cn.equals(rdn[4].getFirst().getType())) {
-            errors.reject("pkcs10.validation.invalid.rdnsequence", 
+            errors.reject("pkcs10.validation.invalid.rdnsequence",
                     "Invalid DN sequence order - expected OID structure order (C, O, OU, L, CN)");
             return;
         }
@@ -176,11 +179,11 @@ public class PKCS10SubjectDNValidator implements Validator {
         }
         // CN
         String cnVal = rdn[4].getFirst().getValue().toString();
-        isValidCN(cnVal, profile, errors); 
-        if(errors.hasErrors()){
-            return; 
+        isValidCN(cnVal, profile, errors);
+        if (errors.hasErrors()) {
+            return;
         }
-        
+
     }
 
     private void isValidCN(String testCN, Profile profile, Errors errors) {
@@ -189,26 +192,26 @@ public class PKCS10SubjectDNValidator implements Validator {
             return;
         }
         // check CN does not have leading/trailing whitespace 
-        if(!testCN.trim().equals(testCN)) {
-            errors.reject("pkcs10.validation.invalid.cn", 
+        if (!testCN.trim().equals(testCN)) {
+            errors.reject("pkcs10.validation.invalid.cn",
                     "Invalid CN value [" + testCN + "]");
-            return; 
+            return;
         }
         // check CN does not have whitespace other than single spaces 
         // (e.g. tabs, multiple consecutive spaces are illegal)
-        if(testCN.contains("  ") || testCN.contains("\t")){
-            errors.reject("pkcs10.validation.invalid.cn", 
+        if (testCN.contains("  ") || testCN.contains("\t")) {
+            errors.reject("pkcs10.validation.invalid.cn",
                     "Invalid CN value contains illegal whitespace (tabs, multiple consecutive whitespace)");
-            return; 
-        } 
+            return;
+        }
         // newline and carriage return are illegal (doubt this would ever happen) 
-        if(testCN.contains("\n") || testCN.contains("\r")){
-            errors.reject("pkcs10.validation.invalid.cn", 
+        if (testCN.contains("\n") || testCN.contains("\r")) {
+            errors.reject("pkcs10.validation.invalid.cn",
                     "Invalid CN value contains illegal newline/carriage return");
-            return; 
-        } 
-        
-        
+            return;
+        }
+
+
         // check if CN has a CAPS letter (not allowed in CN)
         for (int i = 0; i < testCN.length(); ++i) {
             char c = testCN.charAt(i);
@@ -221,13 +224,13 @@ public class PKCS10SubjectDNValidator implements Validator {
         if (Profile.UKPERSON.equals(profile)) {
             if (negatedUserCN_Pattern.matcher(testCN).find()) {
                 errors.reject("pkcs10.validation.invalid.cn", "Invalid CN value - found illegal chars");
-                return ;
+                return;
             }
             String[] names = testCN.split("\\s");
             // Must be at least TWO names 
             if (names.length < 2) {
                 errors.reject("pkcs10.validation.invalid.cn", "Invalid CN value - need at least two names ");
-                return ;
+                return;
             }
             // At least TWO of these names must have length TWO OR MORE
             int ii = 0;
@@ -237,8 +240,8 @@ public class PKCS10SubjectDNValidator implements Validator {
                 }
             }
             //return ii >= 2;
-            if(!(ii >= 2)){
-               errors.reject("pkcs10.validation.invalid.cn", "Invalid CN value - At least two names need two or more chars"); 
+            if (!(ii >= 2)) {
+                errors.reject("pkcs10.validation.invalid.cn", "Invalid CN value - At least two names need two or more chars");
             }
 
         } else if (Profile.UKHOST.equals(profile)) {
@@ -255,43 +258,44 @@ public class PKCS10SubjectDNValidator implements Validator {
                 // against the list of valid service values (if any) 
                 if (this.mutableConfigParams != null) {
                     String[] services = new String[0];
-                    String servicesParam; 
+                    String servicesParam;
                     try {
                         servicesParam = this.mutableConfigParams.getProperty("hostname.service.values");
-                        if(servicesParam != null){
+                        if (servicesParam != null) {
                             services = servicesParam.split(",");
                         }
                     } catch (IOException ex) {
                         throw new IllegalArgumentException(ex);
                     }
                     if (services.length > 0) {
-                        if( !Arrays.asList(services).contains(serviceHostName[0]) ){
-                            errors.reject("pkcs10.validation.invalid.cn", 
-                                    "Invalid CN value - Unsupported Service. Allowed values ["+servicesParam+"]");
-                        } 
+                        if (!Arrays.asList(services).contains(serviceHostName[0])) {
+                            errors.reject("pkcs10.validation.invalid.cn",
+                                    "Invalid CN value - Unsupported Service. Allowed values [" + servicesParam + "]");
+                        }
                     }
                 } else {
                     // if not, then validate against a pattern as a fallback 
-                    log.debug("mutableConfigParams is null, fallback to validate CN with regex"); 
-                    if(negatedHostServiceCN_Pattern.matcher(serviceHostName[0]).find()){
-                        errors.reject("pkcs10.validation.invalid.cn", "Invalid CN service value [" + testCN + "]"); 
+                    log.debug("mutableConfigParams is null, fallback to validate CN with regex");
+                    if (negatedHostServiceCN_Pattern.matcher(serviceHostName[0]).find()) {
+                        errors.reject("pkcs10.validation.invalid.cn", "Invalid CN service value [" + testCN + "]");
                     }
                 }
             } else {
-                if(!DomainValidator.getInstance().isValid(testCN)){
-                   errors.reject("pkcs10.validation.invalid.cn", "Invalid CN domain value [" + testCN + "]"); 
+                if (!DomainValidator.getInstance().isValid(testCN)) {
+                    errors.reject("pkcs10.validation.invalid.cn", "Invalid CN domain value [" + testCN + "]");
                 }
             }
-        } 
+        }
     }
 
     /**
      * Optional: specifies an optional set of service values for service/host certificates.
-     * @param mutableConfigParams 
+     *
+     * @param mutableConfigParams
      */
     @Inject
-    public void setMutableConfigParams(MutableConfigParams mutableConfigParams){
-       this.mutableConfigParams = mutableConfigParams;  
+    public void setMutableConfigParams(MutableConfigParams mutableConfigParams) {
+        this.mutableConfigParams = mutableConfigParams;
     }
 
 }

@@ -13,32 +13,35 @@
 
 package uk.ac.ngs.forms;
 
-import java.io.Serializable;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+
 /**
- * Form bean for downloading certificates. 
- * @author David Meredith  
+ * Form bean for downloading certificates.
+ *
+ * @author David Meredith
  */
-public class RequestDownloadCertFormBean implements Serializable{
+public class RequestDownloadCertFormBean implements Serializable {
     // http://codetutr.com/2013/05/28/spring-mvc-form-validation/
-    
-    @NotNull
-    @Min(1) @Max(Long.MAX_VALUE)
-    private Long certId; 
 
     @NotNull
-    @NotEmpty @Email
-    private String email; 
+    @Min(1)
+    @Max(Long.MAX_VALUE)
+    private Long certId;
 
+    @NotNull
+    @NotEmpty
+    @Email
+    private String email;
 
 
     /**
-     * @return the certificate id  
+     * @return the certificate id
      */
     public Long getCertId() {
         return certId;
@@ -65,6 +68,5 @@ public class RequestDownloadCertFormBean implements Serializable{
         this.email = email;
     }
 
-    
-    
+
 }

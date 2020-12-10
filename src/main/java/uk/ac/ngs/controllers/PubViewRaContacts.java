@@ -12,11 +12,6 @@
  */
 package uk.ac.ngs.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -32,31 +27,38 @@ import uk.ac.ngs.dao.JdbcRaopListDao;
 import uk.ac.ngs.domain.CertificateRow;
 import uk.ac.ngs.domain.RaopListRow;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 /**
- * Controller for the <tt>/pub/viewRAs</tt> page. 
+ * Controller for the <tt>/pub/viewRAs</tt> page.
  *
- * @author David Meredith  
+ * @author David Meredith
  */
 @Controller
 @RequestMapping("/pub/viewRAs")
 public class PubViewRaContacts {
     private static final Log log = LogFactory.getLog(PubViewRaContacts.class);
-    private JdbcRaopListDao jdbcRaopListDao; 
-    private JdbcCertificateDao certDao; 
+    private JdbcRaopListDao jdbcRaopListDao;
+    private JdbcCertificateDao certDao;
     private final Pattern negatedOuPattern = Pattern.compile("[^a-zA-Z0-9\\-]");
 
 
     public static class ViewRaContact {
-       private final List<RaopListRow> raoplistRows; 
-       private final CertificateRow certRow; 
-       private final String loc; 
-       private final String ou; 
-       public ViewRaContact(CertificateRow certRow, String loc, String ou, List<RaopListRow> raoplistRows){
-          this.raoplistRows = raoplistRows; 
-          this.certRow = certRow; 
-          this.loc = loc; 
-          this.ou = ou; 
-       }
+        private final List<RaopListRow> raoplistRows;
+        private final CertificateRow certRow;
+        private final String loc;
+        private final String ou;
+
+        public ViewRaContact(CertificateRow certRow, String loc, String ou, List<RaopListRow> raoplistRows) {
+            this.raoplistRows = raoplistRows;
+            this.certRow = certRow;
+            this.loc = loc;
+            this.ou = ou;
+        }
 
         /**
          * @return the certRow
@@ -91,36 +93,36 @@ public class PubViewRaContacts {
      * ModelAttribute annotations defined on a method in a controller are
      * invoked before RequestMapping methods, within the same controller.
      *
-     * @param ou OrgUnit value 
+     * @param ou      OrgUnit value
      * @param model
      * @param session
      */
     @ModelAttribute
     public void populateModel(@RequestParam(required = false) String ou,
-            ModelMap model, HttpSession session) {
-        log.debug("populateMessage"); 
-        
+                              ModelMap model, HttpSession session) {
+        log.debug("populateMessage");
+
         if (negatedOuPattern.matcher(ou).find()) {
             // provide an empty list instead
             model.put("ou", "Invalid ou param"); //["+HtmlUtils.htmlEscapeHex(ou)+"]");  
             //model.put("raRows", new ArrayList<RaopListRow>(0));
-            model.put("contacts", new ArrayList<ViewRaContact>(0)); 
+            model.put("contacts", new ArrayList<ViewRaContact>(0));
         } else {
             // escape reflected untrusted content   
-            model.put("ou", HtmlUtils.htmlEscapeHex(ou));   
+            model.put("ou", HtmlUtils.htmlEscapeHex(ou));
             //List<RaopListRow> rows = this.jdbcRaopListDao.findBy(ou, null, null, Boolean.TRUE);
             //model.put("raRows", rows);
-           
-            
-            List<ViewRaContact> contacts = new ArrayList<ViewRaContact>(0); 
-            List<CertificateRow> certRows = this.certDao.findActiveRAsBy(null, ou); 
-            for(CertificateRow certRow : certRows){
-                String loc = CertUtil.extractDnAttribute(certRow.getDn(), CertUtil.DNAttributeType.L); 
-                List<RaopListRow> raoplistRowsWithSameCnOuLoc = this.jdbcRaopListDao.findBy( ou, loc, certRow.getCn(), Boolean.TRUE);
-                ViewRaContact contact = new ViewRaContact(certRow, loc, ou, raoplistRowsWithSameCnOuLoc); 
-                contacts.add(contact); 
+
+
+            List<ViewRaContact> contacts = new ArrayList<ViewRaContact>(0);
+            List<CertificateRow> certRows = this.certDao.findActiveRAsBy(null, ou);
+            for (CertificateRow certRow : certRows) {
+                String loc = CertUtil.extractDnAttribute(certRow.getDn(), CertUtil.DNAttributeType.L);
+                List<RaopListRow> raoplistRowsWithSameCnOuLoc = this.jdbcRaopListDao.findBy(ou, loc, certRow.getCn(), Boolean.TRUE);
+                ViewRaContact contact = new ViewRaContact(certRow, loc, ou, raoplistRowsWithSameCnOuLoc);
+                contacts.add(contact);
             }
-            model.put("contacts", contacts); 
+            model.put("contacts", contacts);
         }
     }
 
@@ -134,11 +136,11 @@ public class PubViewRaContacts {
     }
 
     @Inject
-    public void setJdbcRaopListDao(JdbcRaopListDao jdbcRaopListDao){
-       this.jdbcRaopListDao = jdbcRaopListDao;  
+    public void setJdbcRaopListDao(JdbcRaopListDao jdbcRaopListDao) {
+        this.jdbcRaopListDao = jdbcRaopListDao;
     }
 
-    
+
     @Inject
     public void setJdbcCertificateDao(JdbcCertificateDao dao) {
         this.certDao = dao;

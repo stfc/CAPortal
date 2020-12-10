@@ -215,11 +215,11 @@ http://stackoverflow.com/questions/18789320/exception-expectedorg-hibernate-exce
         </dependency>-->
 
         <!-- DB Pooling  -->
-        <!--<dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
-        </dependency>-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.8.0</version>
+        </dependency>
 
         <!-- DB Driver -->
         <dependency>
@@ -269,7 +269,6 @@ http://stackoverflow.com/questions/18789320/exception-expectedorg-hibernate-exce
                 <configuration>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
-                    <encoding>UTF-8</encoding>
                     <release>11</release>
                     <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
                 </configuration>

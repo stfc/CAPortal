@@ -13,19 +13,20 @@
 package uk.ac.ngs.domain;
 
 /**
- * Defines the different types of PKCS10 request. 
- * @author David Meredith 
+ * Defines the different types of PKCS10 request.
+ *
+ * @author David Meredith
  */
 public interface CSR_Flags {
-    
-    public static enum Profile {
+
+    enum Profile {
         UKPERSON,
         UKHOST,
     }
-    
-    public static enum Csr_Types { 
-        NEW, 
+
+    enum Csr_Types {
+        NEW,
         RENEW,
     }
-    
+
 }

@@ -12,13 +12,14 @@
  */
 package uk.ac.ngs.common;
 
+import org.springframework.beans.support.MutableSortDefinition;
+import org.springframework.beans.support.SortDefinition;
+import org.springframework.util.Assert;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.springframework.beans.support.MutableSortDefinition;
-import org.springframework.beans.support.SortDefinition;
-import org.springframework.util.Assert;
 
 /**
  * A bean to hold a partial list of rows.
@@ -68,7 +69,7 @@ public class PartialPagedListHolder<E> implements Serializable {
      * Create a new holder instance with the given source list.
      *
      * @param source the source List
-     * @param sort the SortDefinition to start with
+     * @param sort   the SortDefinition to start with
      */
     public PartialPagedListHolder(List<E> source, SortDefinition sort) {
         setSource(source);
@@ -79,7 +80,7 @@ public class PartialPagedListHolder<E> implements Serializable {
      * Create a new holder instance with the given source list.
      *
      * @param source the source List
-     * @param sort the SortDefinition to start with
+     * @param sort   the SortDefinition to start with
      */
     public PartialPagedListHolder(List<E> source, int totalRows, SortDefinition sort) {
         setSource(source);

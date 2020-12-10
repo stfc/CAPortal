@@ -12,24 +12,25 @@
  */
 package uk.ac.ngs.domain;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
 import uk.ac.ngs.service.CertUtil;
 import uk.ac.ngs.validation.PKCS10Parser;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+
 /**
- * A class to wrap attributes and invariants for a certificate signing request. 
- * Use the provided {@link Builder} to create an instance.  
+ * A class to wrap attributes and invariants for a certificate signing request.
+ * Use the provided {@link Builder} to create an instance.
  * <p/>
  * Required parameters depend on the type of request - this is enforced by the
- * <tt>build()</tt> method that checks values have been provided. 
- * Note, this class does not perform validation of values (e.g. checking  
- * validity of emails, CSR PEM strings etc), rather this class should be used as 
- * an input for subsequent validation. 
- * 
+ * <tt>build()</tt> method that checks values have been provided.
+ * Note, this class does not perform validation of values (e.g. checking
+ * validity of emails, CSR PEM strings etc), rather this class should be used as
+ * an input for subsequent validation.
+ *
  * @author David Meredith
  */
 public class PKCS10_RequestWrapper {
@@ -66,16 +67,16 @@ public class PKCS10_RequestWrapper {
         private long clientSerial;
 
         /**
-         * Create an instance of Builder and call <tt>build()</tt> to create 
+         * Create an instance of Builder and call <tt>build()</tt> to create
          * an instance of {@link PKCS10_RequestWrapper}
-         * 
-         * @param csr_type The type of this CSR 
-         * @param profile The profile that should be used for this CSR 
-         * @param csrPemString A valid PKCS#10 string 
-         * @param email The email that will be recorded in the <tt>request.email</tt> table 
+         *
+         * @param csr_type     The type of this CSR
+         * @param profile      The profile that should be used for this CSR
+         * @param csrPemString A valid PKCS#10 string
+         * @param email        The email that will be recorded in the <tt>request.email</tt> table
          */
         public Builder(CSR_Flags.Csr_Types csr_type,
-                CSR_Flags.Profile profile, String csrPemString, String email) {
+                       CSR_Flags.Profile profile, String csrPemString, String email) {
             this.csrPemString = csrPemString;
             this.csr_type = csr_type;
             this.profile = profile;
@@ -84,28 +85,28 @@ public class PKCS10_RequestWrapper {
 
         /**
          * Create an instance and enforce parameter invariants.
-         * On creation, the mandatory <code>csrPemString</code> attribute is 
-         * parsed and a PKCS#10 object is built. 
-         * 
+         * On creation, the mandatory <code>csrPemString</code> attribute is
+         * parsed and a PKCS#10 object is built.
+         *
          * @return
          * @throws InvalidKeyException
-         * @throws NoSuchAlgorithmException 
+         * @throws NoSuchAlgorithmException
          */
         public PKCS10_RequestWrapper build() throws InvalidKeyException, NoSuchAlgorithmException {
             PKCS10_RequestWrapper csrWrapper = new PKCS10_RequestWrapper(this);
-            
+
             // Check invariants here (MUST check invariants on target object's  
             // params, not on builder fields to protect against TOCTOU attacks)    
             // See Effective Java pattern. 
-            
+
             // ClientData is required For a NEW UKHOST request 
-            if ( (CSR_Flags.Profile.UKHOST.equals(csrWrapper.getProfile())
+            if ((CSR_Flags.Profile.UKHOST.equals(csrWrapper.getProfile())
                     && CSR_Flags.Csr_Types.NEW.equals(csrWrapper.getCsr_type()))
-                    || 
+                    ||
                     // ClientData is also required for a RENEW request
                     (CSR_Flags.Csr_Types.RENEW.equals(csrWrapper.getCsr_type()))
-                    ) {
-                
+            ) {
+
                 if (csrWrapper.getClientDN() == null
                         || csrWrapper.getClientEmail() == null
                         || !(csrWrapper.getClientSerial() > 0)) {
@@ -116,15 +117,15 @@ public class PKCS10_RequestWrapper {
         }
 
         /**
-         * Client data is required for NEW UKHOST CSR request and for a RENEW request 
-         * and identifies the user / caller. It is important that the client 
-         * data is read from or matches the client data stored in the CA DB. 
-         * 
-         * @param clientEmail  email of client as recorded in DB. 
-         * @param clientDN DN of client as recorded in DB - it is important that
-         *   this value is read from or matches the value in the CA DB.  
-         * @param clientSerial Certificate serial/PK used in DB. 
-         * @return 
+         * Client data is required for NEW UKHOST CSR request and for a RENEW request
+         * and identifies the user / caller. It is important that the client
+         * data is read from or matches the client data stored in the CA DB.
+         *
+         * @param clientEmail  email of client as recorded in DB.
+         * @param clientDN     DN of client as recorded in DB - it is important that
+         *                     this value is read from or matches the value in the CA DB.
+         * @param clientSerial Certificate serial/PK used in DB.
+         * @return
          */
         public Builder setClientData(String clientEmail, String clientDN, long clientSerial) {
             this.clientEmail = clientEmail;
@@ -135,7 +136,7 @@ public class PKCS10_RequestWrapper {
     }
 
     /*
-     * Force non-instantiation of class with private constructor 
+     * Force non-instantiation of class with private constructor
      */
     private PKCS10_RequestWrapper(Builder builder) throws InvalidKeyException, NoSuchAlgorithmException {
         this.csr_type = builder.csr_type;
@@ -229,11 +230,12 @@ public class PKCS10_RequestWrapper {
     }
 
     /**
-     * Return clientDN which has been set by reading from the <tt>certificate.dn</tt> 
-     * DB table column. 
-     * The DN should always have an RFC2253 style value akin to: 
+     * Return clientDN which has been set by reading from the <tt>certificate.dn</tt>
+     * DB table column.
+     * The DN should always have an RFC2253 style value akin to:
      * <tt>emailAddress=someEmail@world.com,CN=david meredith,L=DL,OU=CLRC,O=eScience,C=UK</tt>
-     * where emailAddress may/not be present. 
+     * where emailAddress may/not be present.
+     *
      * @return the clientDN
      */
     public String getClientDN() {

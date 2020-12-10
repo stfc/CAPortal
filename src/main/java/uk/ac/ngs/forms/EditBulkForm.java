@@ -20,7 +20,7 @@ import java.util.List;
  * @author David Meredith
  */
 public class EditBulkForm implements Serializable {
-  private List<RequestRowViewWrapper> requestRows; 
+    private List<RequestRowViewWrapper> requestRows;
 
     /**
      * @return the requestRows
@@ -35,5 +35,5 @@ public class EditBulkForm implements Serializable {
     public void setRequestRows(List<RequestRowViewWrapper> requestRows) {
         this.requestRows = requestRows;
     }
-  
+
 }

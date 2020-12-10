@@ -12,23 +12,24 @@
  */
 package uk.ac.ngs.forms;
 
-import java.io.Serializable;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 //import javax.validation.constraints.Pattern;
 
 /**
- * Form bean for verifyPin page. 
- * @author David Meredith  
+ * Form bean for verifyPin page.
+ *
+ * @author David Meredith
  */
 public class VerifyPinFormBean implements Serializable {
 
     //@Pattern(message="Value required (Invalid chars \" ' ; `)", regexp="^[^\"';`]+$") 
-    @Size(message="Value required", min=2, max=240)
+    @Size(message = "Value required", min = 2, max = 240)
     private String pinVerification;
 
     //@Pattern(message="Value required (Invalid chars \" ' ; `)", regexp="^[^\"';`]+$") 
-    @Size(message="Value required", min=2, max=240)
-    private String pin; 
+    @Size(message = "Value required", min = 2, max = 240)
+    private String pin;
 
     /**
      * @return the pinVerification
@@ -58,9 +59,5 @@ public class VerifyPinFormBean implements Serializable {
         this.pin = pin;
     }
 
-    
 
-   
-    
-    
 }

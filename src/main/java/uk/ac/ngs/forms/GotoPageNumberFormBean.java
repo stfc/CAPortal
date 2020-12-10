@@ -12,21 +12,23 @@
  */
 package uk.ac.ngs.forms;
 
-import java.io.Serializable;
-//import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.io.Serializable;
+
+//import javax.validation.constraints.Max;
 //import javax.validation.constraints.NotNull;
 //import javax.validation.constraints.Pattern;
 
 
 /**
- * Simple form submission bean for submitting a page number. 
- * @author David Meredith 
+ * Simple form submission bean for submitting a page number.
+ *
+ * @author David Meredith
  */
-public class GotoPageNumberFormBean  implements Serializable {
-    
-   
-    @Min(value=0, message="0 is minimum")
+public class GotoPageNumberFormBean implements Serializable {
+
+
+    @Min(value = 0, message = "0 is minimum")
     private Integer gotoPageNumber = 0;
 
     /**
@@ -42,6 +44,6 @@ public class GotoPageNumberFormBean  implements Serializable {
     public void setGotoPageNumber(Integer gotoPageNumber) {
         this.gotoPageNumber = gotoPageNumber;
     }
-    
-    
+
+
 }

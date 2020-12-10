@@ -12,30 +12,29 @@
  */
 package uk.ac.ngs.forms;
 
-import java.io.Serializable;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 /**
- *
- * @author David Meredith 
+ * @author David Meredith
  */
-public class NewHostCertFormBean implements Serializable{
-    
-    @Pattern(message="Invalid chars \" ' ; `", regexp="^[^\"';`]*$")
+public class NewHostCertFormBean implements Serializable {
+
+    @Pattern(message = "Invalid chars \" ' ; `", regexp = "^[^\"';`]*$")
     private String ra;
-  
-    @Pattern(message="Invalid host (DNS) name ", regexp="^\\w{2,30}( \\w{2,30})+$") 
-    private String hostname; 
-    
-    @Pattern(message="Invalid email", regexp="^(([0-9a-zA-Z]+[-._])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}[,;]?)+$")
-    private String emailAddress; 
 
-    @Pattern(message="Invalid PIN (10 chars min)", regexp="^[0-9]{10,20}$")
-    private String pin; 
+    @Pattern(message = "Invalid host (DNS) name ", regexp = "^\\w{2,30}( \\w{2,30})+$")
+    private String hostname;
 
-    @Pattern(message="Invalid PIN (10 chars min, invalid chars \"';)", regexp="^['\";]{10,50}$")
-    private String password; 
-    
+    @Pattern(message = "Invalid email", regexp = "^(([0-9a-zA-Z]+[-._])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}[,;]?)+$")
+    private String emailAddress;
+
+    @Pattern(message = "Invalid PIN (10 chars min)", regexp = "^[0-9]{10,20}$")
+    private String pin;
+
+    @Pattern(message = "Invalid PIN (10 chars min, invalid chars \"';)", regexp = "^['\";]{10,50}$")
+    private String password;
+
 
     /**
      * @return the ra
@@ -62,7 +61,7 @@ public class NewHostCertFormBean implements Serializable{
      * @param hostName the name to set
      */
     public void setHostName(String hostName) {
-         this.hostname = hostName;
+        this.hostname = hostName;
     }
 
     /**
