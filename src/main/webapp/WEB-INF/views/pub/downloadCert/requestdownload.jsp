@@ -363,17 +363,12 @@
         <!-- footer includes shared .js files -->
         <%@ include file="../../../jspf/footer.jspf" %>
         <!-- Stuff for crypto / csrs -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/forge.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js"></script>
         <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
         <script src="${pageContext.request.contextPath}/resources/javascript/Blob.js"></script>
         <!-- https://github.com/eligrey/FileSaver.js -->
         <script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
-        <!-- https://github.com/dcneiner/Downloadify -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/downloadify.min.js"></script>
-        <script src="${pageContext.request.contextPath}/resources/javascript/swfobject.js"></script>
         <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
-        <!-- http://www.featureblend.com/javascript-flash-detection-library.html -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/flash_detect_min.js"></script>
 
         <script type="text/javascript">
             function pwValid() {
@@ -399,46 +394,11 @@
                 }
             }
             function browserCheck(b64p12) {
-                // Checks if browser is Safari - if true uses flash file to download
-                // else creates blob of the text data and saves the blob (not supported fully in safari)
-                // if blob is not properly supported then flash version is used as with safari
-                var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0; // At least Safari 3+
-                try {
-                    var isFileSaverSupported = !!new Blob();
-                } catch (e) {
-                    isFileSaverSupported = null;
-                }
-                ;
-                if ((isSafari) || (isFileSaverSupported === null) || (ieVersion() < 10)) {
-                    //if flash is not installed use second fall back method
-                    if (!FlashDetect.installed) {
-                        alert("Please click Download button and add \n\
-a .p12 file extension for the downloaded file.");
-                        $('#createP12Button').hide();
-                        $('#mydownloadURI').show();
-                        $('#mydownloadURI').attr('href', 'data:application/octet-stream;base64,' + b64p12);
-                    } else {
-                        flashDownload(b64p12); //flash is installed
-                    }
-                } else {
-                    var myBuffer = base64DecToArr(b64p12).buffer;
-                    var p12blob = new Blob([myBuffer], {type: 'application/octet-stream'});
-                    saveAs(p12blob, "certBundle.p12");
-                }
+                var myBuffer = base64DecToArr(b64p12).buffer;
+                var p12blob = new Blob([myBuffer], {type: 'application/octet-stream'});
+                saveAs(p12blob, "certBundle.p12");
             }
-            function flashDownload(b64p12) {
-                $('#createP12Button').hide();
-                $('#createFlashButton').show();
-                $('#createFlashButton').downloadify({
-                    swf: '${pageContext.request.contextPath}/resources/media/downloadify.swf',
-                    downloadImage: '${pageContext.request.contextPath}/resources/images/download.png',
-                    width: 100,
-                    height: 30,
-                    filename: 'certBundle.p12',
-                    data: b64p12,
-                    dataType: 'base64'
-                });
-            }
+
             function loadfile(input) {
                 var fileReader = new FileReader();
                 fileReader.onload = function(fileLoadedEvent) {

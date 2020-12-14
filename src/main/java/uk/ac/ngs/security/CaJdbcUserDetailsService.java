@@ -43,6 +43,7 @@ public class CaJdbcUserDetailsService implements UserDetailsService {
 
 
     private JdbcCaUserAuthDao jdbcCaUserAuthDao;
+    private SecurityContextService securityContextService;
 
     /**
      * Query CA database for user with given username (DN) and load their roles.
@@ -74,46 +75,11 @@ public class CaJdbcUserDetailsService implements UserDetailsService {
                     }
                 }
 
-                List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
-                String role = this.getRoleFromDataColumn(cr);
-                if ("User".equalsIgnoreCase(role)) {
-                    SimpleGrantedAuthority co = new SimpleGrantedAuthority("ROLE_CERTOWNER");
-                    auths.add(co);
-
-                } else if ("RA Operator".equalsIgnoreCase(role)) {
-                    SimpleGrantedAuthority ra = new SimpleGrantedAuthority("ROLE_RAOP");
-                    SimpleGrantedAuthority co = new SimpleGrantedAuthority("ROLE_CERTOWNER");
-                    auths.add(co);
-                    auths.add(ra);
-
-                } else if ("CA Operator".equalsIgnoreCase(role)) {
-                    SimpleGrantedAuthority ca = new SimpleGrantedAuthority("ROLE_CAOP");
-                    SimpleGrantedAuthority ra = new SimpleGrantedAuthority("ROLE_RAOP");
-                    SimpleGrantedAuthority co = new SimpleGrantedAuthority("ROLE_CERTOWNER");
-                    auths.add(co);
-                    auths.add(ra);
-                    auths.add(ca);
-                }
+                List<GrantedAuthority> auths = this.securityContextService.getGrantedAuthorities(cr);
                 return new CaUser(dn, true, true, true, true, auths, cr);
             }
         }
         throw new UsernameNotFoundException("User Not found [" + dn + "]");
-    }
-
-    /**
-     * Extract the value from the 'ROLE = role_value' serialized in data field of the given row.
-     *
-     * @param row
-     * @return the ROLE value (if any) otherwise null.
-     */
-    private String getRoleFromDataColumn(CertificateRow row) {
-        if (row.getData() != null) {
-            Matcher m = DATA_ROLE_PATTERN.matcher(row.getData());
-            if (m.find()) {
-                return m.group(1).trim();
-            }
-        }
-        return null;
     }
 
     @Inject
@@ -121,4 +87,8 @@ public class CaJdbcUserDetailsService implements UserDetailsService {
         this.jdbcCaUserAuthDao = jdbcCaUserAuthDao;
     }
 
+    @Inject
+    public void setSecurityContextService(SecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
 }

@@ -103,6 +103,8 @@ Spring Security context
         
         <!--<logout delete-cookies="JSESSIONID" invalidate-session="true" logout-url="/j_spring_security_logout" /> -->
 
+        <csrf disabled="true"/>
+
     </http>
 
     <!--    

@@ -169,7 +169,7 @@ public class JdbcCertificateDao {
 
         String currentTimeUTC = getDateFormat().format(calendarLocal.getTime());
         Map<String, Object> namedParameters = new HashMap<String, Object>();
-        namedParameters.put("currentTime", new Long(currentTimeUTC));
+        namedParameters.put("currentTime", Long.valueOf(currentTimeUTC));
         namedParameters.put("dn", rfc2253DN);
         //log.debug("notafter: ["+namedParameters.get("currentTime")+"]"); 
         String query = "select count(*) from certificate where dn ILIKE :dn and status='VALID' and notafter > :currentTime";
@@ -305,7 +305,7 @@ public class JdbcCertificateDao {
         namedParameters.put("email", certRow.getEmail());
         namedParameters.put("status", certRow.getStatus());
         namedParameters.put("role", certRow.getRole());
-        namedParameters.put("notafter", new Long(getDateFormat().format(certRow.getNotAfter())));
+        namedParameters.put("notafter", Long.valueOf(getDateFormat().format(certRow.getNotAfter())));
         namedParameters.put("cert_key", certRow.getCert_key());
         /*"update certificate set data=:data, dn=:dn, cn=:cn, email=:email,
          * status=:status, role=:role, notafter=:notafter where cert_key=:cert_key";*/

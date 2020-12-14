@@ -213,17 +213,11 @@
 
         <%@ include file="../../jspf/footer.jspf" %>     
         <!-- Stuff for crypto / csrs -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/forge.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js"></script>
         <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
-        <script src="${pageContext.request.contextPath}/resources/javascript/Blob.js"></script>
         <!-- https://github.com/eligrey/FileSaver.js -->
         <script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
-        <!-- https://github.com/dcneiner/Downloadify -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/downloadify.min.js"></script>
-        <script src="${pageContext.request.contextPath}/resources/javascript/swfobject.js"></script>
         <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
-        <!-- http://www.featureblend.com/javascript-flash-detection-library.html -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/flash_detect_min.js"></script>
 
         <script type="text/javascript">
 
@@ -303,37 +297,9 @@
                 }
             }
             function showDownloadLink() {
-                // Checks if browser is Safari - if true uses flash file to download
-                // else creates blob of the text data and saves the blob (not supported fully in safari)
-                // if blob is not properly supported then flash version is used as with safari
-                var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor')>0; // At least Safari 3+
-                try { var isFileSaverSupported = !!new Blob(); } catch(e){isFileSaverSupported = null;};
-                if ((isSafari) || (isFileSaverSupported === null) || (ieVersion() < 10)) {
-                    if(!FlashDetect.installed){
-                        alert("Copy/paste the highlighted text into a plain text file, do not save as formatted rich-text.\n\
-                                (copy/paste is required as browser does not support HTML5 download attribute for locally generated files or Flash)"); 
-//                        $('#mydownloadURI').show();
-//                        var csrval = $('#csrTextArea').val().replace(/\r?\n/g, "\r\n"); 
-//                        $('#mydownloadURI').attr('href', 'data:text;base64,'+btoa(csrval));  
-                    }else{
-                        flashDownload(); //flash is installed
-                    }
-                } else {
-                    $('#savetxt').show();  // isFileSaverSupported is true
-                }
+                $('#savetxt').show();  // isFileSaverSupported is true
             }
-            function flashDownload() {
-                  $('#flashdown').show();
-                  $('#flashdown').downloadify({
-                    swf: '${pageContext.request.contextPath}/resources/media/downloadify.swf',
-                    downloadImage: '${pageContext.request.contextPath}/resources/images/download.png',
-                    width: 100,
-                    height: 30,
-                    filename: $('#cnInputText').val().replace(/[.]/g,'_')+'PrivateKeyAndCsr.txt',
-                    data: $('#csrTextArea').val(),
-                    dataType: 'string'
-                  });  
-            }    
+
             function doProcessing(){
                 var ra = $('#raSelect').val();
                 var cn = $('#cnInputText').val().trim();

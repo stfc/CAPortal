@@ -19,8 +19,8 @@ import org.bouncycastle.asn1.x509.ExtensionsGenerator;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.PKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -110,7 +110,7 @@ public class CsrAndPrivateKeyPemStringBuilder {
         }
 
         StringWriter writer = new StringWriter();
-        PEMWriter pemWrite = new PEMWriter(writer);
+        JcaPEMWriter pemWrite = new JcaPEMWriter(writer);
         pemWrite.writeObject(req1);
         pemWrite.close();
         String csr = writer.toString();
@@ -127,7 +127,7 @@ public class CsrAndPrivateKeyPemStringBuilder {
         // Output encrypted private key pkcs8 PEM string (todo use later api) 
         PemObject pkcs8PemEnc = pkcs8GeneratorEnc.generate();
         StringWriter writer2 = new StringWriter();
-        PEMWriter pemWrite2 = new PEMWriter(writer2);
+        JcaPEMWriter pemWrite2 = new JcaPEMWriter(writer2);
         pemWrite2.writeObject(pkcs8PemEnc);
         pemWrite2.close();
         String pkcs8StrEnc = writer2.toString();

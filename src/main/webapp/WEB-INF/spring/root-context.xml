@@ -160,8 +160,8 @@ Spring root context
     </bean>
 
 
-    <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean" >
-        <property name="resourceLoaderPath" value="/WEB-INF/velocity/email/"/> 
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer" >
+        <property name="templateLoaderPath" value="/WEB-INF/freemarker/email/"/>
     </bean>
 
 

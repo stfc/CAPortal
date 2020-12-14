@@ -12,8 +12,6 @@
  */
 package uk.ac.ngs.controllers;
 
-import net.tanesha.recaptcha.ReCaptchaImpl;
-import net.tanesha.recaptcha.ReCaptchaResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -67,12 +65,6 @@ public class PubRequestUserCert {
         model.addAttribute("countryOID", csrRequestValidationConfigParams.getCountryOID());
         model.addAttribute("orgNameOID", csrRequestValidationConfigParams.getOrgNameOID());
 
-        // Provide the public and private key for the recaptcha (if configured in mutable.properties)  
-        if (this.getUseRecaptcha()) {
-            model.addAttribute("useRecaptcha", true);
-            model.addAttribute("recaptchaPrivateKey", this.mutableConfigParams.getProperty("recaptcha.private.key"));
-            model.addAttribute("recaptchaPublicKey", this.mutableConfigParams.getProperty("recaptcha.public.key"));
-        }
         model.addAttribute("createCsrOnClientOrServer", this.mutableConfigParams.getProperty("createCsrOnClientOrServer"));
         //if(true) throw new RuntimeException("test dave"); 
     }
@@ -130,8 +122,6 @@ public class PubRequestUserCert {
      * @param email
      * @param pw                        Used to encrypt the private key
      * @param pin                       Used to identify that the request belongs to the submitter
-     * @param recaptcha_challenge_field can be null/empty
-     * @param recaptcha_response_field  can be null/empty
      * @param request
      * @param model
      * @return Either 'SUCCESS' or 'FAIL' which always comes at the start of the string
@@ -146,25 +136,12 @@ public class PubRequestUserCert {
             @RequestParam String email,
             @RequestParam String pw,
             @RequestParam String pin,
-            @RequestParam String recaptcha_challenge_field,
-            @RequestParam String recaptcha_response_field,
             HttpServletRequest request,
             //@Valid @ModelAttribute("newUserCertFormBean") NewUserCertFormBean newUserCertFormBean,
             //BindingResult result,
             /*RedirectAttributes redirectAttrs, */ Model model)
             throws IOException {
         //String cn = newUserCertFormBean.getName();
-
-        if (this.getUseRecaptcha()) {
-            String key = this.mutableConfigParams.getProperty("recaptcha.private.key");
-            ReCaptchaImpl reCaptcha = new ReCaptchaImpl();
-            reCaptcha.setPrivateKey(key);
-            ReCaptchaResponse reCaptchaResponse = reCaptcha.checkAnswer(
-                    request.getRemoteAddr(), recaptcha_challenge_field, recaptcha_response_field);
-            if (!reCaptchaResponse.isValid()) {
-                return ("FAIL: reCAPTCHA invalid, please refresh reCAPTCHA and try again (the last reCAPTCHA is now invalid)");
-            }
-        }
 
         ProcessCsrNewService.CsrAttributes csrAttributes = new ProcessCsrNewService.CsrAttributes(pw, cn, ra);
         ProcessCsrResult result = this.processCsrNewService.processNewUserCSR_CreateOnServer(
@@ -182,8 +159,6 @@ public class PubRequestUserCert {
      * @param pin
      * @param email
      * @param csr
-     * @param recaptcha_challenge_field
-     * @param recaptcha_response_field
      * @param request
      * @return Either 'SUCCESS' or 'FAIL' which always comes at the start of the string
      * @throws IOException
@@ -194,21 +169,8 @@ public class PubRequestUserCert {
             @RequestParam String pin,
             @RequestParam String email,
             @RequestParam String csr,
-            @RequestParam String recaptcha_challenge_field,
-            @RequestParam String recaptcha_response_field,
             HttpServletRequest request/*, ServletContext ctx*/)
             throws IOException {
-
-        if (this.getUseRecaptcha()) {
-            String key = this.mutableConfigParams.getProperty("recaptcha.private.key");
-            ReCaptchaImpl reCaptcha = new ReCaptchaImpl();
-            reCaptcha.setPrivateKey(key);
-            ReCaptchaResponse reCaptchaResponse = reCaptcha.checkAnswer(
-                    request.getRemoteAddr(), recaptcha_challenge_field, recaptcha_response_field);
-            if (!reCaptchaResponse.isValid()) {
-                return ("FAIL: reCAPTCHA invalid, please refresh reCAPTCHA and try again (the last reCAPTCHA is now invalid)");
-            }
-        }
 
         ProcessCsrResult result = this.processCsrNewService.processNewUserCSR_Provided(
                 csr, email, pin);
@@ -244,18 +206,6 @@ public class PubRequestUserCert {
             returnResult = "FAIL: " + HtmlUtils.htmlEscapeHex(result.getErrors().getAllErrors().get(0).getDefaultMessage());
         }
         return returnResult;
-    }
-
-    private boolean getUseRecaptcha() {
-        try {
-            String useRecaptchaStr = this.mutableConfigParams.getProperty("use.recaptcha");
-            if (useRecaptchaStr != null) {
-                return Boolean.parseBoolean(useRecaptchaStr);
-            }
-            return false;
-        } catch (IOException ex) {
-            throw new RuntimeException("Could not get 'use.recaptcha' from mutable props file", ex);
-        }
     }
 
     @Inject

@@ -105,9 +105,7 @@ public class ConvertUtil {
             PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
 
             return pubKey;
-        } catch (InvalidKeySpecException ex) {
-            log.log(Level.INFO, ex.getMessage());
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
             log.log(Level.INFO, ex.getMessage());
         }
         return null;
@@ -295,7 +293,7 @@ public class ConvertUtil {
         for (int i = 0; i < hex.length(); i++) {
             char c = hex.charAt(i);
             int d = digits.indexOf(c);
-            BigInteger _b = new BigInteger(new Integer(d).toString());
+            BigInteger _b = new BigInteger(Integer.toString(d));
             b = b.multiply(my_b);
             b = b.add(_b);
         }

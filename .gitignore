@@ -1,6 +1,6 @@
 # project specific files 
-mutableproperties.properties
-project.properties
+src/main/webapp/WEB-INF/mutableproperties.properties
+src/main/webapp/WEB-INF/project.properties
 
 # Eclipse: https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore
 # =====================
@@ -58,3 +58,6 @@ hs_err_pid*
 
 .idea/
 *.iml
+
+project.properties
+mutableproperties.properties

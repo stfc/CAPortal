@@ -221,7 +221,7 @@ public class JdbcRequestDao {
                 + " AND bulk IS NOT NULL";
         Map<String, Object> namedParameters = new HashMap<String, Object>();
         namedParameters.put("dn", rfc2253RenewDN);
-        namedParameters.put("currentTime", new Long(currentTimeUTC));
+        namedParameters.put("currentTime", Long.valueOf(currentTimeUTC));
       
         /*Long maxBulkId = this.jdbcTemplate.query(query, namedParameters, new ResultSetExtractor<Long>() {
             public Long extractData(ResultSet rs) throws SQLException, DataAccessException {

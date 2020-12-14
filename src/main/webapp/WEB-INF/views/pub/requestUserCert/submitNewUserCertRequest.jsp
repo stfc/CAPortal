@@ -170,16 +170,6 @@
                         </div>
                         <div class="form-group">
                             <div class="col-xs-offset-3">
-                                <%  if(request.getAttribute("useRecaptcha") != null){
-                                        String pubkey = (String)request.getAttribute("recaptchaPublicKey"); 
-                                        String privkey =(String)request.getAttribute("recaptchaPublicKey"); 
-                                        //out.print(pubkey+"<br/>"); 
-                                        //out.print(privkey+"<br/>"); 
-                                        // pubkey, privkey, includeNoScript
-                                        ReCaptcha c = ReCaptchaFactory.newSecureReCaptcha(pubkey, privkey, false);
-                                        out.print(c.createRecaptchaHtml(null, null));
-                                    }
-                                %>
                             </div>
                         </div>
                         <div class="form-group">
@@ -212,17 +202,11 @@
         <!-- footer includes shared .js files -->
         <%@ include file="../../../jspf/footer.jspf" %>
         <!-- Stuff for crypto / csrs -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/forge.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js"></script>
         <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
-        <script src="${pageContext.request.contextPath}/resources/javascript/Blob.js"></script>
         <!-- https://github.com/eligrey/FileSaver.js -->
         <script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
-        <!-- https://github.com/dcneiner/Downloadify -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/downloadify.min.js"></script>
-        <script src="${pageContext.request.contextPath}/resources/javascript/swfobject.js"></script>
         <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
-        <!-- http://www.featureblend.com/javascript-flash-detection-library.html -->
-        <script src="${pageContext.request.contextPath}/resources/javascript/flash_detect_min.js"></script>
         
         <script type="text/javascript">        
             function pwSame(){
@@ -297,36 +281,7 @@
                 }
             }
             function showDownloadLink() {
-                // Checks if browser is Safari - if true uses flash file to download
-                // else creates blob of the text data and saves the blob (not supported fully in safari)
-                // if blob is not properly supported then flash version is used as with safari
-                var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor')>0; // At least Safari 3+
-                try { var isFileSaverSupported = !!new Blob(); } catch(e){isFileSaverSupported = null;};
-                if ((isSafari) || (isFileSaverSupported === null) || (ieVersion() < 10)) {
-                    if(!FlashDetect.installed){
-                        alert("Copy/paste the highlighted text into a plain text file, do not save as formatted rich-text.\n\
-                                (copy/paste is required as browser does not support HTML5 download attribute for locally generated files or Flash)");  
-//                        $('#mydownloadURI').show();
-//                        var csrval = $('#csrTextArea').val().replace(/\r?\n/g, "\r\n"); 
-//                        $('#mydownloadURI').attr('href', 'data:text;base64,'+btoa(csrval));
-                    }else{
-                        flashDownload(); //flash is installed
-                    }
-                } else {
-                    $('#savetxt').show(); // isFileSaverSupported is tru
-                }
-            }
-            function flashDownload() {
-              $('#flashdown').show();
-              $('#flashdown').downloadify({
-                swf: '${pageContext.request.contextPath}/resources/media/downloadify.swf',
-                downloadImage: '${pageContext.request.contextPath}/resources/images/download.png',
-                width: 100,
-                height: 30,
-                filename: $('#cnInputText').val().replace(/ /g,'')+'PrivateKeyAndCsr.txt',
-                data: $('#csrTextArea').val(),
-                dataType: 'string'
-              });  
+                $('#savetxt').show();
             }
             
             function doProcessing(){             
@@ -343,8 +298,6 @@
                     var c =  '${countryOID}'; 
                     var o = '${orgNameOID}'; 
                     var messageElement = $("#responseMessage");
-                    var my_recaptcha_challenge_field = $("#recaptcha_challenge_field").val();
-                    var my_recaptcha_response_field = $("#recaptcha_response_field").val();
 
                     var postTarget;
                     var csrTextAreaVal; 
@@ -358,9 +311,7 @@
                                 "&"+$.param({ ra: ra })+
                                 "&"+$.param({ email: email })+
                                 "&"+$.param({ pw: pw })+
-                                "&"+$.param({ pin: pin })+
-                                "&"+$.param({ recaptcha_challenge_field: my_recaptcha_challenge_field })+
-                                "&"+$.param({ recaptcha_response_field: my_recaptcha_response_field }); 
+                                "&"+$.param({ pin: pin });
                     }
                     if('${createCsrOnClientOrServer}' === 'client'){
                         postTarget = $("#postLinkCsr");
@@ -369,9 +320,7 @@
                         dataPostEncodedVal = 
                                 $.param({ pin: pin })+
                                 "&"+$.param({ email: email })+
-                                "&"+$.param({ csr: pem.csr })+
-                                "&"+$.param({ recaptcha_challenge_field: my_recaptcha_challenge_field })+
-                                "&"+$.param({ recaptcha_response_field: my_recaptcha_response_field }); 
+                                "&"+$.param({ csr: pem.csr });
                     }
                    
                     console.log('posting'); 
@@ -510,11 +459,12 @@
                    // User clicked ok so show the 'please wait' modal. 
                    $('#waitModal').modal('show');
                    // Next delay the execution of the slow function with a timeout 
-                   // which gives enough time for the dom to update. 
-                   setTimeout(function(){
-                        doProcessing();
-                      }, 
-                      1000);
+                   // which gives enough time for the dom to update.
+                    doProcessing();
+                   //setTimeout(function(){
+                   //     doProcessing();
+                   //   },
+                   //   1000);
                       // Note, don't call $('#waitModal').modal('hide');  here, as it 
                       // will remove the modal before the doProcessing is invoked. 
                 }); 
