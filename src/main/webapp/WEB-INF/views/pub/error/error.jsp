@@ -4,59 +4,59 @@
     Author     : djm76
 --%>
 
-<%@page contentType="text/html" pageEncoding="windows-1252"%>
+<%@page contentType="text/html" pageEncoding="windows-1252" %>
 <%--<%@ page session="false"%>--%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-        <title>Error Occurred</title>
-    </head>
-    <body>
-       	<!--
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <title>Error Occurred</title>
+</head>
+<body>
+<!--
 An error page with hidden stack-trace suitable for tech support.
-        -->
-        <h1>Application Error</h1>
+-->
+<h1>Application Error</h1>
 
-        <!-- You could use ${requestScope['javax.servlet.forward.request_uri']}
+<!-- You could use ${requestScope['javax.servlet.forward.request_uri']}
         but it's a lot more verbose and doesn't give you the full page URL. -->
-        <c:if test="${not empty url}">
-            <p>
-                <b>Page:</b> ${url}
-            </p>
-        </c:if>
+<c:if test="${not empty url}">
+    <p>
+        <b>Page:</b> ${url}
+    </p>
+</c:if>
 
-        <c:if test="${not empty timestamp}">
-            <p id='created'>
-                <b>Occurred:</b> ${timestamp}
-            </p>
-        </c:if>
+<c:if test="${not empty timestamp}">
+    <p id='created'>
+        <b>Occurred:</b> ${timestamp}
+    </p>
+</c:if>
 
-        <c:if test="${not empty status}">
-            <p>
-                <b>Response Status:</b> ${status}
-                <c:if test="${error}">(${error})</c:if>
-                </p>
-        </c:if>
+<c:if test="${not empty status}">
+    <p>
+        <b>Response Status:</b> ${status}
+        <c:if test="${error}">(${error})</c:if>
+    </p>
+</c:if>
 
-        <p>
-            Oh dear, the application has encountered an error.
-        </p>
-        <p>        
-            Please would you contact <a href="mailto:support@grid-support.ac.uk">support@grid-support.ac.uk</a>
-            and copy/paste the error details shown in the text area below ('Ctrl+a' to select all then 'Ctrl+c' to copy).
-        </p>
-        <p>Apologies for the inconvenience caused.</p>
+<p>
+    Oh dear, the application has encountered an error.
+</p>
+<p>
+    Please would you contact <a href="mailto:support@grid-support.ac.uk">support@grid-support.ac.uk</a>
+    and copy/paste the error details shown in the text area below ('Ctrl+a' to select all then 'Ctrl+c' to copy).
+</p>
+<p>Apologies for the inconvenience caused.</p>
 
 
-        <textarea style="width: 100%; height: 200px;">
+<textarea style="width: 100%; height: 200px;">
         Failed URL: ${url}
-        Exception: ${exception.message}
-            <c:forEach items="${exception.stackTrace}" var="ste"> ${ste}
-            </c:forEach>
-        </textarea> 
+    Exception: ${exception.message}
+    <c:forEach items="${exception.stackTrace}" var="ste"> ${ste}
+    </c:forEach>
+        </textarea>
 
-    </body>
+</body>
 </html>
