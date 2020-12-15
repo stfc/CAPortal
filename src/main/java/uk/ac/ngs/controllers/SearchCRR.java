@@ -14,6 +14,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -52,6 +53,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/raop/searchcrr")
 @SessionAttributes(value = {SearchCRR.SEARCH_CRR_FORM_BEAN_SESSIONSCOPE})
+@Secured("ROLE_RAOP")
 public class SearchCRR {
 
     private JdbcCrrDao jdbcCrrDao;

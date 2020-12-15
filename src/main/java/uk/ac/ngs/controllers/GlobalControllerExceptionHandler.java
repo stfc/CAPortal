@@ -16,6 +16,7 @@ package uk.ac.ngs.controllers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,6 +43,14 @@ public class GlobalControllerExceptionHandler {
     private EmailService emailService;
     private MutableConfigParams mutableConfigParams;
 
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ModelAndView accessDeniedErrorHandler(HttpServletRequest req, Exception e) throws Exception {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/denied/denied");
+        return mav;
+    }
+
     @ExceptionHandler(value = Exception.class)
     public ModelAndView defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
         // If the exception is annotated with @ResponseStatus rethrow it and let
@@ -56,6 +65,7 @@ public class GlobalControllerExceptionHandler {
         // log the error 
         log.error("Global Exception handled with no @ResponsStatus: ");
         log.error(e);
+        e.printStackTrace();
 
         // send notification email 
         boolean emailOnError = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.admins.on.error"));

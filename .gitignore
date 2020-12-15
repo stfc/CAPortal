@@ -1,6 +1,6 @@
 # project specific files 
-src/main/webapp/WEB-INF/mutableproperties.properties
-src/main/webapp/WEB-INF/project.properties
+src/main/resources/mutableproperties.properties
+src/main/resources/project.properties
 
 # Eclipse: https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore
 # =====================

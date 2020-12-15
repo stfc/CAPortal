@@ -14,6 +14,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -53,6 +54,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/raop/searchcert")
 @SessionAttributes(value = {SearchCert.SEARCH_CERT_FORM_BEAN_SESSIONSCOPE})
+@Secured("ROLE_RAOP")
 public class SearchCert {
 
     private static final Log log = LogFactory.getLog(SearchCert.class);

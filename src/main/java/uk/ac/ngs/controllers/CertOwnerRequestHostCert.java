@@ -15,6 +15,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/cert_owner/requestHostCert")
+@Secured("ROLE_CERTOWNER")
 public class CertOwnerRequestHostCert {
 
     private static final Log log = LogFactory.getLog(CertOwnerRequestHostCert.class);

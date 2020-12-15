@@ -14,6 +14,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -50,6 +51,7 @@ import java.security.cert.X509Certificate;
  */
 @Controller
 @RequestMapping("/cert_owner")
+@Secured("ROLE_CERTOWNER")
 public class CertOwnerBaseController {
 
     private static final Log log = LogFactory.getLog(CertOwnerBaseController.class);

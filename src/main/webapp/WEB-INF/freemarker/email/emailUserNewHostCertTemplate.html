@@ -6,10 +6,10 @@ and open the template in the editor.
 -->
 <html>
     <body>
-        Dear ${clientCN},<br/>
+        Dear ${clientCN??},<br/>
         Thank you for requesting a new host certificate from the UK e-Science CA.<br/> 
         The requested host certificate DNs is:<br/> 
-        [${requestedDN}]<br/>
+        [${requestedDN??}]<br/>
         <br/>
         Now please contact one of your Registration Authority operators confirming that 
         you submitted the request. The RA will then approve the request(s). 
@@ -17,10 +17,10 @@ and open the template in the editor.
         <br/>
         <br>
         Your Registration Authority operator(s) are:<br/> 
-        ${raCNs}<br/>
+        ${raCNs>>}<br/>
         <br/>
         And their last known email addresses:<br/>
-        ${raEmails}<br/>
+        ${raEmails??}<br/>
         Please contact the CA if these RAs are unavailable.<br/> 
         Yours faithfully,<br/>
         CA Operator 

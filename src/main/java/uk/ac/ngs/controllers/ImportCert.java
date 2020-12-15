@@ -15,6 +15,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,7 @@ import java.util.Locale;
  */
 @Controller
 @RequestMapping("/caop/importcert")
+@Secured("ROLE_CAOP")
 public class ImportCert {
     private static final Log log = LogFactory.getLog(ImportCert.class);
     private JdbcRequestDao jdbcRequestDao;

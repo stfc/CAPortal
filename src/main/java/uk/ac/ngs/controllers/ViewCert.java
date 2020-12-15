@@ -14,6 +14,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -58,6 +59,7 @@ import java.util.regex.Pattern;
  */
 @Controller
 @RequestMapping("/raop/viewcert")
+@Secured("ROLE_RAOP")
 public class ViewCert {
 
     private static final Log log = LogFactory.getLog(ViewCert.class);

@@ -15,6 +15,7 @@ package uk.ac.ngs.controllers;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -35,6 +36,7 @@ import java.security.NoSuchAlgorithmException;
  */
 @Controller
 @RequestMapping("/raop/verifyPin")
+@Secured("ROLE_RAOP")
 public class VerifyPin {
     private static final Log log = LogFactory.getLog(VerifyPin.class);
 

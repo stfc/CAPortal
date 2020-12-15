@@ -14,6 +14,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,6 +41,7 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("/caop")
+@Secured("ROLE_CAOP")
 public class CaOpBaseController {
     private static final Log log = LogFactory.getLog(CaOpBaseController.class);
     private SecurityContextService securityContextService;

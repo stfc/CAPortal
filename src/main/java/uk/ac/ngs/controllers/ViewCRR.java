@@ -14,6 +14,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,6 +51,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/raop/viewcrr")
+@Secured("ROLE_RAOP")
 public class ViewCRR {
     private static final Log log = LogFactory.getLog(ViewCSR.class);
     private SecurityContextService securityContextService;

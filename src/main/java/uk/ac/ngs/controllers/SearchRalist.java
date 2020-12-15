@@ -14,6 +14,7 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,6 +40,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/raop/searchralist")
+@Secured("ROLE_RAOP")
 public class SearchRalist {
 
     private static final Log log = LogFactory.getLog(SearchRalist.class);
