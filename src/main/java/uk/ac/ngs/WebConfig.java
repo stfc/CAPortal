@@ -1,10 +1,13 @@
 package uk.ac.ngs;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.coyote.ajp.AbstractAjpProtocol;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -22,7 +25,6 @@ import uk.ac.ngs.validation.PKCS10Validator;
 
 @Configuration
 @EnableWebMvc
-@PropertySource("classpath:/project.properties")
 public class WebConfig implements WebMvcConfigurer {
 
     @Value("${supported.pkcs10.country.oid}")
@@ -50,6 +52,13 @@ public class WebConfig implements WebMvcConfigurer {
     private String jdbcUsername;
     @Value("${jdbc.password}")
     private String jdbcPassword;
+
+    @Value("${tomcat.ajp.port}")
+    private int ajpPort;
+    @Value("${tomcat.ajp.remoteauthentication}")
+    private String remoteAuthentication;
+    @Value("${tomcat.ajp.enabled}")
+    private boolean tomcatAjpEnabled;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -145,5 +154,24 @@ public class WebConfig implements WebMvcConfigurer {
         i.setPrefix("/WEB-INF/views/");
         i.setSuffix(".jsp");
         return i;
+    }
+
+    // AJP support https://stackoverflow.com/questions/60501470/springboot-the-ajp-connector-is-configured-with-secretrequired-true-but-the-s
+    // Required because proxying via HTTP does not pass the client certificate data, which is crucial to us!
+    @Bean
+    public TomcatServletWebServerFactory servletContainer() {
+
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+        if (tomcatAjpEnabled) {
+            Connector ajpConnector = new Connector("AJP/1.3");
+            ajpConnector.setPort(ajpPort);
+            ajpConnector.setSecure(false);
+            ajpConnector.setAllowTrace(false);
+            ajpConnector.setScheme("ajp");
+            ((AbstractAjpProtocol) ajpConnector.getProtocolHandler()).setSecretRequired(false);
+            tomcat.addAdditionalTomcatConnectors(ajpConnector);
+        }
+
+        return tomcat;
     }
 }

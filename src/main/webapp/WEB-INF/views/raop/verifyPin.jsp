@@ -41,7 +41,7 @@
 
                 <table>
                     <form:form method="post" action="${pageContext.request.contextPath}/raop/verifyPin"
-                               commandName="verifyPinFormBean">
+                               modelAttribute="verifyPinFormBean">
                         <%--<s:bind path="*">
                             <c:if test="${status.error}">
                                 <div id="message" class="error">Form has errors</div>

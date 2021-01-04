@@ -196,7 +196,7 @@
                             <td>
                                 <form:form method="post"
                                            action="${pageContext.request.contextPath}/raop/viewcsr/approve"
-                                           commandName="csr">
+                                           modelAttribute="csr">
                                     <form:hidden path="status"/>
                                     <form:hidden path="req_key"/>
                                     <button type="submit" class="btn btn-sm btn-primary"
@@ -210,7 +210,7 @@
                         <c:if test="${csr.status == 'NEW' || csr.status =='RENEW' || csr.status == 'APPROVED'}">
                             <td>
                                 <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcsr/delete"
-                                           commandName="csr">
+                                           modelAttribute="csr">
                                     <form:hidden path="status"/>
                                     <form:hidden path="req_key"/>
                                     <button type="submit" class="btn btn-sm btn-danger"

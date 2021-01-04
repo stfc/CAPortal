@@ -1,5 +1,6 @@
 package uk.ac.ngs.service.email;
 
+import freemarker.template.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,9 @@ public class FreemarkerEmailSender implements Sender {
                 message.setTo(msg.getTo());
                 message.setFrom(msg.getFrom());
                 message.setSubject(msg.getSubject());
-                String body = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfig.getConfiguration().getTemplate(templateFileName), hTemplateVariables);
+                Configuration cfg = freemarkerConfig.createConfiguration();
+                cfg.setNumberFormat("computer"); // Otherwise numbers have , in them, which isn't great for our URLs!
+                String body = FreeMarkerTemplateUtils.processTemplateIntoString(cfg.getTemplate(templateFileName), hTemplateVariables);
                 log.info("body=" + body);
                 message.setText(body, true);
             }

@@ -103,7 +103,7 @@
                 <c:if test="${certificateRow.status == 'VALID'}">
                     <form:form method="post"
                                action="${pageContext.request.contextPath}/cert_owner/revoke"
-                               commandName="revokeCertFormBean">
+                               modelAttribute="revokeCertFormBean">
                         <div class="col-xs-8 col-lg-5">
 
                             <input name="cert_key" type="hidden"

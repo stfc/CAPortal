@@ -7,7 +7,7 @@
     <groupId>uk.ac.ngs</groupId>
     <artifactId>caportal</artifactId>
     <name>caportal</name>
-    <!--<packaging>war</packaging>-->
+    <packaging>war</packaging>
     <version>1.0.0</version>
     <description>CA web application for managing certificates</description>
 
@@ -215,6 +215,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <layout>WAR</layout>
+                    <executable>true</executable>
+                    <mainClass>uk.ac.ngs.CAPortalApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

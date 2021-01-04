@@ -235,7 +235,7 @@
                         <td>Go to row:</td>
                         <td>
                             <form:form method="post" action="${pageContext.request.contextPath}/raop/searchcsr/goto"
-                                       commandName="gotoPageFormBean">
+                                       modelAttribute="gotoPageFormBean">
                                 <form:input path="gotoPageNumber" cssStyle="width:30px" placeholder="0"/>
                                 <button type="submit" class="btn btn-sm">Go</button>
                             </form:form>

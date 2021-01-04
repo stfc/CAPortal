@@ -229,22 +229,7 @@ public class ProcessCsrNewService {
             return new ProcessCsrResult(req_key, csrWrapper, pkcs8StrEnc);
 
             // Need to thow more suitable runtime exceptions for this business tier. 
-        } catch (IOException ex) {
-            Logger.getLogger(ProcessCsrNewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(ProcessCsrNewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (NoSuchProviderException ex) {
-            Logger.getLogger(ProcessCsrNewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (OperatorCreationException ex) {
-            Logger.getLogger(ProcessCsrNewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (PKCSException ex) {
-            Logger.getLogger(ProcessCsrNewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (InvalidKeyException ex) {
+        } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | OperatorCreationException | PKCSException | InvalidKeyException ex) {
             Logger.getLogger(ProcessCsrNewService.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }

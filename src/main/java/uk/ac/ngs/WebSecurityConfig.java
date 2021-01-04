@@ -24,6 +24,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(refreshAuthenticationTokenFilter(), FilterSecurityInterceptor.class)
+                .authorizeRequests()
+                .antMatchers("/").permitAll()
+                .antMatchers("/allindex.jsp").permitAll()
+                .antMatchers("/timeout.jsp").permitAll()
+                .antMatchers("/pub/**").permitAll()
+                .antMatchers("/denied/**").permitAll()
+                .antMatchers("/caop/**").authenticated()
+                .antMatchers("/raop/**").authenticated()
+                .antMatchers("/cert_owner/**").authenticated()
+                .and()
                 .x509().authenticationUserDetailsService(caX590AuthMan())
                 .and().csrf().disable()
                 .exceptionHandling().accessDeniedPage("/denied").authenticationEntryPoint(authenticationEntryPoint());

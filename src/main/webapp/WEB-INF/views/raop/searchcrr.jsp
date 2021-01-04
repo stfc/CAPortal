@@ -204,7 +204,7 @@
                         </td>
                         <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                         <form:form method="post" action="${pageContext.request.contextPath}/raop/searchcrr/goto"
-                                   commandName="gotoPageFormBean">
+                                   modelAttribute="gotoPageFormBean">
                             <td>Go to row:</td>
                             <td>
                                 <form:input path="gotoPageNumber" cssStyle="width:30px" placeholder="0"/>

@@ -92,7 +92,7 @@
                 <c:if test="${canDeleteCrr}">
                     <h3>Actions:</h3>
                     <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcrr/delete"
-                               commandName="crr">
+                               modelAttribute="crr">
                         <form:hidden path="crr_key"/>
                         <button type="submit" class="btn btn-sm"
                                 onclick="return confirm('Are you sure you want to delete this certificate revocation request?');">
@@ -103,7 +103,7 @@
                 </c:if>
                 <c:if test="${canApproveCrr}">
                     <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcrr/approve"
-                               commandName="crr">
+                               modelAttribute="crr">
                         <form:hidden path="crr_key"/>
                         <button type="submit" class="btn btn-small"
                                 onclick="return confirm('Are you sure you want to approve this certificate revocation request?');">

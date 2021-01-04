@@ -49,6 +49,7 @@ public class CaX509JdbcPreAuthUserDetails implements AuthenticationUserDetailsSe
      */
     @Override
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) {
+        log.info("Auth request START");
         // http://stackoverflow.com/questions/14563397/spring-security-x-509-authentication-without-user-service
         X509Certificate certificate = (X509Certificate) token.getCredentials();
         String dn = certificate.getSubjectDN().toString();
@@ -62,8 +63,10 @@ public class CaX509JdbcPreAuthUserDetails implements AuthenticationUserDetailsSe
 
         if (cr != null) {
             List<GrantedAuthority> auths = this.securityContextService.getGrantedAuthorities(cr);
+            log.info("Auth request END - SUCCESS");
             return new CaUser(dn, true, true, true, true, auths, cr);
         }
+        log.info("Auth request END - FAIL");
         throw new UsernameNotFoundException("User Not found [" + dn + "] [" + serial.toString() + "]");
     }
 

@@ -177,7 +177,7 @@
                 <c:if test="${viewerCanFullRevoke}">
                     <div class="form-group">
                         <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcert/fullrevoke"
-                                   commandName="revokeCertFormBean">
+                                   modelAttribute="revokeCertFormBean">
                             <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
                             <div class="col-xs-7">
                                 <form:input path="reason" class="form-control"
@@ -201,7 +201,7 @@
                 <div class="form-group">
                     <form:form method="post"
                                action="${pageContext.request.contextPath}/raop/viewcert/requestrevoke"
-                               commandName="revokeCertFormBean">
+                               modelAttribute="revokeCertFormBean">
                         <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
                         <div class="col-xs-7 col-md-4 col-lg-3">
                             <form:input path="reason" class="form-control"
