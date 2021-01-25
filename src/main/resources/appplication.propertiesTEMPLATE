@@ -47,3 +47,9 @@ email.password=password
 
 # The portal can (optionally) send emails, this is used for the from address: 
 email.from=support@grid-support.ac.uk
+
+
+# From https://blog.swdev.ed.ac.uk/2015/06/24/adding-embedded-tomcat-ajp-support-to-a-spring-boot-application/
+tomcat.ajp.port=9090
+tomcat.ajp.remoteauthentication=false
+tomcat.ajp.enabled=true

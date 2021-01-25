@@ -1,0 +1,11 @@
+[Unit]
+Description=caportal
+After=syslog.target
+
+[Service]
+User=portal
+ExecStart=/opt/CAPortal/caportal.war
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
