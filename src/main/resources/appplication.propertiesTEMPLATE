@@ -20,11 +20,9 @@ supported.pkcs10.min.exponent=5
 mutable.config.params.full.path=/full/path/to/file/mutableproperties.properties
 
 	
-# The base url of the portal. 
-# Normally, you will only need to update the server part (you should not need to change
-# '/caportal' unless you have deployed the 'caportal.war' file using another name)   
+# The base url of the portal.
 # This value is used for example when sending emails to RAs and other uses. 
-base.portal.url=https://portal.ca.grid-support.ac.uk/caportal
+base.portal.url=https://portal.ca.grid-support.ac.uk/
 
 
 # Properties for the mailSender bean. Note, you will probably need to modify 
