@@ -90,6 +90,10 @@
                         <td>${certObj.issuerDN}</td>
                     </tr>
                     <tr>
+                        <td>SANs (if any)</td>
+                        <td><c:forEach var="san" items="${sans}">${san} </c:forEach></td>
+                    </tr>
+                    <tr>
                         <td>Email</td>
                         <td><a href="mailto:${cert.email}" id="currEmail">${cert.email}</a>
                             <form:form method="post"

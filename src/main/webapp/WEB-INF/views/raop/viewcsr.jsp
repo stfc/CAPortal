@@ -74,6 +74,10 @@
                         <td>${csr.dn}</td>
                     </tr>
                     <tr>
+                        <td>SANs (if any)</td>
+                        <td><c:forEach var="san" items="${sans}">${san} </c:forEach></td>
+                    </tr>
+                    <tr>
                         <td>&nbsp;&nbsp;&nbsp;VALID/Non-Expired Certs with same DN:</td>
                         <td>
                             <c:forEach var="_certID" items="${validNotExpiredCertIdsWithDN}">

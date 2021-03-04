@@ -14,6 +14,17 @@ package uk.ac.ngs.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.ac.ngs.common.CertUtil;
 import uk.ac.ngs.dao.JdbcCertificateDao;
 import uk.ac.ngs.dao.JdbcRequestDao;
 import uk.ac.ngs.domain.CertificateRow;
@@ -36,6 +48,14 @@ import uk.ac.ngs.service.CsrManagerService;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,6 +85,7 @@ public class ViewCSR {
     private final static Pattern DATA_OWNERSERIAL_PATTERN = Pattern.compile("OWNERSERIAL\\s?=\\s?(\\w+)$", Pattern.MULTILINE);
     private final static Pattern DATA_NOTBEFORE_PATTERN = Pattern.compile("NOTBEFORE\\s?=\\s?(.+)$", Pattern.MULTILINE);
     private final static Pattern DATA_OWNERDN_PATTERN = Pattern.compile("OWNERDN\\s?=\\s?(.+)$", Pattern.MULTILINE);
+    private final static Pattern DATA_CERT_PATTERN = Pattern.compile("-----BEGIN CERTIFICATE REQUEST-----(.+?)-----END CERTIFICATE REQUEST-----", Pattern.DOTALL);
     private final static String CSR_REQUESTROW_MODELMAPPING = "csr";
     private final static String CERTIDs_WITH_SAME_DN_MODELMAPPING = "certsWithMatchedDNs";
 
@@ -173,6 +194,78 @@ public class ViewCSR {
             if (ownerserialmatcher.find()) {
                 String ownerserial = ownerserialmatcher.group(1);
                 modelMap.put("ownerserial", ownerserial);
+            }
+            Matcher certmatcher = DATA_CERT_PATTERN.matcher(row.getData());
+            if (certmatcher.find()) {
+                String pemString = certmatcher.group();
+                try {
+                    ArrayList<String> sans = new ArrayList<>();
+                    PEMParser pemParser = new PEMParser(new StringReader(pemString));
+                    PKCS10CertificationRequest certObj = (PKCS10CertificationRequest) pemParser.readObject();
+                    /*
+                     * Extensions and SANs follow the below ASN1 format, which is why the code below is _complicated_:
+                     *
+                     * TAGGED [0]:
+                     *   SEQUENCE
+                     *   {
+                     *       OBJECT IDENTIFIER=ExtensionRequest (1.2.840.113549.1.9.14)
+                     *       SET
+                     *       {
+                     *           SEQUENCE
+                     *           {
+                     *               SEQUENCE
+                     *               {
+                     *                   OBJECT IDENTIFIER=SubjectAltName (2.5.29.17)
+                     *                   OCTET STRING, encapsulates:
+                     *                       SEQUENCE
+                     *                       {
+                     *                           TAGGED [2] IMPLICIT :
+                     *                               OCTET STRING=
+                     *                                   67 72 69 64 2D 73 75 70   grid-sup
+                     *                                   70 6F 72 74 2E 61 63 2E   port.ac.
+                     *                                   75 6B                     uk
+                     *                           TAGGED [2] IMPLICIT :
+                     *                               OCTET STRING=
+                     *                                   77 77 77 2E 63 61 2E 67   www.ca.g
+                     *                                   72 69 64 2D 73 75 70 70   rid-supp
+                     *                                   6F 72 74 2E 61 63 2E 75   ort.ac.u
+                     *                                   6B                        k
+                     *                           TAGGED [2] IMPLICIT :
+                     *                               OCTET STRING=
+                     *                                   77 77 77 2E 67 72 69 64   www.grid
+                     *                                   2D 73 75 70 70 6F 72 74   -support
+                     *                                   2E 61 63 2E 75 6B         .ac.uk
+                     *                       }
+                     *
+                     *               }
+                     *           }
+                     *       }
+                     */
+
+                    Attribute[] erAttributes = certObj.getAttributes(new ASN1ObjectIdentifier("1.2.840.113549.1.9.14")); // Get the ExtensionRequest attributes
+                    for(Attribute a : erAttributes) {
+                        ASN1Set set = a.getAttrValues();
+                        if(set != null) {
+                            ASN1Encodable asn1Encodable = set.getObjectAt(0); // Assume first object we get from this is the extension requests
+                            Extensions extensions = Extensions.getInstance(asn1Encodable);
+                            if(extensions != null) {
+                                Extension sansExtension = extensions.getExtension(new ASN1ObjectIdentifier("2.5.29.17")); // Get SANs extension
+                                ASN1Sequence sansSequence = ASN1Sequence.getInstance(sansExtension.getExtnValue().getOctets()); // convert to a sequence (as above)
+                                if(sansSequence != null) {
+                                    for (ASN1Encodable san : sansSequence) {
+                                        // There is at least one tagged SAN in every sequence
+                                        ASN1TaggedObject sanTagged = (ASN1TaggedObject) san;
+                                        ASN1OctetString sanString = (ASN1OctetString) sanTagged.getObject();
+                                        sans.add(CertUtil.getPrefix(sanTagged.getTagNo()) + "=" + new String(sanString.getOctets(), StandardCharsets.UTF_8));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    modelMap.put("sans", sans);
+                } catch (IOException ex) {
+                    log.error(ex);
+                }
             }
         } else {
             modelMap.put("pin", "");
@@ -304,28 +397,3 @@ public class ViewCSR {
         this.certDao = dao;
     }
 }
-
-
-/**
- * Handle POSTs to "/raop/viewcsr/delete" to delete the current csr
- */
-    /*@RequestMapping(value = "/delete", method = RequestMethod.POST)
-     public String deleteCSR(
-     @Valid @ModelAttribute("csrSerialFormBean") GotoPageNumberFormBean csrSerialFormBean, BindingResult result,
-     RedirectAttributes redirectAttrs, SessionStatus sessionStatus,
-     Model model, HttpSession session) {
-     if (result.hasErrors()) {
-     log.warn("binding and validation errors");
-     return "raop/viewcsr";
-     }
-     // Get the current CaUser (so we can extract their DN)  
-     CaUser caUser = securityContextService.getCaUserDetails(); 
-     int cert_key = caUser.getCertificateRow().getCert_key();
-     int csrSerial = csrSerialFormBean.getGotoPageNumber(); 
-     // CSR with any existing status can be set to DELETED 
-     //this.csrManagerService.updateCsrStatus(csrSerial, cert_key, CsrManagerService.CSR_STATUS.DELETED); 
-        
-     log.debug("deleting: " + csrSerial);
-     redirectAttrs.addFlashAttribute("message", "Deletion performed ok ["+csrSerial+"]");
-     return "redirect:/raop/viewcsr?requestId=" + csrSerial;
-     }*/

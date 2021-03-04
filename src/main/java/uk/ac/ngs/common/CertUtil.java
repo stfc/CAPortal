@@ -12,6 +12,12 @@
  */
 package uk.ac.ngs.common;
 
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Utility class for certificate related functions. Stateless and thread safe.
  *
@@ -123,5 +129,51 @@ public class CertUtil {
         String C = extractDnAttribute(dn, DNAttributeType.C); //getPKCS10_C();
         //String email = this.getEmail(); 
         return "CN=" + CN + ",L=" + L + ",OU=" + OU + ",O=" + O + ",C=" + C;
+    }
+
+    public static String getPrefix(int tagNumber) {
+        String prefix = "";
+        switch ((int) tagNumber) {
+            case 0:
+                prefix = "otherName";
+                break;
+            case 1:
+                prefix = "rfc822Name";
+                break;
+            case 2:
+                prefix = "DNSName";
+                break;
+            case 3:
+                prefix = "x400Address";
+                break;
+            case 4:
+                prefix = "directoryName";
+                break;
+            case 5:
+                prefix = "ediPartyName";
+                break;
+            case 6:
+                prefix = "uniformResourceIdentifier";
+                break;
+            case 7:
+                prefix = "IPAddress";
+                break;
+            case 8:
+                prefix = "registeredID";
+                break;
+            default:
+                prefix = "UNKNOWN";
+                break;
+        }
+        return prefix;
+    }
+
+    public static ArrayList<String> getSans(X509Certificate cert) throws CertificateParsingException {
+        Collection<List<?>> sans = cert.getSubjectAlternativeNames();
+        ArrayList<String> outputSans = new ArrayList<>();
+        for (List<?> san: sans) {
+            outputSans.add(getPrefix((int) san.get(0)) + "=" + (String) san.get(1)); // index 0 is the identifier - DNSName etc.
+        }
+        return outputSans;
     }
 }
