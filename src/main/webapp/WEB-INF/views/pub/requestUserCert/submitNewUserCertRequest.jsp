@@ -405,11 +405,6 @@
 
 
     $(document).ready(function () {
-//                $("#goToRaPage2").click(function(e){
-//                    if(!window.confirm("Are you sure you have copied your private key?")){
-//                       return false; 
-//                   } 
-//                });               
         $("#createCSRSubmit").tooltip();
         $("#savetxt").tooltip();
         $("#cnInputTextTitle").tooltip();

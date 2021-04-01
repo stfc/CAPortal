@@ -32,7 +32,7 @@
 
 <div id="footer">
     <div class="container">
-        <p class="muted credit">Courtesy   <a href="http://ngs.ac.uk">UK CA</a> and <a href="http://stfc.ac.uk">STFC</a>.
+        <p class="muted credit">The UK eScience Certificate Authority - <a href="https://ca.grid-support.ac.uk">https://ca.grid-support.ac.uk</a>.
             Questions/comments welcome <a href="mailto:support@grid-support.ac.uk">Grid Support Helpdesk</a>
         </p>
     </div>
@@ -40,7 +40,7 @@
 
 <!-- The javascript -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="${pageContext.request.contextPath}/resources/jquery/jquery-1.11.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/bootstrap/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/sharedfuncts.js"></script>
 

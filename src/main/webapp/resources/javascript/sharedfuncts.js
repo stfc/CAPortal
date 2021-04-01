@@ -38,48 +38,6 @@ MvcUtil.showResponse = function(type, text, element) {
     responseElement.fadeIn("slow");
 };
 
-/*MvcUtil.xmlencode = function(xml) {
- //for IE 
- var text;
- if (window.ActiveXObject) {
- text = xml.xml;
- }
- // for Mozilla, Firefox, Opera, etc.
- else {
- text = (new XMLSerializer()).serializeToString(xml);
- }			
- return text.replace(/\&/g,'&'+'amp;').replace(/</g,'&'+'lt;')
- .replace(/>/g,'&'+'gt;').replace(/\'/g,'&'+'apos;').replace(/\"/g,'&'+'quot;');
- };*/
-
-/**
- * If IE, returns a positive number to reflect version, and NaN for other browser like chrome,firefox
- * @returns number or NaN
- */
-function ie_ver() {
-    //See: http://stackoverflow.com/questions/17907445/how-to-detect-ie11
-    msie = parseInt((/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]);
-    if (isNaN(msie)) {
-        msie = parseInt((/trident\/.*; rv:(\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]);
-    }
-    return msie;
-}
-
-function ieVersion() {
-    //returns version of ie in use for flash download button
-    //(feature detection for blob not enough)
-    var ie = (function() {
-        var undef, rv = -1; // Return value assumes failure.
-        if (navigator.appName == 'Microsoft Internet Explorer') {
-            var ua = navigator.userAgent;
-            var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
-            if (re.exec(ua) != null)
-                rv = parseFloat(RegExp.$1);
-        }
-        return ((rv > -1) ? rv : undef);
-    }());
-    return ie;
-}
 
 $(document).ready(function() {
     //checking for feature unsupported in ie < ie9 instead of browser sniffing

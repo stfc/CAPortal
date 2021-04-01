@@ -34,7 +34,7 @@
                            href="${pageContext.request.contextPath}/pub/requestUserCert/submitNewUserCertRequest"
                            data-toggle="tooltip" data-placement="bottom" title="Apply for a new user certificate">Request
                             New User Certificate</a>
-                        <a class="btn btn-info wrapped-btn" href="http://ngs.ac.uk/UKCA" data-toggle="tooltip"
+                        <a class="btn btn-info wrapped-btn" href="http://ca.grid-support.ac.uk" data-toggle="tooltip"
                            data-placement="bottom"
                            title="Visit the CA Helpdesk for information and assistance">Go To CA Helpdesk</a>
                         <a class="btn btn-info wrapped-btn" href="${pageContext.request.contextPath}/pub/viewralist"
@@ -74,39 +74,6 @@
                 </div>
             </div>
 
-
-            <!--                    <blockquote>
-                        <a class="btn btn-info" href="${pageContext.request.contextPath}/cert_owner">Login / View My Certificate</a> 
-                        <br/><br/>  
-                        <p class="text-info">&bull; You <strong><u>DO</u></strong> need to have a UKCA issued user certificate in your browser to login.</p>
-                        <p class="text-info">&bull; RA's please login to view RA Actions (new RA menu items will be added).</p>
-                        <p class="text-info">&bull; To re-authenticate using a different certificate, clear your ssl cache/restart browser.</p>
-                    </blockquote>
-
-                    <br/>
-                    <blockquote>
-                        <a class="btn btn-info" href="${pageContext.request.contextPath}/pub/requestUserCert/submitNewUserCertRequest">Request New User Certificate</a> 
-                        <br/>
-                        <br/>
-                        <p class="text-info">You <strong><u>do NOT</u></strong> need to have a UKCA issued certificate in your browser.</p> 
-                    </blockquote>
-
-                    <br/>
-                    <blockquote>
-                        <a class="btn btn-info" href="${pageContext.request.contextPath}/cert_owner/requestHostCert">Request New Host Certificate</a> 
-                        <br/>
-                        <br/>
-                         <p class="text-info">&bull; You <strong><u>DO</u></strong> need to have a UKCA issued user certificate in your browser to request a host certificate.</p>
-                         <p class="text-info">&bull; To re-authenticate using a different certificate, clear your ssl cache/restart browser.</p> 
-                    </blockquote>
-
-                    <br/>
-                    <blockquote>
-                        <a class="btn btn-info" href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload">Download Certificate</a> 
-                        <br/>
-                        <br/>
-                         <p class="text-info">&bull; You <strong><u>do NOT</u></strong> need to have a UKCA issued user certificate in your browser to download a certificate.</p>
-                    </blockquote>-->
         </div>
     </div>
 </div>

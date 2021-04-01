@@ -73,12 +73,7 @@
     </div>
 </div>
 
-<!--        <div id="IE11warning" class="col-xs-11 col-lg-10 alert alert-danger" role="alert" style="display: none;">
-            You appear to be using IE 11 - there is a bug in IE 11 which prevents the creation of a certificate bundle (p12) file.  
-            <br/>Please use another browser. We are looking into a solution. Apologies for the inconvenience. 
-        </div>-->
 
-<!-- Wrap all page content here -->
 <div id="wrap">
     <div class="row">
         <div class="col-xs-offset-1">
@@ -213,18 +208,8 @@
                             </tr>
                             <tr>
                                 <td>Cert PEM</td>
-                                <td><textarea id="certpem" class="form-control" readonly
-                                              style="height: 160px;">${certdata}</textarea></td>
+                                <td><textarea id="certpem" class="form-control" readonly style="height: 160px;">${certdata}</textarea></td>
                             </tr>
-                                <%--<tr>
-                                    <td>
-                                        <a id="refreshButton" class="btn btn-sm btn-info"
-                                           href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload">
-                                            Clear/Refresh Page
-                                        </a>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>--%>
 
 
                             <tr>
@@ -235,7 +220,6 @@
                                 </td>
                                 <td>
                                     <div class="text-info">
-                                        <!--                                                    <strong>Provide Your Private Key</strong> -->
                                         <ul>
                                             <li>Paste file contents or browse for file</li>
                                             <li>This file was saved when applying for the certificate using this
@@ -252,52 +236,35 @@
                                               style="height: 160px;" data-toggle="tooltip" data-placement="top"
                                               title="Paste or browse for your private key text file (privateKeyAndCSR.txt). Note, the privateKey is NOT sent to the server.">
                                                 </textarea><span></span>
-                                    <input type="file" onchange="loadfile(this)" id="uploadText" data-toggle="tooltip"
-                                           data-placement="right"
-                                           title="Browse for your private key text file. Note, this file is NOT sent to the server"/>
+                                    <input type="file" id="privateKeyPicker" data-toggle="tooltip" data-placement="right" title="Browse for your private key text file. Note, this file is NOT sent to the server"/>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <img src="${pageContext.request.contextPath}/resources/images/number2.png"
-                                         alt="number 2" style="width: 100px; height: 100px;"/>
+                                    <img src="${pageContext.request.contextPath}/resources/images/number2.png" alt="number 2" style="width: 100px; height: 100px;"/>
                                     Enter Your Private Key Password
                                 </td>
                                 <td>
-                                    <!--                                                <div class="text-info">
-                                                                                        <strong>Enter Your Private Key Password</strong>
-                                                                                    </div>-->
                                     <br/>
-                                    <input type="password" id="keypass" class="form-control" data-placement="right"
-                                           title="Password entered when applying for the certificate"/>
+                                    <input type="password" id="keypass" class="form-control" data-placement="right" title="Password entered when applying for the certificate"/>
                                     <span></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <img src="${pageContext.request.contextPath}/resources/images/number3.png"
-                                         alt="number 3" style="width: 100px; height: 100px;"/>
+                                    <img src="${pageContext.request.contextPath}/resources/images/number3.png" alt="number 3" style="width: 100px; height: 100px;"/>
                                     Click 'Save Certificate' button
                                 </td>
                                 <td>
                                     <div class="text-info">
-                                        <!--                                                    <strong>Click 'Save Certificate' button</strong>-->
                                         <ul>
                                             <li>Creates a local Certificate Bundle file (.p12 file)</li>
                                             <li>The .p12 file can be imported into a web browser</li>
                                         </ul>
                                     </div>
-                                    <a id="createP12Button" class="btn btn-sm btn-primary" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="Will prompt .p12 download if valid private key and password entered">
-                                        Save Certificate (.p12)
-                                    </a>
+                                    <a id="createP12Button" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right" title="Will prompt .p12 download if valid private key and password entered">Save Certificate (.p12)</a>
                                     <a href="#" id="mydownloadURI" class="btn btn-sm btn-primary" download="mycert.p12">Download</a>
-                                    <a id="createFlashButton"></a>
-                                    <a id="refreshButton" class="btn btn-sm btn-info"
-                                       href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload">
-                                        Clear/Refresh Page
-                                    </a>
+                                    <a id="refreshButton" class="btn btn-sm btn-info" href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload">Clear/Refresh Page</a>
                                 </td>
                             </tr>
 
@@ -309,67 +276,6 @@
                 <br/>
                 <br/>
                 <br/>
-
-
-                <%--<div class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-xs-1 col-lg-1">&nbsp;
-                        </div>
-                        <div class="col-xs-10">
-                            <h3>Follow Steps 1,2,3 to Save as a Browser Certificate File</h3>
-                            <p class="text-info">Note, your private-key and password are <strong>NEVER</strong> sent over the wire to the server
-                                <a href="#" id="howLink" data-toggle="tooltip" data-placement="right"
-                                   title="We use local JavaScript that runs in your browser to create the .p12 file">(how?)</a>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-xs-2 col-lg-1">
-                            <img src="${pageContext.request.contextPath}/resources/images/number1.png" alt="number 1" style="width: 100px; height: 100px;"/>
-                        </div>
-                        <div class="col-xs-9 col-lg-10">
-                            Provide Your Private Key (saved when applying for the certificate using this portal)<br/>
-                            <textarea class="form-control" id="certkey"
-                                      placeholder="Paste your private key here or browse for your private key text file, then provide the password and click 'Save Certificate (.p12)."
-                                      style="height: 160px;" data-toggle="tooltip" data-placement="top"
-                                title="Paste or browse for your private key text file (privateKeyAndCSR.txt). Note, the privateKey is NOT sent to the server.">
-                            </textarea><span></span>
-                            <input type="file" onchange="loadfile(this)" id="uploadText" data-toggle="tooltip" data-placement="right"
-                                   title="Browse for your private key text file. Note, this file is NOT sent to the server" />
-                        </div>
-                    </div>
-
-
-                   <div class="form-group">
-                        <div class="col-xs-2 col-lg-1">
-                            <img src="${pageContext.request.contextPath}/resources/images/number2.png" alt="number 2" style="width: 100px; height: 100px;"/>
-                        </div>
-<!--                                <div class="col-xs-9 col-lg-10">-->
-                        <div class="col-xs-7 col-md-4 col-lg-3">
-                            Enter Your Private Key Password<br/>
-                            <input type="password" id="keypass" class="form-control" data-placement="right" title="Password entered when applying for the certificate"/><span></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-xs-2 col-lg-1">
-                            <img src="${pageContext.request.contextPath}/resources/images/number3.png" alt="number 3" style="width: 100px; height: 100px;"/>
-                        </div>
-                        <div class="col-xs-9">
-                            Click to save your local Certificate Bundle (.p12 files can be imported into browsers)<br/>
-                            <a id="createP12Button" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right" title="Will prompt .p12 download if valid private key and password entered">
-                                Save Certificate (.p12)
-                            </a>
-                            <a href="#" id="mydownloadURI" class="btn btn-sm btn-primary" download="mycert.p12">Download</a>
-                            <a id="createFlashButton"></a>
-                            <a id="refreshButton" class="btn btn-sm btn-info"
-                                           href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload">
-                                            Clear/Refresh Page
-                                        </a>
-                        </div>
-                    </div>
-            </div>--%>
 
             </c:if>
 
@@ -383,15 +289,24 @@
 <!-- Stuff for crypto / csrs -->
 <script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
-<script src="${pageContext.request.contextPath}/resources/javascript/Blob.js"></script>
 <!-- https://github.com/eligrey/FileSaver.js -->
 <script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
 
 <script type="text/javascript">
+    const fileSelector = document.getElementById('privateKeyPicker');
+    fileSelector.addEventListener('change', () => {
+        const fileReader = new FileReader();
+        fileReader.onloadend = (function(loadEvent) {
+            let textFromFileLoaded = loadEvent.target.result;
+            $("#certkey").val(textFromFileLoaded);
+            keyValid();
+        });
+        fileReader.readAsText(document.getElementById('privateKeyPicker').files[0])
+    });
+
     function pwValid() {
-        //var element = $("#" + pwelement.attr("id"));
-        var element = $("#keypass");
+        const element = $("#keypass");
         if ($(element).val().length < 4) {
             $(element).addClass("error").next().text("Password too short");
             return false;
@@ -402,7 +317,7 @@
     }
 
     function keyValid() {
-        var element = $("#certkey");
+        const element = $("#certkey");
         //error class applied if regex is not matched in private key field
         if (!$(element).val().match(/(-----BEGIN \b(ENCRYPTED|RSA)\b PRIVATE KEY-----)[\s\S]*(-----END \b(ENCRYPTED|RSA)\b PRIVATE KEY-----)/)) {
             $(element).addClass("error"); //.next().text("Please paste private key");
@@ -414,29 +329,12 @@
     }
 
     function browserCheck(b64p12) {
-        var myBuffer = base64DecToArr(b64p12).buffer;
-        var p12blob = new Blob([myBuffer], {type: 'application/octet-stream'});
+        const myBuffer = base64DecToArr(b64p12).buffer;
+        const p12blob = new Blob([myBuffer], {type: 'application/x-pkcs12'});
         saveAs(p12blob, "certBundle.p12");
     }
 
-    function loadfile(input) {
-        var fileReader = new FileReader();
-        fileReader.onload = function (fileLoadedEvent) {
-            var textFromFileLoaded = fileLoadedEvent.target.result;
-            $("#certkey").val(textFromFileLoaded);
-            keyValid();
-        };
-        fileReader.readAsText(input.files[0], "UTF-8");
-    }
-
     $(document).ready(function () {
-
-//                if (ie_ver() === 11) {
-//                    $("#IE11warning").show();
-//                    $("#createCSRSubmit").attr('disabled', 'disabled');
-//                }
-
-        //$("#keypass").tooltip();
         $('#howLink').tooltip();
         $("#certkey").tooltip();
         $("#createP12Button").tooltip();
@@ -470,25 +368,29 @@
                 if (regexPrivKey === null) {
                     alert("Private key not found, please ensure correct file has been selected or pasted into text area.");
                 } else {
-                    var _pem = {
+                    const _pem = {
                         certificateDev: $("#certpem").val(),
                         privateKeyDev: regexPrivKey[0]
                     };
                     // Try to parse certificate and private key object
                     try {
-                        var cert = forge.pki.certificateFromPem(_pem.certificateDev, true);
-                        var password = $('#keypass').val();
-                        var privateKey = forge.pki.decryptRsaPrivateKey(_pem.privateKeyDev, password);
+                        const cert = forge.pki.certificateFromPem(_pem.certificateDev, true);
+                        const password = $('#keypass').val();
+                        const privateKey = forge.pki.decryptRsaPrivateKey(_pem.privateKeyDev, password);
                         if (privateKey !== null) {
-                            var chain = [cert];
-                            //create PKCS12
-                            console.log('\nCreating PKCS#12...');
-                            var newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(privateKey, chain, password,
-                                {generateLocalKeyId: true, friendlyName: 'myUkCaCertficate', algorithm: '3des'});
-                            var newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
-                            console.log('\nBase64-encoded new PKCS#12:');
-                            var b64p12 = forge.util.encode64(newPkcs12Der);
-                            browserCheck(b64p12);
+                            if (privateKey.n.toString() !== cert.publicKey.n.toString()) {
+                                alert("Private and public key modulo do not match. Are you sure you uploaded the correct file?")
+                            } else {
+                                var chain = [cert];
+                                //create PKCS12
+                                console.log('\nCreating PKCS#12...');
+                                const newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(privateKey, chain, password,
+                                    {generateLocalKeyId: true, friendlyName: 'myUkCaCertficate', algorithm: '3des'});
+                                const newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
+                                console.log('\nBase64-encoded new PKCS#12:');
+                                const b64p12 = forge.util.encode64(newPkcs12Der);
+                                browserCheck(b64p12);
+                            }
                         } else {
                             alert("Please enter the correct password for the private key");
                         }
@@ -503,7 +405,6 @@
                 }
             }
         });
-
 
     });  // end on ready
 </script>

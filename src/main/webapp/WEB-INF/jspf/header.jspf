@@ -6,12 +6,6 @@
 <c:url value="/raop" var="raOpUrl"></c:url>
 <c:url value="/caop" var="caOpUrl"></c:url>
 
-<!-- Bootstrap alert appears at the top of a page if user using < ie9 -->
-<div class="alert alert-warning alert-dismissable iesupport">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> <strong>Warning!</strong> 
-    <br />Support for versions of IE less than 9 can no longer be provided.
-    <br />Please <strong><a href="http://windows.microsoft.com/en-GB/internet-explorer/download-ie" class="alert-link">upgrade to a newer version</a></strong> or
-    use a different browser.</div>
 <div class="navbar navbar-inverse navbar-fixed-top navbar-default">
     <div class="navbar-header">
         <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
@@ -29,9 +23,7 @@
                             <ul class="dropdown-menu">
                                 <li><a href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload"><b>Download Certificate</b></a></li>
                                 <li><a href="${pageContext.request.contextPath}/pub/requestUserCert/submitNewUserCertRequest"><b>Request User Certificate</b></a></li>
-                                <%--<li><a href="#"><b>Request User</b> Certificate (Coming soon)</a></li>--%>
                                 <li><a href="${pageContext.request.contextPath}/cert_owner/requestHostCert"><b>Request Host Certificate</b> (Cert must be loaded in browser)</a></li>
-                                <%--<li><a href="#"><b>Request Host</b> Certificate (Coming soon - Valid user cert must be loaded in browser)</a></li>--%>
                                 <li><a href="${pageContext.request.contextPath}/cert_owner/renew"><b>Renew Certificate</b> (Cert must be loaded in browser)</a></li>
                                 <li><a href="${pageContext.request.contextPath}/cert_owner/revoke"><b>Revoke Certificate</b> (Cert must be loaded in browser)</a></li>
                             </ul>  
@@ -79,9 +71,6 @@
                 </ul> 
             </div>
 </div>
-<!--<div style="text-align: right;" class="text-error">In development (more coming soon)</div>-->
-<!-- code for the wait modal which appears when generating a certificate
--->
 <div class="modal fade" id="waitModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
 aria-hidden="true">
     <div class="modal-dialog">
@@ -100,31 +89,3 @@ aria-hidden="true">
         </div>
     </div>
 </div>
-
-<%-- <div id="header">
-    <div class="username">
-        Welcome: <strong><sec:authentication
-                property="principal.username" /></strong>
-    </div>
-    <br />
-    
-    <ul>
-        <c:url value="/" var="homeUrl" />
-        <li><a href="${homeUrl}">Home</a></li>
-        <li>&nbsp; | &nbsp;</li>
-
-        <c:url value="/cert_owner" var="certOwnerHomeUrl" />
-        <li><a href="${certOwnerHomeUrl}">My Home</a></li>
-        <li>&nbsp; | &nbsp;</li>
-
-        <c:url value="/raop" var="raOpUrl" />
-        <li><a href="${raOpUrl}">RAOP Home</a></li>
-        <li>&nbsp; | &nbsp;</li>
-
-        <c:url value="/caop" var="caOpUrl" />
-        <li><a href="${caOpUrl}">CAOP Home</a></li>
-        <li>&nbsp; | &nbsp;</li>
-
-    </ul>
-    <br />
-</div> --%>
