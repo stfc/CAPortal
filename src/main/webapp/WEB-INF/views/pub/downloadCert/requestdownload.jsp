@@ -328,7 +328,7 @@
         }
     }
 
-    function browserCheck(b64p12) {
+    function downloadCert(b64p12) {
         const myBuffer = base64DecToArr(b64p12).buffer;
         const p12blob = new Blob([myBuffer], {type: 'application/x-pkcs12'});
         saveAs(p12blob, "certBundle.p12");
@@ -389,7 +389,7 @@
                                 const newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
                                 console.log('\nBase64-encoded new PKCS#12:');
                                 const b64p12 = forge.util.encode64(newPkcs12Der);
-                                browserCheck(b64p12);
+                                downloadCert(b64p12);
                             }
                         } else {
                             alert("Please enter the correct password for the private key");

@@ -60,17 +60,6 @@
                 </ul>
             </c:if>
 
-            <!--                    <div id="IE11warning" class="col-xs-11 col-lg-10 alert alert-danger" role="alert" style="display: none;">
-                                    You appear to be using IE 11 - there is a bug in IE 11 which prevents the new/renew action.
-                                    <br/>Please use another browser. We are looking into a solution. Apologies for the inconvenience.
-                                </div>-->
-            <!--<div id="SafariWarning" class="col-xs-11 col-lg-10 alert alert-danger" role="alert" style="display: none;">
-                You appear to be using Safari. Please use another browser
-                (e.g. Firefox or Chrome). Safari does
-                not support some HTML5 features that are required by the new/renew action.
-                Apologies for the inconvenience caused.
-            </div>-->
-
             <c:if test="${not empty renewOkMessage}">
                 <div class="success">${renewOkMessage}</div>
             </c:if>
@@ -274,10 +263,6 @@
     }
 
     $(document).ready(function () {
-//               if(ie_ver() === 11){
-//                   $("#IE11warning").show(); 
-//                   $("#createCSRSubmit").attr('disabled','disabled');
-//               }
 
         $("#sign_up_passwordTitle").tooltip();
         $("#sign_up_password_confirmTitle").tooltip();
@@ -345,12 +330,7 @@
             console.log('after confirm');
             // User clicked ok so show the 'please wait' modal.
             $('#waitModal').modal('show');
-            // Next delay the execution of the slow function with a timeout
-            // which gives enough time for the dom to update.
-            setTimeout(function () {
-                    doProcessing();
-                },
-                1000);
+            doProcessing();
             // Note, don't call $('#waitModal').modal('hide');  here, as it
             // will remove the modal before the doProcessing is invoked.
         });
@@ -371,19 +351,11 @@
         var csrTextAreaVal;
         var dataPostEncodedVal;
 
-        if ('${createCsrOnClientOrServer}' === 'server') {
-            postTarget = $("#postLinkViaServer");
-            csrTextAreaVal = '';
-            dataPostEncodedVal = $.param({pw: pw}) +
-                "&" + $.param({email: email});
-        }
-        if ('${createCsrOnClientOrServer}' === 'client') {
             postTarget = $("#postLinkViaClient");
             var pem = createCSR(cn, ou, loc, o, c, pw);
             csrTextAreaVal = pem.privateKey + pem.csr;
             dataPostEncodedVal = $.param({csr: pem.csr}) +
                 "&" + $.param({email: email});
-        }
 
 
         $.ajax({

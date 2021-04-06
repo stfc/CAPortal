@@ -88,6 +88,11 @@ public class DownloadCert {
             return null; // or can use: return "pub/downloadCert/requestdownload";
         }
 
+        if (requestDownloadCertFormBean.getCertId() == null || requestDownloadCertFormBean.getEmail() == null) {
+            // They haven't filled in the form correctly
+            return null;
+        }
+
         CertificateRow cert = this.certDao.findById(requestDownloadCertFormBean.getCertId());
         if (cert == null) {
             modelMap.put("errorMessage", "Can't find certificate with given ID");
@@ -144,22 +149,4 @@ public class DownloadCert {
     public void setJdbcCertificateDao(JdbcCertificateDao dao) {
         this.certDao = dao;
     }
-
-    // http://stackoverflow.com/questions/18275043/spring-download-file-and-redirect
-    /*@RequestMapping(value = "/download", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-     @ResponseBody
-     public String download(HttpServletResponse response) throws IOException {
-     response.setContentType("application/force-download");
-     //FileReader fr = new FileReader("/folder/file.extension");
-     //return IOUtils.toString(fr); // IOUtils come from Apache Commons IO
-     return "sampleString";
-     }*/
-    /*@RequestMapping(value = "/downloadpost", method = RequestMethod.POST)
-     public String downloadAfterPost(
-     @RequestParam(value="certid", required = true ) String certid, 
-     @RequestParam(value="email", required = true ) String email, 
-     Model model, RedirectAttributes redirectAttrs)  {
-     log.info("New cert download request ["+certid+"] ["+email+"]");
-     return "redirect:/pub/downloadcertificate"; 
-     }*/
 }

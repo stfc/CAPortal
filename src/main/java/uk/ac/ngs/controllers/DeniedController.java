@@ -36,17 +36,4 @@ public class DeniedController {
         //return "redirect:/denied/denied";
         return "denied/denied";
     }
-
-
-    /**
-     * Handle GETs to '/denied/denied' to map to 403 page.
-     */
-    /*@RequestMapping(value="denied", method = RequestMethod.GET)
-    public String handleGetRequests(
-            HttpEntity<String> entity) {
-            //HttpServletResponse response) throws IOException {
-        //entity.getHeaders().add("HTTP/1.0 403 Forbidden", null);
-        //response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden you are");
-        return "denied/denied";
-    }*/
 }
