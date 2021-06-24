@@ -17,8 +17,8 @@
  * @returns {{privateKey: *, csr: *, publicKey: *}}
  */
 function createCSR(cn, ou, loc, o, c, pw) {
-    //var forge = require('../js/forge');
-    //console.log('Generating 2048-bit key-pair...');
+
+    console.log('Generating 2048-bit key-pair...');
     var keys = forge.pki.rsa.generateKeyPair({bits: 2048, workers: -1});
     console.log('Key-pair created.');
 
@@ -51,16 +51,6 @@ function createCSR(cn, ou, loc, o, c, pw) {
         }
     ]);
 
-    // add optional attributes
-    /*csr.setAttributes([
-     {
-     name: 'challengePassword',
-     value: 'password'
-     }, {
-     name: 'unstructuredName',
-     value: 'My company'
-     }
-     ]);*/
 
     // sign certification request
     csr.sign(keys.privateKey);
@@ -78,25 +68,6 @@ function createCSR(cn, ou, loc, o, c, pw) {
         csr: forge.pki.certificationRequestToPem(csr)
     };
 
-    //console.log('\nKey-Pair:');
-    //console.log(pem.privateKey);
-    //console.log(pem.publicKey);
-    //console.log('\nCertification Request (CSR):');
-    //console.log(pem.csr);
-
-    // verify certification request
-    /*try {
-     if(csr.verify()) {
-     console.log('Certification request (CSR) verified.');
-     }
-     else {
-     throw new Error('Signature not verified.');
-     }
-     }
-     catch(err) {
-     console.log('Certification request (CSR) verification failure: ' +
-     JSON.stringify(err, null, 2));
-     }*/
     return pem;
 }
             

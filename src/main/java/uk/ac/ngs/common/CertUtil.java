@@ -12,6 +12,7 @@
  */
 package uk.ac.ngs.common;
 
+import javax.security.auth.x500.X500Principal;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -173,6 +174,22 @@ public class CertUtil {
         ArrayList<String> outputSans = new ArrayList<>();
         for (List<?> san: sans) {
             outputSans.add(getPrefix((int) san.get(0)) + "=" + (String) san.get(1)); // index 0 is the identifier - DNSName etc.
+        }
+        return outputSans;
+    }
+
+    public static ArrayList<String> getHtmlFormattedSans(X509Certificate cert) throws CertificateParsingException {
+        Collection<List<?>> sans = cert.getSubjectAlternativeNames();
+        X500Principal subject = cert.getSubjectX500Principal();
+        String cn = extractDnAttribute(subject.toString(), DNAttributeType.CN);
+        ArrayList<String> outputSans = new ArrayList<>();
+        for (List<?> san: sans) {
+            String sanName = (String) san.get(1);
+            if (!sanName.equals(cn)) {
+                outputSans.add(getPrefix((int) san.get(0)) + "=<span style=\"color:red;font-weight:bold\">" + sanName + "</span>"); // index 0 is the identifier - DNSName etc.
+            } else {
+                outputSans.add(getPrefix((int) san.get(0)) + "=" + sanName);
+            }
         }
         return outputSans;
     }

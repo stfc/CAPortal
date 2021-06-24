@@ -159,7 +159,7 @@ public class ViewCert {
                 InputStream is = new ByteArrayInputStream(pemString.getBytes(StandardCharsets.UTF_8));
                 X509Certificate certObj = (X509Certificate) cf.generateCertificate(is);
                 modelMap.put("certObj", certObj);
-                modelMap.put("sans", uk.ac.ngs.common.CertUtil.getSans(certObj));
+                modelMap.put("sans", uk.ac.ngs.common.CertUtil.getHtmlFormattedSans(certObj));
             } catch (CertificateException ex) {
                 log.error(ex);
             }
