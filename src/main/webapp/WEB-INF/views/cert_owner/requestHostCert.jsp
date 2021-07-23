@@ -224,7 +224,7 @@
             </div>
             <div class="col-xs-11">
                 <!--<textarea id="csrTextArea" class="form-control" readonly style="height: 200px;"></textarea>-->
-                <textarea id="csrTextArea" style="width: 900px; height: 200px;"></textarea>
+                <textarea id="csrTextArea" style="width: 900px; height: 200px;" readonly aria-readonly="true"></textarea>
             </div>
         </div>
     </div>
