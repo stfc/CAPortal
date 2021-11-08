@@ -397,9 +397,14 @@
                     } catch (ex) {
                         alert("Could not create private key object - please check provided password and private key text");
                         if (ex.stack) {
+                            console.log('Error name:', ex.name);
+                            console.log('Error message:', ex.message);
+                            console.log('Error:', ex);
                             console.log(ex.stack);
                         } else {
-                            console.log('Error', ex);
+                            console.log('Error name:', ex.name);
+                            console.log('Error message:', ex.message);
+                            console.log('Error:', ex);
                         }
                     }
                 }
