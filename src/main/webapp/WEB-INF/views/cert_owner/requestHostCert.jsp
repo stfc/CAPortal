@@ -232,7 +232,7 @@
 
 <%@ include file="../../jspf/footer.jspf" %>
 <!-- Stuff for crypto / csrs -->
-<script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
 <!-- https://github.com/eligrey/FileSaver.js -->
 <script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
