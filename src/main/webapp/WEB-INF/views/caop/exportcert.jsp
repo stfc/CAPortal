@@ -42,16 +42,16 @@
 </div>
 <div id="wrap">
     <div class="row">
-        <div class="col-xs-offset-1">
-            <div class="col-xs-10"><h2>Export Approved Certificates</h2>
+        <div class="col-offset-1">
+            <div class="col-10"><h2>Export Approved Certificates</h2>
                 <h4>Approved certificates to be exported for signing will appear below</h4>
             </div>
-            <div class="col-xs-offset-11">
+            <div class="col-offset-11">
                 <a href="#" id="helpMod" style="color: inherit;">
                     <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;"></span>
                 </a>
             </div>
-            <div class="col-xs-11">
+            <div class="col-11">
                 <br/>
                 [<b>${fn:length(approved_reqrows)}</b>] Approved <b>CSRs</b> [<b>${fn:length(crr_reqrows)}</b>] Approved
                 <b>CRRs</b>

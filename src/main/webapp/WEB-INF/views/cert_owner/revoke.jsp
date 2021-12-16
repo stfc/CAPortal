@@ -26,14 +26,14 @@
 <%--<jsp:include page="../common/header.jsp"/>--%>
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
             <h2>Revoke Certificate</h2>
             <c:if test="${not empty revokeOkMessage}">
                 <div class="success">${revokeOkMessage}</div>
             </c:if>
-            <div class="col-xs-11 col-lg-10">
+            <div class="col-11 col-lg-10">
                 <table class="table table-hover table-condensed">
                     <thead>
                     <tr>
@@ -104,7 +104,7 @@
                     <form:form method="post"
                                action="${pageContext.request.contextPath}/cert_owner/revoke"
                                modelAttribute="revokeCertFormBean">
-                        <div class="col-xs-8 col-lg-5">
+                        <div class="col-8 col-lg-5">
 
                             <input name="cert_key" type="hidden"
                                    value="${certificateRow.cert_key}"/>
@@ -113,7 +113,7 @@
                             <br/>
                             <form:errors path="reason" cssClass="text-error"/>
                         </div>
-                        <div class="col-xs-1 col-lg-1">
+                        <div class="col-1 col-lg-1">
                             <button type="submit" class="btn btn-sm btn-primary"
                                     onclick="return confirm('Are you sure you want to approve a full revocation of this certificate?');">
                                 Revoke Certificate

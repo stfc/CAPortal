@@ -9,7 +9,7 @@
     <title>Session Timeout</title>
 </head>
 <body>
-<div id="content">
+<div id="content" class="container">
     <h2>Invalid Session</h2>
 
     <p>

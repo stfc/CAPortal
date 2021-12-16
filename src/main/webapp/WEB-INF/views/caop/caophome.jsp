@@ -21,7 +21,7 @@
 
 <body>
 <%@ include file="../../jspf/header.jspf" %>
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="container">
         <h1>CAOP home!</h1>
         <p>
@@ -32,7 +32,7 @@
             <h2>Tasks</h2>
             [<b>${fn:length(approved_reqrows)}</b>] <b>APPROVED</b>,
             [<b>${fn:length(crr_reqrows)}</b>] <b>REVOKE</b>
-            <div class="col-xs-11">
+            <div class="col-11">
                 <table class="table tablecondensed">
                     <thead>
                     <tr>

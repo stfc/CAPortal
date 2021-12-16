@@ -26,9 +26,9 @@
 <%--<jsp:include page="../common/header.jsp"/>--%>
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
 
             <h3>Your Certificate Details</h3>
             <c:if test="${not empty emailUpdateOkMessage}">
@@ -37,7 +37,7 @@
             <c:if test="${not empty emailUpdateFailMessage}">
                 <div class="error">${emailUpdateFailMessage}</div>
             </c:if>
-            <div class="col-xs-11 col-lg-10">
+            <div class="col-11 col-lg-10">
                 <table class="table table-hover table-condensed">
                     <thead>
                     <tr>

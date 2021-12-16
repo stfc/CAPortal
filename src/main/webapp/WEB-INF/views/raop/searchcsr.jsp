@@ -27,9 +27,9 @@
 <%--<jsp:include page="../common/header.jsp" />--%>
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
             <%--Mydebug[${mydebugmessage}]--%>
             <s:hasBindErrors name="searchCsrFormBean_REQUESTSCOPE">
                 <div id="thesemessages" class="error">Invalid GET request search parameter</div>
@@ -51,7 +51,7 @@
                             <div id="errormessage" class="error">Form has errors</div>
                         </c:if>
                     </s:bind>
-                    <div class="col-xs-4">
+                    <div class="col-4">
                         <font class="muted">
                             _ matches any single char<br/>
                             % matches a string
@@ -59,10 +59,10 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>For RA</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:select path="ra" class="form-control">
                             <form:options items="${ralistArray}"/>
                         </form:select>
@@ -70,10 +70,10 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Type</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:select path="status" class="form-control">
                             <form:option value="NEW_or_RENEW"/>
                             <form:option value="NEW"/>
@@ -87,19 +87,19 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Common Name Like (CN)</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="name" placeholder="A Name" class="form-control"/>
                         <form:errors path="name" cssClass="text-error"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Distinguished Name Like (DN)</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="dn" placeholder="CN=some body,L=DL,OU=CLRC,O=eScience,C=UK"
                                     class="form-control"/>
                         <form:errors path="dn" cssClass="text-error"/>
@@ -107,20 +107,20 @@
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
+                        <div class="col-3 col-lg-3">
                             <strong>Data Like</strong> <font class="muted">(shown if own ROLE_CAOP)</font>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <form:input path="data" placeholder="CWIZPIN" class="form-control"/>
                             <form:errors path="data" cssClass="text-error"/>
                         </div>
                     </div>
                 </sec:authorize>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Email Address Like</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="emailAddress" class="form-control"
                                     placeholder="someone@world.com"/>
                         <form:errors path="emailAddress" cssClass="text-error"/>
@@ -128,32 +128,32 @@
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
+                        <div class="col-3 col-lg-3">
                             <strong>Email Address is Null</strong>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <form:checkbox path="searchNullEmailAddress"/>
                             <font class="muted">(if checked, this will override email search string above)</font>
                         </div>
                     </div>
                 </sec:authorize>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Serial</strong>
                         <font class="muted" style="text-decoration: underline">
                             (if given, all other search criteria are ignored)
                         </font>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="req_key" placeholder="1234" class="form-control"/>
                         <form:errors path="req_key" cssClass="text-error"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Results per page:</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:select path="showRowCount" class="form-control">
                             <form:option value="20"/>
                             <form:option value="50"/>
@@ -162,7 +162,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-offset-3">
+                    <div class="col-offset-3">
                         <button type="submit" class="btn btn-md btn-primary">Search</button>
                     </div>
                 </div>
@@ -178,7 +178,7 @@
             <br/>
 
             <!--<table id="csrResultsTable" class="table table-hover table-condensed">-->
-            <div class="col-xs-11">
+            <div class="col-11">
                 <table id="csrResultsTable" class="tablesorter-blue">
                     <!--  <caption>List of certificate rows returned by search</caption> -->
                     <thead>

@@ -22,9 +22,9 @@
 <body id="certBody">
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
             <h2>Renew Certificate</h2>
             <ul>
                 <li>When clicking 'Submit Request' a new <abbr title="Certificate Signing Request">CSR</abbr> is
@@ -47,7 +47,7 @@
                 <div class="success">${renewOkMessage}</div>
             </c:if>
             <br/>
-            <div class="col-xs-11 col-lg-10">
+            <div class="col-11 col-lg-10">
                 <table class="table table-hover table-condensed">
                     <thead>
                     <tr>
@@ -122,40 +122,40 @@
 
                 <form action="" class="form-horizontal" role="form">
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
+                        <div class="col-3 col-lg-3">
                             <strong><a href="#" id="emailTitle" tabindex="-1" data-toggle="tooltip"
                                        data-placement="right"
                                        title="Email that is associated with your Certificate">e-Mail</a></strong>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="text" id="emailInputText" value="${certificateRow.email}"
                                    class="form-control"/><span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
+                        <div class="col-3 col-lg-3">
                             <strong><a href="#" id="sign_up_passwordTitle" tabindex="-1" data-toggle="tooltip"
                                        data-placement="right"
                                        title="The password is used to encrypt your locally generated private key.">Key
                                 Password</a></strong>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="password" id="sign_up_password" class="form-control"/><span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
+                        <div class="col-3 col-lg-3">
                             <strong><a href="#" id="sign_up_password_confirmTitle" tabindex="-1" data-toggle="tooltip"
                                        data-placement="right"
                                        title="The password is used to encrypt your locally generated private key.">Confirm
                                 Password</a></strong>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="password" id="sign_up_password_confirm" class="form-control"/><span></span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-xs-offset-3 col-xs-8">
+                        <div class="col-offset-3 col-8">
                             <a id="createCSRSubmit" class="btn btn-sm btn-primary"
                                data-toggle="tooltip"
                                data-placement="right"
@@ -169,14 +169,14 @@
                 </form>
             </c:if>
             <div id="responseMessage"></div>
-            <div class="col-xs-11">
+            <div class="col-11">
                 <a id="flashdown" href="#">Save Private Key As Text File</a>
                 <a id="savetxt" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right"
                    title="Prompts .txt file download">
                     Save Private Key As Text File
                 </a>
             </div>
-            <div class="col-xs-11">
+            <div class="col-11">
                 <%--<textarea id="csrTextArea" class="form-control" readonly style="height: 200px;"></textarea>--%>
                 <textarea id="csrTextArea" style="width: 900px; height: 200px;"></textarea>
             </div>

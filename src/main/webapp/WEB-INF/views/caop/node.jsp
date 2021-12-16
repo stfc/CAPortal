@@ -24,11 +24,11 @@
 
 <body>
 <%@ include file="../../jspf/header.jspf" %>
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="container">
         <h2>CA Operator Import/Export</h2>
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <form method="post">
                     <!-- do Checks with JSTL and not JS - JS variables are
                     cached which could wrongly show a button -->
@@ -56,7 +56,7 @@
 
 
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <h3>Approved CSRs</h3>
                 <table id="csrApprovedTable" class="table table-striped table-hover">
                     <thead>
@@ -100,7 +100,7 @@
 
 
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <h3>Approved CRRs</h3>
                 <table id="crrApprovedTable" class="table table-striped table-hover">
                     <thead>

@@ -1,90 +1,72 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:url value="/" var="homeUrl"></c:url>
 <c:url value="/cert_owner" var="certOwnerHomeUrl"></c:url>
 <c:url value="/raop" var="raOpUrl"></c:url>
 <c:url value="/caop" var="caOpUrl"></c:url>
 
-<div class="navbar navbar-inverse navbar-fixed-top navbar-default">
+<div class="navbar navbar-expand-lg navbar navbar-dark bg-dark">
+    <div class="container">
     <div class="navbar-header">
-        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
         <a class="navbar-brand" href="${homeUrl}">UK CA Portal</a>
     </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="${pageContext.request.contextPath}/pub/viewralist">RA List</a></li>
-                    <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">Certificates<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload"><b>Download Certificate</b></a></li>
-                                <li><a href="${pageContext.request.contextPath}/pub/requestUserCert/submitNewUserCertRequest"><b>Request User Certificate</b></a></li>
-                                <li><a href="${pageContext.request.contextPath}/cert_owner/requestHostCert"><b>Request Host Certificate</b> (Cert must be loaded in browser)</a></li>
-                                <li><a href="${pageContext.request.contextPath}/cert_owner/renew"><b>Renew Certificate</b> (Cert must be loaded in browser)</a></li>
-                                <li><a href="${pageContext.request.contextPath}/cert_owner/revoke"><b>Revoke Certificate</b> (Cert must be loaded in browser)</a></li>
-                            </ul>  
-                    </li> 
-                    <li><a href="${certOwnerHomeUrl}">Login/MyCert</a></li>                 
-                    <sec:authorize access="hasRole('ROLE_RAOP')">
-<!--                        <li><a href="${raOpUrl}">RAOP Home</a></li>-->
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">RAOP Actions<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="${raOpUrl}">RAOP Home</a></li>
-                                <%--<li class="nav-header">Certificates</li>--%>
-                                <li><a href="${pageContext.request.contextPath}/raop/searchcsr">Search <b>New/Renew</b> Signing Requests</a></li>
-                                <li><a href="${pageContext.request.contextPath}/raop/searchcrr">Search <b>Revocation</b> Requests</a></li>
-                                <%--<li class="divider"></li>--%>
-                                <c:url value="/raop/searchcert" var="raOpSearchCert" />
-                                <li><a href="${raOpSearchCert}">Search <b>Certificates</b></a></li>
-                                <%--<li><a href="${pageContext.request.contextPath}/raop/searchralist">Search RAs</a></li>--%>
-                            </ul>
-                        </li>  
-                    </sec:authorize>
-                    <sec:authorize access="hasRole('ROLE_CAOP')">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">CAOP Actions<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="${caOpUrl}">CAOP Home</a></li>
-                                <li><a href="${pageContext.request.contextPath}/caop/exportcert"><b>Export</b> Approved Certificates</a></li>
-                                <li><a href="${pageContext.request.contextPath}/caop/importcert"><b>Import</b> Signed Certificates</a></li>
-                            </ul>
-                        </li>
-                    </sec:authorize>
-                    <!-- Logout handler - don't think? is needed as we are using x509 with no 
-                    un/pw auth fallback handler chain - but we may want to clear the security context. -->    
-                    <%--<jsp:useBean id="now" scope="session" class="java.util.Date"/>
-                    <fmt:formatDate value="${now}" type="both" pattern="yyyyMMddhhmmss" var="timeStamp"/>
-                    <c:url value="/j_spring_security_logout?idx=${timeStamp}" var="logoutUrl" />
-                    <li><a href="${logoutUrl}">Log Out</a></li>--%>
-                    <%--<c:url value="/j_spring_security_logout" var="logoutUrl" />
-                    <li><a href="${logoutUrl}">Log Out</a></li>--%>
-                    
-                    <%-- 
-                    response.setHeader( "Expires", "-1" ); 
-                    response.setHeader( "Cache-Control", "no-cache" ); 
-                    --%>
-                </ul> 
-            </div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/pub/viewralist">RA List</a></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">Certificates</a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
+                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload"><b>Download Certificate</b></a></li>
+                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/pub/requestUserCert/submitNewUserCertRequest"><b>Request User Certificate</b></a></li>
+                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/cert_owner/requestHostCert"><b>Request Host Certificate</b> (Cert must be loaded in browser)</a></li>
+                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/cert_owner/renew"><b>Renew Certificate</b> (Cert must be loaded in browser)</a></li>
+                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/cert_owner/revoke"><b>Revoke Certificate</b> (Cert must be loaded in browser)</a></li>
+                </ul>
+            </li>
+            <li><a class="nav-link" href="${certOwnerHomeUrl}">Login/MyCert</a></li>
+            <sec:authorize access="hasRole('ROLE_RAOP')">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">RAOP Actions</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="nav-link" href="${raOpUrl}">RAOP Home</a></li>
+                        <li><a class="nav-link" href="${pageContext.request.contextPath}/raop/searchcsr">Search <b>New/Renew</b> Signing Requests</a></li>
+                        <li><a class="nav-link" href="${pageContext.request.contextPath}/raop/searchcrr">Search <b>Revocation</b>Requests</a></li>
+                        <li><a class="nav-link" href="${pageContext.request.contextPath}/raop/searchcert">Search <b>Certificates</b></a></li>
+                    </ul>
+                </li>
+            </sec:authorize>
+            <sec:authorize access="hasRole('ROLE_CAOP')">
+                <li class="nav-dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-bs-toggle="dropdown" aria-expanded="false">CAOP Actions</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="nav-link" href="${caOpUrl}">CAOP Home</a></li>
+                        <li><a class="nav-link" href="${pageContext.request.contextPath}/caop/exportcert"><b>Export</b> Approved Certificates</a></li>
+                        <li><a class="nav-link" href="${pageContext.request.contextPath}/caop/importcert"><b>Import</b> Signed Certificates</a></li>
+                    </ul>
+                </li>
+            </sec:authorize>
+        </ul>
+    </div>
+    </div>
 </div>
-<div class="modal fade" id="waitModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-aria-hidden="true">
+<div class="modal fade" id="waitModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content"></div>
     </div>
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                 <h4 class="modal-title" id="waitModalLabel">PLEASE WAIT</h4>
+                <h4 class="modal-title" id="waitModalLabel">PLEASE WAIT</h4>
             </div>
-            <div class="modal-body">Generating a local public-private key pair and sending the public key
-                to the server.
-                <br />(Please be patient, key generation can take time to complete depending
-                on your browser/computer)</div>
+            <div class="modal-body">
+                Generating a local public-private key pair and sending the public key to the server.<br/>
+                (Please be patient, key generation can take time to complete depending on your browser/computer)
+            </div>
             <div class="modal-footer"></div>
         </div>
     </div>

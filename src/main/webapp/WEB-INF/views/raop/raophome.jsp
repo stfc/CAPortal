@@ -20,9 +20,9 @@
 
 <body>
 <%@ include file="../../jspf/header.jspf" %>
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
 
             <h2>Pending Requests for Your RA [<font class="text-info">${ra}</font>]</h2>
             <h4>(RAs, please bookmark this page to view your pending requests)</h4>
@@ -33,7 +33,7 @@
             &nbsp;&nbsp;&nbsp;&nbsp;Last Refreshed: <b>${lastPageRefreshDate}</b>
             <br/>
             <br/>
-            <div class="col-xs-11">
+            <div class="col-11">
                 <table class="table tablecondensed">
                     <thead>
                     <tr>

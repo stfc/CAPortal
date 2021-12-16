@@ -26,9 +26,9 @@
 <%--<jsp:include page="../common/header.jsp" />--%>
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
 
             <h3>RA Operators for Organisation Unit (OU): [${ou}]</h3>
             <p>
@@ -48,7 +48,7 @@
             </sec:authorize>
 
             <%--<h5>RA List last refreshed: &nbsp;(${sessionScope.lastRalistSearchDate_session})</h5>--%>
-            <div class="col-xs-11">
+            <div class="col-11">
 
                 <table class="table table-hover table-condensed">
                     <thead>

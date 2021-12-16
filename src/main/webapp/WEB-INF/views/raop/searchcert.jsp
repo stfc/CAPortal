@@ -28,9 +28,9 @@
 <%--<jsp:include page="../common/header.jsp" />--%>
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
 
             <%--<c:if test="${status.error}">
                 <div id="messagess" class="error">Form has errors</div>
@@ -58,7 +58,7 @@
                             <div id="message" class="error">Form has errors</div>
                         </c:if>
                     </s:bind>
-                    <div class="col-xs-4">
+                    <div class="col-4">
                         <font class="muted">
                             _ matches any single char<br/>
                             % matches a string
@@ -66,20 +66,20 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Common Name Like (CN)</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="name" class="form-control"
                                     placeholder="A Name"/> <form:errors
                             path="name" cssClass="text-error"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Certificate RA</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:select path="ra" class="form-control">
                             <form:options items="${ralistArray}"/>
                         </form:select>
@@ -87,10 +87,10 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Distinguished Name Like (DN)</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="dn" class="form-control"
                                     placeholder="CN=some body,L=DL,OU=CLRC,O=eScience,C=UK"/> <form:errors
                             path="dn" cssClass="text-error"/>
@@ -98,20 +98,20 @@
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
+                        <div class="col-3 col-lg-3">
                             <strong>Data Like</strong> <font class="muted">(shown if own ROLE_CAOP)</font>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <form:input path="data" class="form-control"/> <form:errors
                                 path="data" cssClass="text-error"/>
                         </div>
                     </div>
                 </sec:authorize>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Email Address Like</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="emailAddress" class="form-control"
                                     placeholder="someone@world.com"/> <form:errors
                             path="emailAddress" cssClass="text-error"/>
@@ -119,21 +119,21 @@
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
+                        <div class="col-3 col-lg-3">
                             <strong>Email Address is Null</strong>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <form:checkbox path="searchNullEmailAddress"/>&nbsp;&nbsp;<font class="muted">(if checked,
                             this will override email search string above)</font>
                         </div>
                     </div>
                 </sec:authorize>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Serial Number</strong> <font class="muted" style="text-decoration: underline">(if given,
                         other search criteria are ignored)</font>&nbsp;&nbsp;
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="serial" class="form-control"
                                     placeholder="1234"/> <form:errors
                             path="serial" cssClass="text-error"/>
@@ -144,10 +144,10 @@
                 Role
                 </a>-->
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Role</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:select path="role" class="form-control">
                             <form:option value="all"/>
                             <form:option value="User"/>
@@ -161,10 +161,10 @@
                 Status
                 </a>-->
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Status</strong> <font class="muted">(note, VALID Certs can be Expired)</font>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:select path="status" class="form-control">
                             <form:option value="VALID"/>
                             <form:option value="REVOKED"/>
@@ -174,18 +174,18 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Valid Only</strong> <font class="muted">(Excludes Expired Certs)</font>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:checkbox path="notExpired"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
+                    <div class="col-3 col-lg-3">
                         <strong>Results per page:</strong>
                     </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:select path="showRowCount" class="form-control">
                             <form:option value="20"/>
                             <form:option value="50"/>
@@ -194,7 +194,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-xs-offset-3">
+                    <div class="col-offset-3">
                         <button type="submit" class="btn btn-md btn-primary">Search</button>
                     </div>
                 </div>
@@ -208,7 +208,7 @@
             </h4>
 
             <br/>
-            <div class="col-xs-11">
+            <div class="col-11">
                 <table id="certResultsTable" class="tablesorter-blue"><!-- table table-hover table-condensed-->
                     <!--  <caption>List of certificate rows returned by search</caption> -->
                     <thead>

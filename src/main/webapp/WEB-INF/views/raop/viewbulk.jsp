@@ -23,9 +23,9 @@
 </head>
 <body>
 <%@ include file="../../jspf/header.jspf" %>
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1 col-xs-10">
+        <div class="col-offset-1 col-10">
             <h1>Manage Bulk</h1>
             <h4>(bulkId=${bulkView.bulkId} requested by <c:out value="${bulkView.rows['0'].requestRow.email}"/>)</h4>
 
@@ -35,7 +35,7 @@
             <c:if test="${not empty errorMessage}">
                 <div id="errorMessage" class="error">${errorMessage}</div>
             </c:if>
-            <div class="col-xs-offset-10">
+            <div class="col-offset-10">
                 <strong><a href="#" id="selall">Select / Deselect All</a></strong>
             </div>
             <form:form method="post" modelAttribute="bulkView">
@@ -62,7 +62,7 @@
                                         ${rowWrapper.requestRow.req_key}</a>
                             </td>
                             <td> ${rowWrapper.requestRow.cn}</td>
-                            <td class="vertAlign col-xs-2">
+                            <td class="vertAlign col-2">
                                 <button type="button" class="btn btn-sm dnPop" data-container="body"
                                         data-toggle="popover"
                                         data-placement="top" data-content="${rowWrapper.requestRow.dn}">DN

@@ -25,9 +25,9 @@
 <%--<jsp:include page="../common/header.jsp" />--%>
 <%@ include file="../../jspf/header.jspf" %>
 
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
 
             <h2>Verify Pin</h2>
             <c:if test="${pin == null}">

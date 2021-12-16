@@ -74,12 +74,10 @@
 </div>
 
 
-<div id="wrap">
-    <div class="row">
-        <div class="col-xs-offset-1">
+<div id="wrap" class="container">
             <div class="row">
-                <div class="col-xs-10"><h2>Download Certificate</h2></div>
-                <div class="col-xs-offset-11">
+                <div class="col-10"><h2>Download Certificate</h2></div>
+                <div class="col-offset-11">
                     <a href="#" id="helpMod" style="color: inherit;">
                         <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;"></span>
                     </a>
@@ -114,27 +112,27 @@
                         </s:bind>
                     </div>
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-2">
+                        <div class="col-3 col-lg-2">
                             <strong>Certificate Serial Number</strong>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <form:input id="certId" class="form-control" path="certId" placeholder="12345"/>
                             <span></span>
                             <form:errors path="certId" cssClass="text-error"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-xs-3 col-lg-2">
+                        <div class="col-3 col-lg-2">
                             <strong>Certificate Email Address</strong>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <form:input id="email" class="form-control" path="email" placeholder="some.body@world.com"/>
                             <span></span>
                             <form:errors path="email" cssClass="text-error"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-xs-offset-2 col-xs-8">
+                        <div class="col-offset-2 col-8">
                             <button id="submitButton" type="submit" class="btn btn-sm btn-primary">
                                 Download Certificate
                             </button>
@@ -145,7 +143,7 @@
 
             <c:if test="${cert != null}">
                 <div class="form-group">
-                    <div class="col-xs-11">
+                    <div class="col-11">
                         <table class="table table-hover table-condensed">
                             <thead>
                             <tr>
@@ -281,8 +279,6 @@
 
 
         </div>
-    </div>
-</div>
 
 <!-- footer includes shared .js files -->
 <%@ include file="../../../jspf/footer.jspf" %>

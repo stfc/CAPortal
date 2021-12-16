@@ -40,18 +40,18 @@
         </div>
     </div>
 </div>
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
-            <div class="col-xs-10"><h2>Import Signed Certificates</h2>
+        <div class="col-offset-1">
+            <div class="col-10"><h2>Import Signed Certificates</h2>
             </div>
-            <div class="col-xs-offset-11">
+            <div class="col-offset-11">
                 <a href="#" id="helpMod" style="color: inherit;">
                     <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;"></span>
                 </a>
             </div>
             <br/><br/>
-            <div class="col-xs-11">
+            <div class="col-11">
                 <button id="importBt" type="submit" class="btn btn-md btn-warning"
                         data-toggle="tooltip" data-placement="right"
                         title="Import New Certificates and CRL"

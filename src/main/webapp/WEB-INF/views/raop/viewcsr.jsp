@@ -33,10 +33,10 @@
 --%>
 
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
-            <div class="col-xs-11 col-lg-10">
+        <div class="col-offset-1">
+            <div class="col-11 col-lg-10">
                 <h2>View CSR - Signing Request</h2>
 
                 <c:if test="${errorMessage != null}">
@@ -229,7 +229,7 @@
                 </table>
             </div>
 
-            <div class="col-xs-11 col-md-9 col-lg-8">
+            <div class="col-11 col-md-9 col-lg-8">
                 <br/><br/>
                 <h4>Data</h4>
                 <textarea rows="15" class="form-control" readonly="readonly">${csr.data}</textarea>

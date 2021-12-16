@@ -28,9 +28,9 @@
 <%--<jsp:include page="../common/header.jsp" />--%>
 
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col">
             <div>
                 <h2>RA List (${fn:length(editRalistFormBean.source)})</h2>
                 <c:if test="${not empty message}">
@@ -48,7 +48,7 @@
             <br/>
             <form:form id="form" method="post" action="${pageContext.request.contextPath}/raop/searchralist/save"
                        modelAttribute="editRalistFormBean" cssClass="form-search">
-                <div class="col-xs-11 col-lg-10">
+                <div class="col-11 col-lg-10">
                     <table class="table table-hover table-condensed">
                         <thead>
                         <tr>
