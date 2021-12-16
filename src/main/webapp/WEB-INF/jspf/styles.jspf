@@ -66,6 +66,9 @@
         display: block;
         margin: 0 auto;
     }
+    code {
+        font-size: 80%;
+    }
 </style>
 
 

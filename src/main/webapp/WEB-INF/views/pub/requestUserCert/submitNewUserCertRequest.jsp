@@ -121,13 +121,14 @@
             <input type="password" id="sign_up_password_confirm" class="form-control"/>
             <div class="form-text">The password is used to encrypt your locally generated private key</div>
             <br />
-            <button id="createCSRSubmit" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right" title="This may take some time depending on your browser/computer (it generates a new public/private key-pair in your browser and sends the public key to the server)">Submit Request</button>&nbsp;
+            <button id="createCSRSubmit" class="btn btn-sm btn-primary">Submit Request</button>
+            <div class="form-text">This may take some time depending on your browser/computer (it generates a new public/private key-pair in your browser and sends the public key to the server)</div>
+            <br />
             <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
         </div>
     </form>
     <div id="responseMessage"></div>
-    <a id="flashdown" href="#">Save Private Key As Text File</a>
-    <a id="savetxt" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right" title="Prompts .txt file download">Save Private Key As Text File</a>
+    <a id="savetxt" class="btn btn-sm btn-primary">Save Private Key As Text File</a>
     <label for="csrTextArea"></label><textarea id="csrTextArea" style="width: 900px; height: 200px;" readonly aria-readonly="true"></textarea>
 </div>
 

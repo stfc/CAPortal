@@ -1,14 +1,4 @@
-
-<style type="text/css">
-    /* Custom page CSS
-    -------------------------------------------------- */
-    /* Not required for template or sticky footer method. */
-
-    code {
-      font-size: 80%;
-    }
-</style>
-
+<br />
 <div id="footer">
     <div class="container">
         <p class="muted credit">The UK eScience Certificate Authority - <a href="https://ca.grid-support.ac.uk">https://ca.grid-support.ac.uk</a>.

@@ -25,19 +25,12 @@
 </head>
 
 <body>
-<%--<jsp:include page="../common/header.jsp" />--%>
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
 <div id="wrap" class="container">
     <div class="row">
         <div class="col-offset-1">
 
-            <%--<c:if test="${status.error}">
-                <div id="messagess" class="error">Form has errors</div>
-            </c:if>--%>
-            <%--<c:if test="${not empty requestScope['org.springframework.validation.BindingResult.searchCertFormBean_REQUESTSCOPE'].allErrors}">
-                An Error has occurred!!!
-            </c:if>--%>
             <s:hasBindErrors name="searchCertFormBean_REQUESTSCOPE">
                 <div id="thesemessages" class="error">Invalid GET request search parameter</div>
             </s:hasBindErrors>
@@ -47,9 +40,6 @@
                        modelAttribute="searchCertFormBean" cssClass="form-horizontal">
                 <div class="form-group">
                     <h2 class="form-search-heading">Search for Certificates</h2>
-                        <%--<c:if test="${not empty message}">
-                            <div id="message" class="success">${message}</div>
-                        </c:if>--%>
                     <c:if test="${not empty searchOk}">
                         <div id="message" class="success">${searchOk}</div>
                     </c:if>
@@ -59,10 +49,10 @@
                         </c:if>
                     </s:bind>
                     <div class="col-4">
-                        <font class="muted">
+                        <span class="muted">
                             _ matches any single char<br/>
                             % matches a string
-                        </font>
+                        </span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -123,15 +113,15 @@
                             <strong>Email Address is Null</strong>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
-                            <form:checkbox path="searchNullEmailAddress"/>&nbsp;&nbsp;<font class="muted">(if checked,
-                            this will override email search string above)</font>
+                            <form:checkbox path="searchNullEmailAddress"/>&nbsp;&nbsp;<span class="muted">(if checked,
+                            this will override email search string above)</span>
                         </div>
                     </div>
                 </sec:authorize>
                 <div class="form-group">
                     <div class="col-3 col-lg-3">
-                        <strong>Serial Number</strong> <font class="muted" style="text-decoration: underline">(if given,
-                        other search criteria are ignored)</font>&nbsp;&nbsp;
+                        <strong>Serial Number</strong> <span class="muted" style="text-decoration: underline">(if given,
+                        other search criteria are ignored)</span>&nbsp;&nbsp;
                     </div>
                     <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:input path="serial" class="form-control"
@@ -139,10 +129,6 @@
                             path="serial" cssClass="text-error"/>
                     </div>
                 </div>
-                <!--<a href="#" data-toggle="tooltip"
-                title="Allowed chars: a-z A-Z 0-9_ -">
-                Role
-                </a>-->
                 <div class="form-group">
                     <div class="col-3 col-lg-3">
                         <strong>Role</strong>
@@ -156,13 +142,9 @@
                         </form:select>
                     </div>
                 </div>
-                <!--<a href="#" data-toggle="tooltip"
-                title="Allowed chars: a-z A-Z 0-9_ -">
-                Status
-                </a>-->
                 <div class="form-group">
                     <div class="col-3 col-lg-3">
-                        <strong>Status</strong> <font class="muted">(note, VALID Certs can be Expired)</font>
+                        <strong>Status</strong> <span class="muted">(note, VALID Certs can be Expired)</span>
                     </div>
                     <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:select path="status" class="form-control">
@@ -175,7 +157,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-lg-3">
-                        <strong>Valid Only</strong> <font class="muted">(Excludes Expired Certs)</font>
+                        <strong>Valid Only</strong> <span class="muted">(Excludes Expired Certs)</span>
                     </div>
                     <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                         <form:checkbox path="notExpired"/>
@@ -210,11 +192,9 @@
             <br/>
             <div class="col-11">
                 <table id="certResultsTable" class="tablesorter-blue"><!-- table table-hover table-condensed-->
-                    <!--  <caption>List of certificate rows returned by search</caption> -->
                     <thead>
                     <tr>
                         <th class="sorter-false">#</th>
-                        <!--                                <th>Detail</th>-->
                         <th>Serial</th>
                         <th>CN</th>
                         <th>Email</th>
@@ -250,7 +230,6 @@
                             <td>${cert.status}</td>
                             <td><fmt:formatDate value="${cert.notAfter}"></fmt:formatDate>
                             </td>
-                                <%--${cert.notAfter}--%>
                             <td class="vertAlign">
                                 <button type="button" class="btn btn-sm dnPop" data-container="body"
                                         data-toggle="popover"
@@ -292,11 +271,11 @@
                             <c:url value="/raop/searchcert/page?page=first" var="pagefirstaction"/>
                             <c:url value="/raop/searchcert/page?page=last" var="pagelastaction"/>
                             <td>
-                                <ul class="pager">
-                                    <li><a href="${pagefirstaction}">First</a></li>
-                                    <li><a href="${pageprevaction}">&laquo; Previous</a></li>
-                                    <li><a href="${pagenextaction}">Next &raquo;</a></li>
-                                    <li><a href="${pagelastaction}">Last</a></li>
+                                <ul class="pagination">
+                                    <li class="page-item"><a class="page-link" href="${pagefirstaction}">First</a></li>
+                                    <li class="page-item"><a class="page-link" href="${pageprevaction}">&laquo; Previous</a></li>
+                                    <li class="page-item"><a class="page-link" href="${pagenextaction}">Next &raquo;</a></li>
+                                    <li class="page-item"><a class="page-link" href="${pagelastaction}">Last</a></li>
                                 </ul>
                             </td>
                         </c:if>
@@ -312,7 +291,6 @@
 <%@ include file="../../jspf/footer.jspf" %>
 <script type="text/javascript"
         src="${pageContext.request.contextPath}/resources/jquery/tablesorter/js/jquery.tablesorter.min.js"></script>
-<%--<script type="text/javascript" src="${pageContext.request.contextPath}/resources/jquery/tablesorter/js/jquery.tablesorter.widgets.min.js"></script>--%>
 
 <script>
     $("._showDnDiv").hide();
@@ -327,33 +305,6 @@
     $(function () {
         $("#certResultsTable").tablesorter();
     });
-</script>
-<script>
-    /*function showHide(id) {
-       console.log("Info"+id);
-       var e = document.getElementById(id);
-       if(e.style.display == 'block')
-          e.style.display = 'none';
-       else
-          e.style.display = 'block';
-   }
-
-//For use with downtimes active and imminent in the gocdb portal. Will change
-// the user control depending on whether the user has expanded the extra information
-// table or not
-function toggleMessage(id) {
-   //console.info(id);
-   content = document.getElementById(id).innerHTML;
-
-   if(content.indexOf("+") !== -1){
-       //console.log("Found +");
-       document.getElementById(id).innerHTML = "-Hide Detail";
-   }else{
-       //console.log("Not Found +");
-       document.getElementById(id).innerHTML = "+Show Detail";
-   }
-
-}*/
 </script>
 </body>
 </html>

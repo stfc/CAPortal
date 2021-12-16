@@ -126,23 +126,19 @@
                 <form action="" class="form-horizontal" role="form">
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="cnInputTextTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="Hostname will make up the Common Name of your host certificate">
-                                Hostname</a></strong>
+                                <label for="cnInputText">Hostname</label>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="text" id="cnInputText" class="form-control" placeholder="some.dnsname.ac.uk"
                                    onChange="javascript:this.value=this.value.toLowerCase();"/>
                             <span></span>
+                            <div class="form-text">Hostname will make up the Common Name of your host certificate</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="raSelectTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="The RA defines the certificate Locality and Org name">Your RA</a></strong>
-                            <font class="muted">(Registration Authority)</font>
+                            <label for="raSelect">Your RA</label>
+                            <span class="muted">(Registration Authority)</span>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <select id="raSelect" class="form-control">
@@ -153,48 +149,42 @@
                                     <option>${ra}</option>
                                 </c:forEach>
                             </select><span></span>
+                            <div class="form-text">The RA defines the certificate Locality and Org name</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="emailInputTextTitle" tabindex="-1"
-                                       data-toggle="tooltip" data-placement="right"
-                                       title="You will receive an email to this address with the certificate
-                                ID/Serial number, which you will need to download your signed certfiicate">e-Mail</a></strong>
+                            <label for="emailInputText">e-Mail</label>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="text" id="emailInputText" class="form-control"
                                    placeholder="some@domain.com"/><span></span>
+                            <div class="form-text">You will receive an email to this address with the certificate ID/Serial number, which you will need to download your signed certfiicate</div>
                         </div>
+
                     </div>
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="pinInputTextTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="For host cert requests, you may need to quote this to your RA to prove you submitted the CSR (usually not required)">PIN</a></strong>
+                            <label for="pinInputText">PIN</label>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="text" id="pinInputText" class="form-control"
                                    placeholder="memorable phrase"/><span></span>
+                            <div class="form-text">For host cert requests, you may need to quote this to your RA to prove you submitted the CSR (usually not required)</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="sign_up_passwordTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="The password is used to encrypt your locally generated private key.">Key
-                                Password</a></strong>
+                            <label for="sign_up_password">Key Password</label>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="password" id="sign_up_password" class="form-control"/><span></span>
+                            <div class="form-text">The password is used to encrypt your locally generated private key</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="sign_up_password_confirmTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="The password is used to encrypt your locally generated private key.">Confirm
-                                Password</a></strong>
+                            <label for="sign_up_password_confirm">Confirm Password</label>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="password" id="sign_up_password_confirm" class="form-control"/><span></span>
@@ -202,13 +192,11 @@
                     </div>
                     <div class="form-group">
                         <div class="col-offset-3 col-8">
-                            <a id="createCSRSubmit" class="btn btn-sm btn-primary"
-                               data-toggle="tooltip"
-                               data-placement="right"
-                               title="This may take some time depending on your browser/computer
-                                   (it generates a new public/private key-pair in the browser and sends the public key to the server)">
+                            <a id="createCSRSubmit" class="btn btn-sm btn-primary">
                                 Submit Request
-                            </a>&nbsp;
+                            </a><br />
+                            <div class="form-text">This may take some time depending on your browser/computer
+                                (it generates a new public/private key-pair in the browser and sends the public key to the server)</div>
                             <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
                         </div>
                     </div>
@@ -216,14 +204,11 @@
             </c:if>
             <div id="responseMessage"></div>
             <div class="col-11">
-                <a id="flashdown" href="#">Save Private Key As Text File</a>
-                <a id="savetxt" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right"
-                   title="Prompts .txt file download">
+                <a id="savetxt" class="btn btn-sm btn-primary">
                     Save Private Key As Text File
                 </a>
             </div>
             <div class="col-11">
-                <!--<textarea id="csrTextArea" class="form-control" readonly style="height: 200px;"></textarea>-->
                 <textarea id="csrTextArea" style="width: 900px; height: 200px;" readonly aria-readonly="true"></textarea>
             </div>
         </div>

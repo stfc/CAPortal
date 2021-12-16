@@ -13,15 +13,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="Renew certificate page for UK CA certificate owners"/>
     <meta name="author" content="David Meredith"/>
-    <!-- Styles -->
-    <%--<jsp:include page="../common/styles.jsp" />--%>
     <%@ include file="../../jspf/styles.jspf" %>
     <link href="${pageContext.request.contextPath}/resources/css/messages/messages.css" rel="stylesheet"/>
 </head>
 
 <body id="certBody">
 <%@ include file="../../jspf/header.jspf" %>
-<!-- Wrap all page content here -->
 <div id="wrap" class="container">
     <div class="row">
         <div class="col-offset-1">
@@ -123,32 +120,26 @@
                 <form action="" class="form-horizontal" role="form">
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="emailTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="Email that is associated with your Certificate">e-Mail</a></strong>
+                            <label for="emailInputText">e-Mail</label>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="text" id="emailInputText" value="${certificateRow.email}"
                                    class="form-control"/><span></span>
+                            <div class="form-text">Email that is associated with your Certificate</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="sign_up_passwordTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="The password is used to encrypt your locally generated private key.">Key
-                                Password</a></strong>
+                            <label for="sign_up_password">Key Password</label>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="password" id="sign_up_password" class="form-control"/><span></span>
+                            <div class="form-text">The password is used to encrypt your locally generated private key.</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-3 col-lg-3">
-                            <strong><a href="#" id="sign_up_password_confirmTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="The password is used to encrypt your locally generated private key.">Confirm
-                                Password</a></strong>
+                            <label for="sign_up_password_confirm">Confirm Password</label>
                         </div>
                         <div class="col-8 col-sm-6 col-md-5 col-lg-3">
                             <input type="password" id="sign_up_password_confirm" class="form-control"/><span></span>
@@ -156,13 +147,9 @@
                     </div>
                     <div class="form-group">
                         <div class="col-offset-3 col-8">
-                            <a id="createCSRSubmit" class="btn btn-sm btn-primary"
-                               data-toggle="tooltip"
-                               data-placement="right"
-                               title="This may take some time depending on your browser/computer
-                                       (it generates a new public/private key-pair in the browser and sends the public key to the server)">
-                                Submit Request
-                            </a>&nbsp;
+                            <br />
+                            <a id="createCSRSubmit" class="btn btn-sm btn-primary">Submit Request</a>
+                            <div class="form-text">This may take some time depending on your browser/computer (it generates a new public/private key-pair in the browser and sends the public key to the server)</div><br />
                             <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
                         </div>
                     </div>
@@ -170,19 +157,13 @@
             </c:if>
             <div id="responseMessage"></div>
             <div class="col-11">
-                <a id="flashdown" href="#">Save Private Key As Text File</a>
-                <a id="savetxt" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right"
-                   title="Prompts .txt file download">
+                <a id="savetxt" class="btn btn-sm btn-primary">
                     Save Private Key As Text File
                 </a>
             </div>
             <div class="col-11">
-                <%--<textarea id="csrTextArea" class="form-control" readonly style="height: 200px;"></textarea>--%>
                 <textarea id="csrTextArea" style="width: 900px; height: 200px;"></textarea>
             </div>
-            <%-- <p>
-            Your principal object is....: <%= request.getUserPrincipal() %>
-            </p> --%>
         </div>
     </div>
 </div>

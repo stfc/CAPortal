@@ -60,10 +60,6 @@
                         <sec:authorize access="hasRole('ROLE_RAOP')">
                             <th>Email</th>
                         </sec:authorize>
-                        <%--<sec:authorize access="hasRole('ROLE_CAOP')">
-                            <th>Promote</th>
-                            <th>Demote</th>
-                        </sec:authorize>--%>
                     </tr>
                     </thead>
                     <tbody>
@@ -78,10 +74,6 @@
                             <sec:authorize access="hasRole('ROLE_RAOP')">
                                 <td><a href="mailto:${contact.certRow.email}">${contact.certRow.email}</a></td>
                             </sec:authorize>
-                                <%--<sec:authorize access="hasRole('ROLE_CAOP')">
-                                    <td>Promote Here</td>
-                                    <td>Demote Here</td>
-                                </sec:authorize>--%>
                         </tr>
                     </c:forEach>
                     </tbody>

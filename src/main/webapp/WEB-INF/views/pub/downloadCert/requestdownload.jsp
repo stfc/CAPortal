@@ -75,210 +75,212 @@
 
 
 <div id="wrap" class="container">
-            <div class="row">
-                <div class="col-10"><h2>Download Certificate</h2></div>
-                <div class="col-offset-11">
-                    <a href="#" id="helpMod" style="color: inherit;">
-                        <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;"></span>
-                    </a>
-                </div>
-            </div>
-            <div>
-                <c:if test="${not empty successMessage}">
-                    <div class="success">
-                        <ul>
-                            <li>${successMessage}</li>
-                            <li><strong>Follow Steps 1,2,3 below </strong>to create a browser compatible certificate
-                                file
-                        </ul>
-                    </div>
-                </c:if>
-                <c:if test="${not empty errorMessage}">
-                    <div id="message" class="error">Error - ${errorMessage}</div>
-                </c:if>
-            </div>
-
-
-            <c:if test="${cert == null}">
-                <br/>
-                <form:form id="requestCertForm" method="post"
-                           action="${pageContext.request.contextPath}/pub/downloadCert/requestdownload"
-                           modelAttribute="requestDownloadCertFormBean" cssClass="form-horizontal">
-                    <div>
-                        <s:bind path="*">
-                            <c:if test="${status.error}">
-                                <div id="message" class="error">Form has errors</div>
-                            </c:if>
-                        </s:bind>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-2">
-                            <strong>Certificate Serial Number</strong>
-                        </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
-                            <form:input id="certId" class="form-control" path="certId" placeholder="12345"/>
-                            <span></span>
-                            <form:errors path="certId" cssClass="text-error"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-2">
-                            <strong>Certificate Email Address</strong>
-                        </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
-                            <form:input id="email" class="form-control" path="email" placeholder="some.body@world.com"/>
-                            <span></span>
-                            <form:errors path="email" cssClass="text-error"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-offset-2 col-8">
-                            <button id="submitButton" type="submit" class="btn btn-sm btn-primary">
-                                Download Certificate
-                            </button>
-                        </div>
-                    </div>
-                </form:form>
-            </c:if>
-
-            <c:if test="${cert != null}">
-                <div class="form-group">
-                    <div class="col-11">
-                        <table class="table table-hover table-condensed">
-                            <thead>
-                            <tr>
-                                <th>Certificate Attribute</th>
-                                <th>Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Serial Number (cert_key)</td>
-                                <td>${cert.cert_key}, (hex: ${hexSerial})</td>
-                            </tr>
-                            <tr>
-                                <td>Common Name (CN)</td>
-                                <td>${cert.cn}</td>
-                            </tr>
-                            <tr>
-                                <td>Distinguished Name (DN)</td>
-                                <td>${cert.dn}</td>
-                            </tr>
-                            <tr>
-                                <td>Issuer DN</td>
-                                <td>${certObj.issuerDN}</td>
-                            </tr>
-                            <tr>
-                                <td>Email</td>
-                                <td><a href="mailto:${cert.email}">${cert.email}</a></td>
-                            </tr>
-                            <tr>
-                                <td>Status</td>
-                                <td><b>
-                                    <c:if test="${cert.status == 'VALID'}">
-                                        <font color="green">${cert.status}</font>
-                                    </c:if>
-                                    <c:if test="${cert.status != 'VALID'}">
-                                        <font color="red">${cert.status}</font>
-                                    </c:if>
-                                </b></td>
-                            </tr>
-                            <tr>
-                                <td>Role</td>
-                                <td>${cert.role}</td>
-                            </tr>
-                            <tr>
-                                <td>Not Before (Starts)</td>
-                                <td>${certObj.notBefore}</td>
-                            </tr>
-                            <tr>
-                                <td>Not After (Expires)</td>
-                                <td>${certObj.notAfter}</td>
-                            </tr>
-
-                            <tr>
-                                <td>Signature Algorithm</td>
-                                <td>${certObj.sigAlgName}</td>
-                            </tr>
-                            <tr>
-                                <td>Type/Version</td>
-                                <td>${certObj.type} / ${certObj.version}</td>
-                            </tr>
-                            <tr>
-                                <td>Cert PEM</td>
-                                <td><textarea id="certpem" class="form-control" readonly style="height: 160px;">${certdata}</textarea></td>
-                            </tr>
-
-
-                            <tr>
-                                <td>
-                                    <img src="${pageContext.request.contextPath}/resources/images/number1.png"
-                                         alt="number 1" style="width: 100px; height: 100px;"/>
-                                    Provide Your Private Key
-                                </td>
-                                <td>
-                                    <div class="text-info">
-                                        <ul>
-                                            <li>Paste file contents or browse for file</li>
-                                            <li>This file was saved when applying for the certificate using this
-                                                portal
-                                            </li>
-                                            <li>Your key and pw are <strong>NEVER</strong> sent over to the server
-                                                <a href="#" id="howLink" data-toggle="tooltip" data-placement="right"
-                                                   title="We use local JavaScript that runs in your browser to create the .p12 file">(how?)</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <textarea class="form-control" id="certkey"
-                                              placeholder="Paste your private key here or browse for your private key text file, then provide the password and click 'Save Certificate (.p12)."
-                                              style="height: 160px;" data-toggle="tooltip" data-placement="top"
-                                              title="Paste or browse for your private key text file (privateKeyAndCSR.txt). Note, the privateKey is NOT sent to the server.">
-                                                </textarea><span></span>
-                                    <input type="file" id="privateKeyPicker" data-toggle="tooltip" data-placement="right" title="Browse for your private key text file. Note, this file is NOT sent to the server"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <img src="${pageContext.request.contextPath}/resources/images/number2.png" alt="number 2" style="width: 100px; height: 100px;"/>
-                                    Enter Your Private Key Password
-                                </td>
-                                <td>
-                                    <br/>
-                                    <input type="password" id="keypass" class="form-control" data-placement="right" title="Password entered when applying for the certificate"/>
-                                    <span></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <img src="${pageContext.request.contextPath}/resources/images/number3.png" alt="number 3" style="width: 100px; height: 100px;"/>
-                                    Click 'Save Certificate' button
-                                </td>
-                                <td>
-                                    <div class="text-info">
-                                        <ul>
-                                            <li>Creates a local Certificate Bundle file (.p12 file)</li>
-                                            <li>The .p12 file can be imported into a web browser</li>
-                                        </ul>
-                                    </div>
-                                    <a id="createP12Button" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right" title="Will prompt .p12 download if valid private key and password entered">Save Certificate (.p12)</a>
-                                    <a href="#" id="mydownloadURI" class="btn btn-sm btn-primary" download="mycert.p12">Download</a>
-                                    <a id="refreshButton" class="btn btn-sm btn-info" href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload">Clear/Refresh Page</a>
-                                </td>
-                            </tr>
-
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <br/>
-                <br/>
-                <br/>
-
-            </c:if>
-
-
+    <div class="row">
+        <div class="col-10"><h2>Download Certificate</h2></div>
+        <div class="col-offset-11">
+            <a href="#" id="helpMod" style="color: inherit;">
+                <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;"></span>
+            </a>
         </div>
+    </div>
+    <div>
+        <c:if test="${not empty successMessage}">
+            <div class="success">
+                <ul>
+                    <li>${successMessage}</li>
+                    <li><strong>Follow Steps 1,2,3 below </strong>to create a browser compatible certificate
+                        file
+                </ul>
+            </div>
+        </c:if>
+        <c:if test="${not empty errorMessage}">
+            <div id="message" class="error">Error - ${errorMessage}</div>
+        </c:if>
+    </div>
+
+
+    <c:if test="${cert == null}">
+        <br/>
+        <div class="form-group">
+            <form:form id="requestCertForm" method="post"
+                       action="${pageContext.request.contextPath}/pub/downloadCert/requestdownload"
+                       modelAttribute="requestDownloadCertFormBean" cssClass="form-horizontal">
+                <div>
+                    <s:bind path="*">
+                        <c:if test="${status.error}">
+                            <div id="message" class="error">Form has errors</div>
+                        </c:if>
+                    </s:bind>
+                </div>
+                <div class="col-3 col-lg-2">
+                    <strong>Certificate Serial Number</strong>
+                </div>
+                <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <form:input id="certId" class="form-control" path="certId" placeholder="12345"/>
+                    <span></span>
+                    <form:errors path="certId" cssClass="text-error"/>
+                </div>
+                <div class="col-3 col-lg-2">
+                    <strong>Certificate Email Address</strong>
+                </div>
+                <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <form:input id="email" class="form-control" path="email" placeholder="some.body@world.com"/>
+                    <span></span>
+                    <form:errors path="email" cssClass="text-error"/>
+                </div>
+                <br />
+                <button id="submitButton" type="submit" class="btn btn-sm btn-primary">
+                    Download Certificate
+                </button>
+            </form:form>
+        </div>
+    </c:if>
+
+    <c:if test="${cert != null}">
+        <div class="form-group">
+            <div class="col-11">
+                <table class="table table-hover table-condensed">
+                    <thead>
+                    <tr>
+                        <th>Certificate Attribute</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Serial Number (cert_key)</td>
+                        <td>${cert.cert_key}, (hex: ${hexSerial})</td>
+                    </tr>
+                    <tr>
+                        <td>Common Name (CN)</td>
+                        <td>${cert.cn}</td>
+                    </tr>
+                    <tr>
+                        <td>Distinguished Name (DN)</td>
+                        <td>${cert.dn}</td>
+                    </tr>
+                    <tr>
+                        <td>Issuer DN</td>
+                        <td>${certObj.issuerDN}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><a href="mailto:${cert.email}">${cert.email}</a></td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td><b>
+                            <c:if test="${cert.status == 'VALID'}">
+                                <font color="green">${cert.status}</font>
+                            </c:if>
+                            <c:if test="${cert.status != 'VALID'}">
+                                <font color="red">${cert.status}</font>
+                            </c:if>
+                        </b></td>
+                    </tr>
+                    <tr>
+                        <td>Role</td>
+                        <td>${cert.role}</td>
+                    </tr>
+                    <tr>
+                        <td>Not Before (Starts)</td>
+                        <td>${certObj.notBefore}</td>
+                    </tr>
+                    <tr>
+                        <td>Not After (Expires)</td>
+                        <td>${certObj.notAfter}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Signature Algorithm</td>
+                        <td>${certObj.sigAlgName}</td>
+                    </tr>
+                    <tr>
+                        <td>Type/Version</td>
+                        <td>${certObj.type} / ${certObj.version}</td>
+                    </tr>
+                    <tr>
+                        <td>Cert PEM</td>
+                        <td><textarea id="certpem" class="form-control" readonly
+                                      style="height: 160px;">${certdata}</textarea></td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="text-nowrap">
+                            <img src="${pageContext.request.contextPath}/resources/images/number1.png"
+                                 alt="number 1" style="width: 100px; height: 100px;"/>
+                            Provide Your Private Key
+                        </td>
+                        <td>
+                            <div>
+                                <ul>
+                                    <li>Paste file contents or browse for file</li>
+                                    <li>This file was saved when applying for the certificate using this
+                                        portal
+                                    </li>
+                                    <li>Your key and password are <strong>NEVER</strong> sent over to the server - we use local JavaScript that runs in your browser to create the .p12 file
+                                    </li>
+                                </ul>
+                            </div>
+                            <textarea class="form-control" id="certkey"
+                                      placeholder="Paste your private key here or browse for your private key text file, then provide the password and click 'Save Certificate (.p12)."
+                                      style="height: 160px;" data-toggle="tooltip" data-placement="top"
+                                      title="Paste or browse for your private key text file (privateKeyAndCSR.txt). Note, the privateKey is NOT sent to the server.">
+                                                </textarea><span></span>
+                            <input type="file" id="privateKeyPicker" data-toggle="tooltip" data-placement="right"
+                                   title="Browse for your private key text file. Note, this file is NOT sent to the server"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">
+                            <img src="${pageContext.request.contextPath}/resources/images/number2.png" alt="number 2"
+                                 style="width: 100px; height: 100px;"/>
+                            Enter Your Private Key Password
+                        </td>
+                        <td>
+                            <br/>
+                            <input type="password" id="keypass" class="form-control" data-placement="right"
+                                   title="Password entered when applying for the certificate"/>
+                            <span></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">
+                            <img src="${pageContext.request.contextPath}/resources/images/number3.png" alt="number 3" style="width: 100px; height: 100px;"/>Click 'Save Certificate' button
+                        </td>
+                        <td>
+                            <div>
+                                <ul>
+                                    <li>Creates a local Certificate Bundle file (.p12 file)</li>
+                                    <li>The .p12 file can be imported into a web browser</li>
+                                </ul>
+                            </div>
+                            <a id="createP12Button" class="btn btn-sm btn-primary" data-toggle="tooltip"
+                               data-placement="right"
+                               title="Will prompt .p12 download if valid private key and password entered">Save
+                                Certificate (.p12)</a>
+                            <a href="#" id="mydownloadURI" class="btn btn-sm btn-primary"
+                               download="mycert.p12">Download</a>
+                            <a id="refreshButton" class="btn btn-sm btn-info"
+                               href="${pageContext.request.contextPath}/pub/downloadCert/requestdownload">Clear/Refresh
+                                Page</a>
+                        </td>
+                    </tr>
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br/>
+        <br/>
+        <br/>
+
+    </c:if>
+
+
+</div>
 
 <!-- footer includes shared .js files -->
 <%@ include file="../../../jspf/footer.jspf" %>
@@ -293,7 +295,7 @@
     const fileSelector = document.getElementById('privateKeyPicker');
     fileSelector.addEventListener('change', () => {
         const fileReader = new FileReader();
-        fileReader.onloadend = (function(loadEvent) {
+        fileReader.onloadend = (function (loadEvent) {
             let textFromFileLoaded = loadEvent.target.result;
             $("#certkey").val(textFromFileLoaded);
             keyValid();

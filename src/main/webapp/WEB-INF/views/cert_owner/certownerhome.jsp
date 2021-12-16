@@ -146,9 +146,6 @@
 
             <br/><br/>
 
-            <%-- <p>
-            Your principal object is....: <%= request.getUserPrincipal() %>
-            </p> --%>
         </div>
     </div>
 </div>

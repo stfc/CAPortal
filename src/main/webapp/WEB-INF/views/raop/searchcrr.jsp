@@ -218,11 +218,11 @@
                             <c:url value="/raop/searchcrr/page?page=first" var="pagefirstaction"/>
                             <c:url value="/raop/searchcrr/page?page=last" var="pagelastaction"/>
                             <td>
-                                <ul class="pager">
-                                    <li><a href="${pagefirstaction}">First</a></li>
-                                    <li><a href="${pageprevaction}">&laquo; Previous</a></li>
-                                    <li><a href="${pagenextaction}">Next &raquo;</a></li>
-                                    <li><a href="${pagelastaction}">Last</a></li>
+                                <ul class="pagination">
+                                    <li class="page-item"><a class="page-link" href="${pagefirstaction}">First</a></li>
+                                    <li class="page-item"><a class="page-link" href="${pageprevaction}">&laquo; Previous</a></li>
+                                    <li class="page-item"><a class="page-link" href="${pagenextaction}">Next &raquo;</a></li>
+                                    <li class="page-item"><a class="page-link" href="${pagelastaction}">Last</a></li>
                                 </ul>
                             </td>
                         </c:if>

@@ -32,21 +32,21 @@
             <sec:authorize access="hasRole('ROLE_RAOP')">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">RAOP Actions</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="nav-link" href="${raOpUrl}">RAOP Home</a></li>
-                        <li><a class="nav-link" href="${pageContext.request.contextPath}/raop/searchcsr">Search <b>New/Renew</b> Signing Requests</a></li>
-                        <li><a class="nav-link" href="${pageContext.request.contextPath}/raop/searchcrr">Search <b>Revocation</b>Requests</a></li>
-                        <li><a class="nav-link" href="${pageContext.request.contextPath}/raop/searchcert">Search <b>Certificates</b></a></li>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
+                        <li><a class="dropdown-item" href="${raOpUrl}">RAOP Home</a></li>
+                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/raop/searchcsr">Search <b>New/Renew</b> Signing Requests</a></li>
+                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/raop/searchcrr">Search <b>Revocation</b> Requests</a></li>
+                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/raop/searchcert">Search <b>Certificates</b></a></li>
                     </ul>
                 </li>
             </sec:authorize>
             <sec:authorize access="hasRole('ROLE_CAOP')">
-                <li class="nav-dropdown">
+                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-bs-toggle="dropdown" aria-expanded="false">CAOP Actions</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="nav-link" href="${caOpUrl}">CAOP Home</a></li>
-                        <li><a class="nav-link" href="${pageContext.request.contextPath}/caop/exportcert"><b>Export</b> Approved Certificates</a></li>
-                        <li><a class="nav-link" href="${pageContext.request.contextPath}/caop/importcert"><b>Import</b> Signed Certificates</a></li>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown3">
+                        <li><a class="dropdown-item" href="${caOpUrl}">CAOP Home</a></li>
+                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/caop/exportcert"><b>Export</b> Approved Certificates</a></li>
+                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/caop/importcert"><b>Import</b> Signed Certificates</a></li>
                     </ul>
                 </li>
             </sec:authorize>

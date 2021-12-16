@@ -24,7 +24,7 @@
     <div class="row">
         <div class="col-offset-1">
 
-            <h2>Pending Requests for Your RA [<font class="text-info">${ra}</font>]</h2>
+            <h2>Pending Requests for Your RA [<span class="text-info">${ra}</span>]</h2>
             <h4>(RAs, please bookmark this page to view your pending requests)</h4>
             <br/>
             [<b>${fn:length(new_reqrows)}</b>] <b>NEW</b>,
