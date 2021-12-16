@@ -78,12 +78,7 @@
     <div class="row">
         <div class="col-offset-1">
             <div class="row">
-                <div class="col-10"><h2>Request New Host Certificate</h2></div>
-                <div class="col-offset-11">
-                    <a href="#" id="helpMod" style="color: inherit;">
-                        <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;"></span>
-                    </a>
-                </div>
+                <div class="col-10"><h2>Request New Host Certificate <a data-bs-toggle="modal" data-bs-target="#helpModal"><i class="bi bi-question-circle"></i></a></h2></div>
             </div>
             <ul>
                 <li>When clicking 'Submit Request' a new <abbr title="Certificate Signing Request">CSR</abbr> is

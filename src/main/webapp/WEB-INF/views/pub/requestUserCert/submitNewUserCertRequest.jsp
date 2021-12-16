@@ -72,10 +72,7 @@
 </div>
 <!-- Wrap all page content here -->
 <div id="wrap" class="container">
-    <h2>Request New User Certificate</h2>
-    <a href="#" id="helpMod" style="color: inherit;" data-bs-target="helpModal" data-bs-toggle="modal">
-        <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;">Help!</span>
-    </a>
+    <h2>Request New User Certificate <a data-bs-toggle="modal" data-bs-target="#helpModal"><i class="bi bi-question-circle"></i></a></h2>
     <ul>
         <li>When clicking 'Submit Request' a new <abbr title="Certificate Signing Request">CSR</abbr> is
             created by your <strong>browser</strong>.

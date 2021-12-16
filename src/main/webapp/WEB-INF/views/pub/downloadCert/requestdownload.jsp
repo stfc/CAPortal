@@ -76,12 +76,7 @@
 
 <div id="wrap" class="container">
     <div class="row">
-        <div class="col-10"><h2>Download Certificate</h2></div>
-        <div class="col-offset-11">
-            <a href="#" id="helpMod" style="color: inherit;">
-                <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;"></span>
-            </a>
-        </div>
+        <div class="col-10"><h2>Download Certificate <a data-bs-toggle="modal" data-bs-target="#helpModal"><i class="bi bi-question-circle"></i></a></h2></div>
     </div>
     <div>
         <c:if test="${not empty successMessage}">

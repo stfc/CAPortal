@@ -21,7 +21,7 @@
     <%--<jsp:include page="../common/styles.jsp" />--%>
     <%@ include file="../../jspf/styles.jspf" %>
     <link href="${pageContext.request.contextPath}/resources/css/messages/messages.css" rel="stylesheet"/>
-    <link href="${pageContext.request.contextPath}/resources/jquery/tablesorter/css/theme.blue.css" rel="stylesheet"/>
+    <link href="${pageContext.request.contextPath}/resources/jquery/tablesorter/css/theme.blue.min.css" rel="stylesheet"/>
 </head>
 
 <body>
