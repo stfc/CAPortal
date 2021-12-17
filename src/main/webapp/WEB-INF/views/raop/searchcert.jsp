@@ -28,17 +28,13 @@
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
 <div id="wrap" class="container">
-    <div class="row">
-        <div class="col-offset-1">
-
             <s:hasBindErrors name="searchCertFormBean_REQUESTSCOPE">
                 <div id="thesemessages" class="error">Invalid GET request search parameter</div>
             </s:hasBindErrors>
 
 
-            <form:form id="form" method="post" action="${pageContext.request.contextPath}/raop/searchcert"
-                       modelAttribute="searchCertFormBean" cssClass="form-horizontal">
-                <div class="form-group">
+            <form:form id="form" method="post" action="${pageContext.request.contextPath}/raop/searchcert" modelAttribute="searchCertFormBean" cssClass="form-horizontal">
+                <div class="col">
                     <h2 class="form-search-heading">Search for Certificates</h2>
                     <c:if test="${not empty searchOk}">
                         <div id="message" class="success">${searchOk}</div>
@@ -48,92 +44,92 @@
                             <div id="message" class="error">Form has errors</div>
                         </c:if>
                     </s:bind>
-                    <div class="col-4">
+                    <div class="col">
                         <span class="muted">
                             _ matches any single char<br/>
                             % matches a string
                         </span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Common Name Like (CN)</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:input path="name" class="form-control"
                                     placeholder="A Name"/> <form:errors
                             path="name" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Certificate RA</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:select path="ra" class="form-control">
                             <form:options items="${ralistArray}"/>
                         </form:select>
                         <form:errors path="ra" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Distinguished Name Like (DN)</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:input path="dn" class="form-control"
                                     placeholder="CN=some body,L=DL,OU=CLRC,O=eScience,C=UK"/> <form:errors
                             path="dn" cssClass="text-error"/>
                     </div>
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
-                            <strong>Data Like</strong> <font class="muted">(shown if own ROLE_CAOP)</font>
+                    <div class="row">
+                        <div class="col">
+                            <strong>Data Like</strong> <span class="muted">(shown if own ROLE_CAOP)</span>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <form:input path="data" class="form-control"/> <form:errors
                                 path="data" cssClass="text-error"/>
                         </div>
                     </div>
                 </sec:authorize>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Email Address Like</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:input path="emailAddress" class="form-control"
                                     placeholder="someone@world.com"/> <form:errors
                             path="emailAddress" cssClass="text-error"/>
                     </div>
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="row">
+                        <div class="col">
                             <strong>Email Address is Null</strong>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
-                            <form:checkbox path="searchNullEmailAddress"/>&nbsp;&nbsp;<span class="muted">(if checked,
+                        <div class="col">
+                            <form:checkbox path="searchNullEmailAddress" class="form-control"/>&nbsp;&nbsp;<span class="muted">(if checked,
                             this will override email search string above)</span>
                         </div>
                     </div>
                 </sec:authorize>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Serial Number</strong> <span class="muted" style="text-decoration: underline">(if given,
                         other search criteria are ignored)</span>&nbsp;&nbsp;
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:input path="serial" class="form-control"
                                     placeholder="1234"/> <form:errors
                             path="serial" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Role</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:select path="role" class="form-control">
                             <form:option value="all"/>
                             <form:option value="User"/>
@@ -142,11 +138,11 @@
                         </form:select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Status</strong> <span class="muted">(note, VALID Certs can be Expired)</span>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:select path="status" class="form-control">
                             <form:option value="VALID"/>
                             <form:option value="REVOKED"/>
@@ -155,19 +151,19 @@
                         </form:select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Valid Only</strong> <span class="muted">(Excludes Expired Certs)</span>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
-                        <form:checkbox path="notExpired"/>
+                    <div class="col">
+                        <form:checkbox path="notExpired" class="form-control"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row">
+                    <div class="col">
                         <strong>Results per page:</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:select path="showRowCount" class="form-control">
                             <form:option value="20"/>
                             <form:option value="50"/>
@@ -175,8 +171,8 @@
                         </form:select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-offset-3">
+                <div class="row">
+                    <div class="col">
                         <button type="submit" class="btn btn-md btn-primary">Search</button>
                     </div>
                 </div>
@@ -190,7 +186,7 @@
             </h4>
 
             <br/>
-            <div class="col-11">
+            <div class="row">
                 <table id="certResultsTable" class="tablesorter-blue"><!-- table table-hover table-condensed-->
                     <thead>
                     <tr>
@@ -211,13 +207,6 @@
                         <c:set var="count" value="${count + 1}" scope="page"/>
                         <tr>
                             <td>${sessionScope.certSearchPageHolder.row + count}</td>
-                            <!--                                    <td><a href="#" class="classLinkShowHide">Detail</a></td>-->
-                            <!--                                    <td>
-                                            <a href="#a${count}" 
-                                               onclick="showHide('div_${count}');toggleMessage('div_a${count}');">
-                                                <div id="div_a${count}">+Show Detail</div>
-                                            </a>
-                                        </td>-->
                             <td><a href="${viewcert}">${cert.cert_key}</a></td>
                             <td>${cert.cn}
                                 <a class="_showDnLink">+dn</a>
@@ -261,7 +250,7 @@
                             <td>Go to row:</td>
                             <td>
                                 <form:input path="gotoPageNumber" cssStyle="width:30px" placeholder="0"/>
-                                <button type="submit" class="btn btn-sm">Go</button>
+                                <button type="submit" class="">Go</button>
                             </td>
                         </form:form>
                         <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
