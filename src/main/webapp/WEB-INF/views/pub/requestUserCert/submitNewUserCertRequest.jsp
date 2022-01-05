@@ -72,7 +72,8 @@
 </div>
 <!-- Wrap all page content here -->
 <div id="wrap" class="container">
-    <h2>Request New User Certificate <a data-bs-toggle="modal" data-bs-target="#helpModal"><i class="bi bi-question-circle"></i></a></h2>
+    <h2>Request New User Certificate <a data-bs-toggle="modal" data-bs-target="#helpModal"><i
+            class="bi bi-question-circle"></i></a></h2>
     <ul>
         <li>When clicking 'Submit Request' a new <abbr title="Certificate Signing Request">CSR</abbr> is
             created by your <strong>browser</strong>.
@@ -94,39 +95,87 @@
        style="display: none;"></a>
 
     <form action="" class="form-horizontal" role="form">
-        <div class="form-group">
-            <label for="cnInputText">Name</label>
-            <input type="text" id="cnInputText" class="form-control" onChange="javascript:this.value=this.value.toLowerCase();" placeholder="firstname lastname"/>
-            <div class="form-text">Full name will make up the Common Name of your certificate</div>
-            <label for="raSelect">Your Institution</label>
-            <select id="raSelect" class="form-control">
-                <option selected disabled>Please Select...</option>
-                <c:forEach items="${ralistArray}" var="ra">
-                    <option>${ra}</option>
-                </c:forEach>
-            </select>
-            <div class="form-text">After applying for your certificate, you will need to visit your local/nearest institution RA and provide photo-ID</div>
-            <label for="emailInputText">e-Mail</label>
-            <input type="text" id="emailInputText" class="form-control" placeholder="some@domain.com"/>
-            <div class="form-text">You will receive an email to this address with the certificate ID/Serial number, which you will need to download your signed certificate</div>
-            <label for="pinInputText">PIN</label>
-            <input type="text" id="pinInputText" class="form-control" placeholder="memorable phrase"/>
-            <div class="form-text">You will need to quote this to your RA to prove you submitted the certificate request</div>
-            <label for="sign_up_password">Key Password</label>
-            <input type="password" id="sign_up_password" class="form-control"/>
-            <label for="sign_up_password_confirm">Confirm Password</label>
-            <input type="password" id="sign_up_password_confirm" class="form-control"/>
-            <div class="form-text">The password is used to encrypt your locally generated private key</div>
-            <br />
-            <button id="createCSRSubmit" class="btn btn-sm btn-primary">Submit Request</button>
-            <div class="form-text">This may take some time depending on your browser/computer (it generates a new public/private key-pair in your browser and sends the public key to the server)</div>
-            <br />
-            <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
+        <div class="row form-cols">
+            <div class="col">
+                <label for="cnInputText">Name</label>
+            </div>
+            <div class="col">
+                <input type="text" id="cnInputText" class="form-control"
+                       onChange="javascript:this.value=this.value.toLowerCase();" placeholder="firstname lastname"/>
+                <div class="form-text">Full name will make up the Common Name of your certificate</div>
+            </div>
+        </div>
+        <div class="row form-cols">
+            <div class="col">
+                <label for="raSelect">Your Institution</label>
+            </div>
+            <div class="col">
+                <select id="raSelect" class="form-control">
+                    <option selected disabled>Please Select...</option>
+                    <c:forEach items="${ralistArray}" var="ra">
+                        <option>${ra}</option>
+                    </c:forEach>
+                </select>
+                <div class="form-text">After applying for your certificate, you will need to visit your local/nearest
+                    institution RA and provide photo-ID
+                </div>
+            </div>
+        </div>
+        <div class="row form-cols">
+            <div class="col">
+                <label for="emailInputText">e-Mail</label>
+            </div>
+            <div class="col">
+                <input type="text" id="emailInputText" class="form-control" placeholder="some@domain.com"/>
+                <div class="form-text">You will receive an email to this address with the certificate ID/Serial number,
+                    which you will need to download your signed certificate
+                </div>
+            </div>
+        </div>
+        <div class="row form-cols">
+            <div class="col">
+                <label for="pinInputText">PIN</label>
+            </div>
+            <div class="col">
+                <input type="text" id="pinInputText" class="form-control" placeholder="memorable phrase"/>
+                <div class="form-text">You will need to quote this to your RA to prove you submitted the certificate
+                    request
+                </div>
+            </div>
+        </div>
+        <div class="row form-cols">
+            <div class="col">
+                <label for="sign_up_password">Key Password</label>
+            </div>
+            <div class="col">
+                <input type="password" id="sign_up_password" class="form-control"/>
+            </div>
+        </div>
+        <div class="row form-cols">
+            <div class="col">
+                <label for="sign_up_password_confirm">Confirm Password</label>
+            </div>
+            <div class="col">
+                <input type="password" id="sign_up_password_confirm" class="form-control"/>
+
+                <div class="form-text">The password is used to encrypt your locally generated private key</div>
+            </div>
+            <div class="row form-cols">
+                <div class="col">
+                    <button id="createCSRSubmit" class="btn btn-sm btn-primary">Submit Request</button>
+                    <div class="form-text">This may take some time depending on your browser/computer (it generates a
+                        new public/private key-pair in your browser and sends the public key to the server)
+                    </div>
+                    <br />
+                    <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
+                </div>
+            </div>
         </div>
     </form>
     <div id="responseMessage"></div>
     <a id="savetxt" class="btn btn-sm btn-primary">Save Private Key As Text File</a>
-    <label for="csrTextArea"></label><textarea id="csrTextArea" style="width: 900px; height: 200px;" readonly aria-readonly="true"></textarea>
+    <label for="csrTextArea"></label><textarea id="csrTextArea" style="width: 900px; height: 200px;" readonly
+                                               aria-readonly="true"></textarea>
 </div>
 
 <!-- footer includes shared .js files -->

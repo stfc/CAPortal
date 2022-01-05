@@ -119,23 +119,23 @@
                    style="display: none;"></a>
 
                 <form action="" class="form-horizontal" role="form">
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="row form-cols">
+                        <div class="col">
                                 <label for="cnInputText">Hostname</label>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="text" id="cnInputText" class="form-control" placeholder="some.dnsname.ac.uk"
                                    onChange="javascript:this.value=this.value.toLowerCase();"/>
                             <span></span>
                             <div class="form-text">Hostname will make up the Common Name of your host certificate</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="row form-cols">
+                        <div class="col">
                             <label for="raSelect">Your RA</label>
                             <span class="muted">(Registration Authority)</span>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <select id="raSelect" class="form-control">
                                 <option selected disabled>Please Select, your RA is shown first below for
                                     convenience...
@@ -147,46 +147,46 @@
                             <div class="form-text">The RA defines the certificate Locality and Org name</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="row form-cols">
+                        <div class="col">
                             <label for="emailInputText">e-Mail</label>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="text" id="emailInputText" class="form-control"
                                    placeholder="some@domain.com"/><span></span>
                             <div class="form-text">You will receive an email to this address with the certificate ID/Serial number, which you will need to download your signed certfiicate</div>
                         </div>
 
                     </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="row form-cols">
+                        <div class="col">
                             <label for="pinInputText">PIN</label>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="text" id="pinInputText" class="form-control"
                                    placeholder="memorable phrase"/><span></span>
                             <div class="form-text">For host cert requests, you may need to quote this to your RA to prove you submitted the CSR (usually not required)</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="row form-cols">
+                        <div class="col">
                             <label for="sign_up_password">Key Password</label>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="password" id="sign_up_password" class="form-control"/><span></span>
                             <div class="form-text">The password is used to encrypt your locally generated private key</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="row form-cols">
+                        <div class="col">
                             <label for="sign_up_password_confirm">Confirm Password</label>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="password" id="sign_up_password_confirm" class="form-control"/><span></span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-offset-3 col-8">
+                    <div class="row form-cols">
+                        <div class="col">
                             <a id="createCSRSubmit" class="btn btn-sm btn-primary">
                                 Submit Request
                             </a><br />

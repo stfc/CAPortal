@@ -105,7 +105,7 @@
                     <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcrr/approve"
                                modelAttribute="crr">
                         <form:hidden path="crr_key"/>
-                        <button type="submit" class="btn btn-small"
+                        <button type="submit" class="btn btn-light"
                                 onclick="return confirm('Are you sure you want to approve this certificate revocation request?');">
                             Approve Revocation Request
                         </button>

@@ -51,7 +51,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Common Name Like (CN)</strong>
                     </div>
@@ -61,7 +61,7 @@
                             path="name" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Certificate RA</strong>
                     </div>
@@ -72,7 +72,7 @@
                         <form:errors path="ra" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Distinguished Name Like (DN)</strong>
                     </div>
@@ -83,7 +83,7 @@
                     </div>
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
-                    <div class="row">
+                    <div class="row form-cols">
                         <div class="col">
                             <strong>Data Like</strong> <span class="muted">(shown if own ROLE_CAOP)</span>
                         </div>
@@ -93,7 +93,7 @@
                         </div>
                     </div>
                 </sec:authorize>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Email Address Like</strong>
                     </div>
@@ -104,17 +104,18 @@
                     </div>
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
-                    <div class="row">
+                    <div class="row form-cols">
                         <div class="col">
                             <strong>Email Address is Null</strong>
                         </div>
                         <div class="col">
-                            <form:checkbox path="searchNullEmailAddress" class="form-control"/>&nbsp;&nbsp;<span class="muted">(if checked,
+                            <form:checkbox path="searchNullEmailAddress" />
+                            <span class="muted">(if checked,
                             this will override email search string above)</span>
                         </div>
                     </div>
                 </sec:authorize>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Serial Number</strong> <span class="muted" style="text-decoration: underline">(if given,
                         other search criteria are ignored)</span>&nbsp;&nbsp;
@@ -125,7 +126,7 @@
                             path="serial" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Role</strong>
                     </div>
@@ -138,7 +139,7 @@
                         </form:select>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Status</strong> <span class="muted">(note, VALID Certs can be Expired)</span>
                     </div>
@@ -151,15 +152,15 @@
                         </form:select>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Valid Only</strong> <span class="muted">(Excludes Expired Certs)</span>
                     </div>
                     <div class="col">
-                        <form:checkbox path="notExpired" class="form-control"/>
+                        <form:checkbox path="notExpired"/>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <strong>Results per page:</strong>
                     </div>
@@ -171,7 +172,7 @@
                         </form:select>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row form-cols">
                     <div class="col">
                         <button type="submit" class="btn btn-md btn-primary">Search</button>
                     </div>

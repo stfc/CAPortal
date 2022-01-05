@@ -29,7 +29,7 @@
 <!-- Wrap all page content here -->
 <div id="wrap" class="container">
     <div class="row">
-        <div class="col-offset-1">
+        <div class="col">
 
             <s:hasBindErrors name="searchCrrFormBean_REQUESTSCOPE">
                 <div id="thesemessages" class="error">Invalid GET request search parameter</div>
@@ -58,22 +58,22 @@
                         </font>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row form-cols">
+                    <div class="col">
                         <strong>For RA</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:select path="ra" class="form-control">
                             <form:options items="${ralistArray}"/>
                         </form:select>
                         <form:errors path="ra" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row form-cols">
+                    <div class="col">
                         <strong>Type</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:select path="status" class="form-control">
                             <form:option value="NEW"/>
                             <form:option value="ARCHIVED"/>
@@ -84,52 +84,52 @@
                         <form:errors path="status" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row form-cols">
+                    <div class="col">
                         <strong>Common Name Like (CN)</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:input path="name" placeholder="A Name" class="form-control"/>
                         <form:errors path="name" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row form-cols">
+                    <div class="col">
                         <strong>Distinguished Name Like (DN)</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:input path="dn" placeholder="CN=some body,L=DL,OU=CLRC,O=eScience,C=UK"
                                     class="form-control"/>
                         <form:errors path="dn" cssClass="text-error"/>
                     </div>
                 </div>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="row form-cols">
+                        <div class="col">
                             <strong>Data Like</strong> <font class="muted">(shown if own ROLE_CAOP)</font>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <form:input path="data" placeholder="CWIZPIN" class="form-control"/>
                             <form:errors path="data" cssClass="text-error"/>
                         </div>
                     </div>
                 </sec:authorize>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row form-cols">
+                    <div class="col">
                         <strong>Serial</strong> <font class="muted" style="text-decoration: underline">
                         (if given, all other
                         search criteria are ignored)</font>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:input path="crr_key" placeholder="1234" class="form-control"/>
                         <form:errors path="crr_key" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-lg-3">
+                <div class="row form-cols">
+                    <div class="col">
                         <strong>Results per page:</strong>
                     </div>
-                    <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                    <div class="col">
                         <form:select path="showRowCount" class="form-control">
                             <form:option value="20"/>
                             <form:option value="50"/>
@@ -137,8 +137,8 @@
                         </form:select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-offset-3">
+                <div class="row form-cols">
+                    <div class="col">
                         <button type="submit" class="btn btn-md btn-primary">Search</button>
                     </div>
                 </div>
@@ -208,7 +208,7 @@
                             <td>Go to row:</td>
                             <td>
                                 <form:input path="gotoPageNumber" cssStyle="width:30px" placeholder="0"/>
-                                <button type="submit" class="btn btn-small">Go</button>
+                                <button type="submit" class="btn btn-light">Go</button>
                             </td>
                         </form:form>
                         <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>

@@ -96,7 +96,7 @@
                     </tbody>
                 </table>
                 <sec:authorize access="hasRole('ROLE_CAOP')">
-                    <button type="submit" class="btn btn-small btn-primary">Submit Changes</button>
+                    <button type="submit" class="btn btn-light btn-primary">Submit Changes</button>
                 </sec:authorize>
 
             </form:form>

@@ -69,6 +69,10 @@
     code {
         font-size: 80%;
     }
+
+    .form-cols {
+        padding: 5px;
+    }
 </style>
 
 
