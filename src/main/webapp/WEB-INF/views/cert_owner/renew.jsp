@@ -1,18 +1,21 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%@page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Cert Renew</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="Renew certificate page for UK CA certificate owners"/>
     <meta name="author" content="David Meredith"/>
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <!-- default header name is X-CSRF-TOKEN -->
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <%@ include file="../../jspf/styles.jspf" %>
     <link href="${pageContext.request.contextPath}/resources/css/messages/messages.css" rel="stylesheet"/>
 </head>
@@ -315,6 +318,9 @@
         var csrTextAreaVal;
         var dataPostEncodedVal;
 
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
         postTarget = $("#postLinkViaClient");
         var pem = createCSR(cn, ou, loc, o, c, pw);
         csrTextAreaVal = pem.privateKey + pem.csr;
@@ -324,6 +330,7 @@
         $.ajax({
             type: "POST", url: postTarget.attr("href"),
             data: dataPostEncodedVal,
+            headers: {"X-CSRF-TOKEN": token},
             success: function (text) {
                 if (text.substring(0, 7) === "SUCCESS") {
                     MvcUtil.showSuccessResponse('SUCCESS - Next steps:' +

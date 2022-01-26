@@ -1,4 +1,3 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
 <%--<%@ page session="false"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -6,12 +5,11 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 
-<!DOCTYPE html>
+<!doctype html>
 
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Download Certificate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -76,7 +74,8 @@
 
 <div id="wrap" class="container">
     <div class="row">
-        <div class="col-10"><h2>Download Certificate <a data-bs-toggle="modal" data-bs-target="#helpModal"><i class="bi bi-question-circle"></i></a></h2></div>
+        <div class="col-10"><h2>Download Certificate <a data-bs-toggle="modal" data-bs-target="#helpModal"><i
+                class="bi bi-question-circle"></i></a></h2></div>
     </div>
     <div>
         <c:if test="${not empty successMessage}">
@@ -100,6 +99,7 @@
             <form:form id="requestCertForm" method="post"
                        action="${pageContext.request.contextPath}/pub/downloadCert/requestdownload"
                        modelAttribute="requestDownloadCertFormBean" cssClass="form-horizontal">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 <div>
                     <s:bind path="*">
                         <c:if test="${status.error}">
@@ -107,23 +107,25 @@
                         </c:if>
                     </s:bind>
                 </div>
-                <div class="col-3 col-lg-2">
-                    <strong>Certificate Serial Number</strong>
+                <div class="row form-cols">
+                    <div class="col">
+                        Certificate Serial Number
+                    </div>
+                    <div class="col">
+                        <form:input id="certId" class="form-control" path="certId" placeholder="12345"/>
+                        <form:errors path="certId" cssClass="text-error"/>
+                    </div>
                 </div>
-                <div class="col-8 col-sm-6 col-md-5 col-lg-3">
-                    <form:input id="certId" class="form-control" path="certId" placeholder="12345"/>
-                    <span></span>
-                    <form:errors path="certId" cssClass="text-error"/>
+                <div class="row form-cols">
+                    <div class="col">
+                        Certificate Email Address
+                    </div>
+                    <div class="col">
+                        <form:input id="email" class="form-control" path="email" placeholder="some.body@world.com"/>
+                        <form:errors path="email" cssClass="text-error"/>
+                    </div>
                 </div>
-                <div class="col-3 col-lg-2">
-                    <strong>Certificate Email Address</strong>
-                </div>
-                <div class="col-8 col-sm-6 col-md-5 col-lg-3">
-                    <form:input id="email" class="form-control" path="email" placeholder="some.body@world.com"/>
-                    <span></span>
-                    <form:errors path="email" cssClass="text-error"/>
-                </div>
-                <br />
+                <br/>
                 <button id="submitButton" type="submit" class="btn btn-sm btn-primary">
                     Download Certificate
                 </button>
@@ -214,7 +216,8 @@
                                     <li>This file was saved when applying for the certificate using this
                                         portal
                                     </li>
-                                    <li>Your key and password are <strong>NEVER</strong> sent over to the server - we use local JavaScript that runs in your browser to create the .p12 file
+                                    <li>Your key and password are <strong>NEVER</strong> sent over to the server - we
+                                        use local JavaScript that runs in your browser to create the .p12 file
                                     </li>
                                 </ul>
                             </div>
@@ -242,7 +245,8 @@
                     </tr>
                     <tr>
                         <td class="text-nowrap">
-                            <img src="${pageContext.request.contextPath}/resources/images/number3.png" alt="number 3" style="width: 100px; height: 100px;"/>Click 'Save Certificate' button
+                            <img src="${pageContext.request.contextPath}/resources/images/number3.png" alt="number 3"
+                                 style="width: 100px; height: 100px;"/>Click 'Save Certificate' button
                         </td>
                         <td>
                             <div>

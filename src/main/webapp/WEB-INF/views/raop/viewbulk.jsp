@@ -1,15 +1,15 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%@ page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>View Bulk</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -39,17 +39,16 @@
                 <strong><a href="#" id="selall">Select / Deselect All</a></strong>
             </div>
             <form:form method="post" modelAttribute="bulkView">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 <table id="bulkTab" class="table table-hover tablesorter-blue">
                     <thead>
                     <tr>
-                        <th><strong>#</strong></th>
-                        <th><strong>Serial:</strong></th>
-                        <th><strong>Common Name:</strong></th>
-                        <th><strong>Distinguished Name:</strong></th>
-                        <th><strong>Status:</strong></th>
-                        <th class="sorter-false"><strong>Select/Deselect</strong></th>
-                        <!--                                    <th class="sorter-false"><strong>Approve</strong></th>
-                                                            <th class="sorter-false"><strong>Delete</strong></th>-->
+                        <th>#</th>
+                        <th>Serial:</th>
+                        <th>Common Name:</th>
+                        <th>Distinguished Name:</th>
+                        <th>Status:</th>
+                        <th class="sorter-false">Select/Deselect</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -77,15 +76,9 @@
                                                             rowWrapper.requestRow.status =='APPROVED'}">
                                     <td style="text-align:center"><form:checkbox
                                             path="rows[${status.index}].checked"/></td>
-                                    <!-- <td><input type="submit" class="btn btn-sm btn-primary" value="Approve"
-                                    onclick="return confirm('Are you sure you want to approve certificate?');"
-                                    formaction="${pageContext.request.contextPath}/raop/viewbulk/approveSingle"/>
-                                    </td>
-                                    <td><button type="button" class="btn btn-sm btn-danger">Delete</button></td>-->
                                 </c:when>
                                 <c:otherwise>
                                     <td>No action allowed</td>
-                                    <!--<td>No action</td><td>No action</td>-->
                                 </c:otherwise>
                             </c:choose>
                         </tr>

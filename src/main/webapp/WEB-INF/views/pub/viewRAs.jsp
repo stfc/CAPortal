@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%--<%@ page session="false"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -6,11 +6,11 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>View RA List</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -47,7 +47,7 @@
                 </p> <br/>
             </sec:authorize>
 
-            <%--<h5>RA List last refreshed: &nbsp;(${sessionScope.lastRalistSearchDate_session})</h5>--%>
+            <%--<h5>RA List last refreshed: (${sessionScope.lastRalistSearchDate_session})</h5>--%>
             <div class="col-11">
 
                 <table class="table table-hover table-condensed">
@@ -87,7 +87,7 @@
 </div> <!-- /span -->
 
 
-<%--<jsp:include page="../common/footer.jsp" />--%>
+
 <%@ include file="../../jspf/footer.jspf" %>
 </body>
 </html>

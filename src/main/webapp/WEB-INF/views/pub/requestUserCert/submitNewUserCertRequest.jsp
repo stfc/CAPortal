@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 
 <%--<%@ page session="false"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -7,18 +7,21 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 
-<!DOCTYPE html>
+<!doctype html>
 
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Submit New User Certificate Request</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="Page for requesting new user certs for public."/>
     <meta name="author" content="David Meredith"/>
     <meta name="author" content="Sam Worley"/>
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <!-- default header name is X-CSRF-TOKEN -->
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <!-- Styles -->
     <%@ include file="../../../jspf/styles.jspf" %>
     <link href="${pageContext.request.contextPath}/resources/css/messages/messages.css" rel="stylesheet"/>
@@ -95,6 +98,7 @@
        style="display: none;"></a>
 
     <form action="" class="form-horizontal" role="form">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <div class="row form-cols">
             <div class="col">
                 <label for="cnInputText">Name</label>
@@ -289,6 +293,9 @@
         var csrTextAreaVal;
         var dataPostEncodedVal;
 
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
         postTarget = $("#postLinkCsr");
         var pem = createCSR(cn, ou, loc, o, c, pw);
         csrTextAreaVal = pem.privateKey + pem.csr;
@@ -301,6 +308,7 @@
         $.ajax({
             type: "POST", url: postTarget.attr("href"),
             data: dataPostEncodedVal,
+            headers: {"X-CSRF-TOKEN": token},
             success: function (text) {
                 if (text.substring(0, 7) === "SUCCESS") {
                     MvcUtil.showSuccessResponse('SUCCESS - Next steps:' +

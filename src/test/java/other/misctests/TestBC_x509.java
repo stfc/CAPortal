@@ -14,6 +14,7 @@ package other.misctests;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import org.junit.After;
@@ -59,7 +60,7 @@ public class TestBC_x509 {
          //byte[] pembytes = obj.getContent();
          
          CertificateFactory cf = CertificateFactory.getInstance("X.509");
-         InputStream is = new ByteArrayInputStream(x509Pem.getBytes("UTF-8"));
+         InputStream is = new ByteArrayInputStream(x509Pem.getBytes(StandardCharsets.UTF_8));
          X509Certificate certObj = (X509Certificate) cf.generateCertificate(is);
          //System.out.println(certObj.getSubjectDN().getName()); 
          assertEquals("CN=david ra meredith, L=DL, OU=CLRC, O=eScienceDev, C=UK", certObj.getSubjectDN().getName()); 

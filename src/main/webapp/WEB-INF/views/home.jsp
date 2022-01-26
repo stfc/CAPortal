@@ -1,11 +1,11 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%@page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Public Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>

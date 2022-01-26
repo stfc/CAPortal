@@ -187,7 +187,7 @@ public class CsrManagerService {
             return this.jdbcRequestDao.updateRequestRow(csr);
 
         } else {
-            String detail = "serial: [" + csr.getReq_key() + "] newStatus: [" + newStatus.toString() + "] current csrStatus: [" + currentCsrStatus + "]";
+            String detail = "serial: [" + csr.getReq_key() + "] newStatus: [" + newStatus + "] current csrStatus: [" + currentCsrStatus + "]";
             throw new IllegalCsrStateTransition("Invalid status transition for CSR: " + detail);
         }
     }

@@ -1,16 +1,16 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%@page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<!DOCTYPE html>
+<!doctype html>
 
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Revoke Certificate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -104,6 +104,7 @@
                     <form:form method="post"
                                action="${pageContext.request.contextPath}/cert_owner/revoke"
                                modelAttribute="revokeCertFormBean">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                         <div class="col-8 col-lg-5">
 
                             <input name="cert_key" type="hidden"

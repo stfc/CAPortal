@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -6,8 +5,8 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -36,7 +35,7 @@
 <!-- Wrap all page content here -->
 <div id="wrap" class="container">
     <div class="row">
-        <div class="col-offset-1">
+        <div class="col">
             <h2>View Certificate</h2>
             <c:if test="${errorMessage != null}">
                 <div id="message" class="error">${errorMessage}</div>
@@ -58,7 +57,6 @@
             </c:if>
             <h4>Last Page Refresh: (${lastViewRefreshDate})</h4>
             <br/>
-            <div class="col-11 col-lg-10">
                 <table class="table table-hover table-condensed">
                     <thead>
                     <tr>
@@ -98,6 +96,7 @@
                         <td><a href="mailto:${cert.email}" id="currEmail">${cert.email}</a>
                             <form:form method="post"
                                        action="${pageContext.request.contextPath}/raop/viewcert/rachangemail">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                 <div id="inputEmail">
                                     <input id="emailInputText" name="email" value="${cert.email}"/><span></span>
                                 </div>
@@ -179,11 +178,12 @@
                 <c:if test="${canRevokeCert}">
                 <!-- Only home RA or CAOP can do full revoke -->
                 <c:if test="${viewerCanFullRevoke}">
-                    <div class="form-group">
+                    <div class="row form-cols">
                         <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcert/fullrevoke"
                                    modelAttribute="revokeCertFormBean">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                             <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
-                            <div class="col-7">
+                            <div class="col">
                                 <form:input path="reason" class="form-control"
                                             placeholder="Reason to revoke (value is required)"/>
                             </div>
@@ -193,7 +193,7 @@
                             </button>
                         </form:form>
                     </div>
-                    <div class="col-11">
+                    <div class="col">
                         (Certificate will be <b>SUSPENDED</b> and an <b>APPROVED</b> revocation
                         request will be created)
                     </div>
@@ -202,16 +202,17 @@
 
                 <!-- Any RA/CAOP can request a revoke -->
                 <c:if test="${!viewerCanFullRevoke}">
-                <div class="form-group">
+                <div class="row form-cols">
                     <form:form method="post"
                                action="${pageContext.request.contextPath}/raop/viewcert/requestrevoke"
                                modelAttribute="revokeCertFormBean">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                         <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
-                        <div class="col-7 col-md-4 col-lg-3">
+                        <div class="col">
                             <form:input path="reason" class="form-control"
                                         placeholder="Reason to revoke (value is required)"/>
                         </div>
-                        <div class="col-1 col-lg-1">
+                        <div class="col">
                             <button type="submit" class="btn btn-sm btn-primary"
                                     onclick="return confirm('Are you sure you want to request revocation of this certificate?');">
                                 Request Revocation
@@ -220,7 +221,7 @@
                     </form:form>
                 </div>
 
-                <p class="col-11">
+                <p class=col">
                     (Certificate will be <b>SUSPENDED</b> and a <b>NEW</b>
                     revocation request will be created)</p>
             </div>
@@ -238,9 +239,10 @@
                     <div>
                         <form:form method="post"
                                    action="${pageContext.request.contextPath}/raop/viewcert/changerole">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                             <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
-                            <div class="row">
-                                <div class="col-md-2">
+                            <div class="row form-cols">
+                                <div class="col">
                                     <select name="operation" style="width: 150px; height: 35px">
                                         <c:if test="${canPromote}">
                                             <option selected value="promote">
@@ -255,9 +257,8 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-10">
+                                <div class="col">
                                     <button type="submit" class="btn btn-sm btn-primary"
-
                                             onclick="return confirm('Are you sure you want to perform this application?');">
                                         Apply
                                     </button>
@@ -268,7 +269,7 @@
                 </div>
             </c:if>
         </div>
-        <div class="col-11 col-md-9 col-lg-8">
+        <div class="col">
             <br/>
             <h4>Data</h4>
             <textarea rows="15" class="form-control" readonly="readonly">${cert.data}</textarea>
@@ -277,7 +278,7 @@
     </div>
 </div>
 
-<%--<jsp:include page="../common/footer.jsp" />--%>
+
 <%@ include file="../../jspf/footer.jspf" %>
 <script type="text/javascript">
     function emailValid() {

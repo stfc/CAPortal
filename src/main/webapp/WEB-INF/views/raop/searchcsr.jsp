@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%--<%@ page session="false"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -7,11 +7,11 @@
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Search CSRs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -37,6 +37,7 @@
 
             <form:form id="form" method="post" action="${pageContext.request.contextPath}/raop/searchcsr"
                        modelAttribute="searchCsrFormBean" cssClass="form-horizontal">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 <div class="row form-cols">
                     <h2 class="form-search-heading">Search Signing Requests (CSRs)</h2>
                     <br/>
@@ -52,7 +53,7 @@
                         </c:if>
                     </s:bind>
                     <div class="col-4">
-                        <font class="muted">
+                        <span class="muted">
                             _ matches any single char<br/>
                             % matches a string
                         </font>
@@ -60,7 +61,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>For RA</strong>
+                        For RA
                     </div>
                     <div class="col">
                         <form:select path="ra" class="form-control">
@@ -71,7 +72,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Type</strong>
+                        Type
                     </div>
                     <div class="col">
                         <form:select path="status" class="form-control">
@@ -88,7 +89,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Common Name Like (CN)</strong>
+                        Common Name Like (CN)
                     </div>
                     <div class="col">
                         <form:input path="name" placeholder="A Name" class="form-control"/>
@@ -97,7 +98,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Distinguished Name Like (DN)</strong>
+                        Distinguished Name Like (DN)
                     </div>
                     <div class="col">
                         <form:input path="dn" placeholder="CN=some body,L=DL,OU=CLRC,O=eScience,C=UK"
@@ -108,7 +109,7 @@
                 <sec:authorize access="hasRole('ROLE_CAOP')">
                     <div class="row form-cols">
                         <div class="col">
-                            <strong>Data Like</strong> <font class="muted">(shown if own ROLE_CAOP)</font>
+                            Data Like <span class="muted">(shown if own ROLE_CAOP)</span>
                         </div>
                         <div class="col">
                             <form:input path="data" placeholder="CWIZPIN" class="form-control"/>
@@ -118,7 +119,7 @@
                 </sec:authorize>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Email Address Like</strong>
+                        Email Address Like
                     </div>
                     <div class="col">
                         <form:input path="emailAddress" class="form-control"
@@ -129,20 +130,20 @@
                 <sec:authorize access="hasRole('ROLE_CAOP')">
                     <div class="row form-cols">
                         <div class="col">
-                            <strong>Email Address is Null</strong>
+                            Email Address is Null
                         </div>
                         <div class="col">
                             <form:checkbox path="searchNullEmailAddress"/>
-                            <font class="muted">(if checked, this will override email search string above)</font>
+                            <span class="muted">(if checked, this will override email search string above)</span>
                         </div>
                     </div>
                 </sec:authorize>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Serial</strong>
-                        <font class="muted" style="text-decoration: underline">
+                        Serial
+                        <span class="muted" style="text-decoration: underline">
                             (if given, all other search criteria are ignored)
-                        </font>
+                        </span>
                     </div>
                     <div class="col">
                         <form:input path="req_key" placeholder="1234" class="form-control"/>
@@ -151,7 +152,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Results per page:</strong>
+                        Results per page:
                     </div>
                     <div class="col">
                         <form:select path="showRowCount" class="form-control">
@@ -171,7 +172,7 @@
 
             <h4>CSR Results (total = ${sessionScope.csrSearchPageHolder.totalRows}
                 <c:if test="${sessionScope.lastCSRSearchDate_session != null}">
-                    ,&nbsp;${sessionScope.lastCSRSearchDate_session}
+                    ,${sessionScope.lastCSRSearchDate_session}
                 </c:if>)
             </h4>
 
@@ -222,25 +223,26 @@
                     <tr>
                         <td>
                             <c:if test="${sessionScope.csrSearchPageHolder.totalRows == 0}">
-                                Showing:&nbsp;[<b>0</b>]
+                                Showing:[<b>0</b>]
                             </c:if>
                             <c:if test="${sessionScope.csrSearchPageHolder.totalRows != 0}">
-                                Showing:&nbsp;[<b>${sessionScope.csrSearchPageHolder.row+1}</b>] <!--zero offset list -->
+                                Showing:[<b>${sessionScope.csrSearchPageHolder.row+1}</b>] <!--zero offset list -->
                             </c:if>
                             to
                             [<b>${sessionScope.csrSearchPageHolder.row + fn:length(sessionScope.csrSearchPageHolder.source)}</b>]
                             of [<b>${sessionScope.csrSearchPageHolder.totalRows}</b>]
                         </td>
-                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
                         <td>Go to row:</td>
                         <td>
                             <form:form method="post" action="${pageContext.request.contextPath}/raop/searchcsr/goto"
                                        modelAttribute="gotoPageFormBean">
                                 <form:input path="gotoPageNumber" cssStyle="width:30px" placeholder="0"/>
-                                <button type="submit" class="btn btn-sm">Go</button>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                <button type="submit" class="btn btn-secondary">Go</button>
                             </form:form>
                         </td>
-                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
                         <c:if test="${fn:length(sessionScope.csrSearchPageHolder.source) > 0}">
                         <c:url value="/raop/searchcsr/page?page=next" var="pagenextaction"/>
                         <c:url value="/raop/searchcsr/page?page=prev" var="pageprevaction"/>
@@ -263,7 +265,7 @@
 </div>
 
 
-<%--<jsp:include page="../common/footer.jsp" />--%>
+
 <%@ include file="../../jspf/footer.jspf" %>
 <script type="text/javascript"
         src="${pageContext.request.contextPath}/resources/jquery/tablesorter/js/jquery.tablesorter.min.js"></script>

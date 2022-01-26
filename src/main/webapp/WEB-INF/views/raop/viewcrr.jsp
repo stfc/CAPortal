@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%--<%@ page session="false"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -6,8 +6,8 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -94,7 +94,8 @@
                     <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcrr/delete"
                                modelAttribute="crr">
                         <form:hidden path="crr_key"/>
-                        <button type="submit" class="btn btn-sm"
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        <button type="submit" class="btn btn-secondary"
                                 onclick="return confirm('Are you sure you want to delete this certificate revocation request?');">
                             Delete Revocation Request
                         </button>
@@ -105,6 +106,7 @@
                     <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcrr/approve"
                                modelAttribute="crr">
                         <form:hidden path="crr_key"/>
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                         <button type="submit" class="btn btn-light"
                                 onclick="return confirm('Are you sure you want to approve this certificate revocation request?');">
                             Approve Revocation Request
@@ -123,7 +125,7 @@
 
 
 </div>
-<%--<jsp:include page="../common/footer.jsp" />--%>
+
 <%@ include file="../../jspf/footer.jspf" %>
 </body>
 </html>

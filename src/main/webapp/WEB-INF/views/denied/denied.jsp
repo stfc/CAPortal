@@ -1,6 +1,6 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%@ page session="false" %>
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>

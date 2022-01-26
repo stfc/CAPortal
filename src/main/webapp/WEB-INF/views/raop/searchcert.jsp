@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%--<%@ page session="false"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -7,11 +7,11 @@
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Search Certificate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -34,6 +34,7 @@
 
 
             <form:form id="form" method="post" action="${pageContext.request.contextPath}/raop/searchcert" modelAttribute="searchCertFormBean" cssClass="form-horizontal">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 <div class="col">
                     <h2 class="form-search-heading">Search for Certificates</h2>
                     <c:if test="${not empty searchOk}">
@@ -53,7 +54,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Common Name Like (CN)</strong>
+                        Common Name Like (CN)
                     </div>
                     <div class="col">
                         <form:input path="name" class="form-control"
@@ -63,7 +64,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Certificate RA</strong>
+                        Certificate RA
                     </div>
                     <div class="col">
                         <form:select path="ra" class="form-control">
@@ -74,7 +75,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Distinguished Name Like (DN)</strong>
+                        Distinguished Name Like (DN)
                     </div>
                     <div class="col">
                         <form:input path="dn" class="form-control"
@@ -85,7 +86,7 @@
                 <sec:authorize access="hasRole('ROLE_CAOP')">
                     <div class="row form-cols">
                         <div class="col">
-                            <strong>Data Like</strong> <span class="muted">(shown if own ROLE_CAOP)</span>
+                            Data Like <span class="muted">(shown if own ROLE_CAOP)</span>
                         </div>
                         <div class="col">
                             <form:input path="data" class="form-control"/> <form:errors
@@ -95,7 +96,7 @@
                 </sec:authorize>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Email Address Like</strong>
+                        Email Address Like
                     </div>
                     <div class="col">
                         <form:input path="emailAddress" class="form-control"
@@ -106,7 +107,7 @@
                 <sec:authorize access="hasRole('ROLE_CAOP')">
                     <div class="row form-cols">
                         <div class="col">
-                            <strong>Email Address is Null</strong>
+                            Email Address is Null
                         </div>
                         <div class="col">
                             <form:checkbox path="searchNullEmailAddress" />
@@ -117,8 +118,8 @@
                 </sec:authorize>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Serial Number</strong> <span class="muted" style="text-decoration: underline">(if given,
-                        other search criteria are ignored)</span>&nbsp;&nbsp;
+                        Serial Number <span class="muted" style="text-decoration: underline">(if given,
+                        other search criteria are ignored)</span>
                     </div>
                     <div class="col">
                         <form:input path="serial" class="form-control"
@@ -128,7 +129,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Role</strong>
+                        Role
                     </div>
                     <div class="col">
                         <form:select path="role" class="form-control">
@@ -141,7 +142,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Status</strong> <span class="muted">(note, VALID Certs can be Expired)</span>
+                        Status <span class="muted">(note, VALID Certs can be Expired)</span>
                     </div>
                     <div class="col">
                         <form:select path="status" class="form-control">
@@ -150,11 +151,12 @@
                             <form:option value="SUSPENDED"/>
                             <form:option value="all"/>
                         </form:select>
+
                     </div>
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Valid Only</strong> <span class="muted">(Excludes Expired Certs)</span>
+                        Valid Only <span class="muted">(Excludes Expired Certs)</span>
                     </div>
                     <div class="col">
                         <form:checkbox path="notExpired"/>
@@ -162,7 +164,7 @@
                 </div>
                 <div class="row form-cols">
                     <div class="col">
-                        <strong>Results per page:</strong>
+                        Results per page:
                     </div>
                     <div class="col">
                         <form:select path="showRowCount" class="form-control">
@@ -182,7 +184,7 @@
 
             <h4>Certificate Results (total = ${sessionScope.certSearchPageHolder.totalRows}
                 <c:if test="${sessionScope.lastCertSearchDate_session != null}">
-                    ,&nbsp;${sessionScope.lastCertSearchDate_session}
+                    ,${sessionScope.lastCertSearchDate_session}
                 </c:if>)
             </h4>
 
@@ -236,25 +238,25 @@
                     <tr>
                         <td>
                             <c:if test="${sessionScope.certSearchPageHolder.totalRows == 0}">
-                                Showing:&nbsp;[<b>0</b>]
+                                Showing:[<b>0</b>]
                             </c:if>
                             <c:if test="${sessionScope.certSearchPageHolder.totalRows > 0}">
-                                Showing:&nbsp;[<b>${sessionScope.certSearchPageHolder.row+1}</b>]
+                                Showing:[<b>${sessionScope.certSearchPageHolder.row+1}</b>]
                             </c:if>
                             to
                             [<b>${sessionScope.certSearchPageHolder.row + fn:length(sessionScope.certSearchPageHolder.source)}</b>]
                             of [<b>${sessionScope.certSearchPageHolder.totalRows}</b>] <!--zero offset list -->
                         </td>
-                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
                         <form:form method="post" action="${pageContext.request.contextPath}/raop/searchcert/goto"
                                    modelAttribute="gotoPageFormBean">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                             <td>Go to row:</td>
                             <td>
                                 <form:input path="gotoPageNumber" cssStyle="width:30px" placeholder="0"/>
-                                <button type="submit" class="">Go</button>
+                                <button type="submit" class="btn btn-secondary">Go</button>
                             </td>
                         </form:form>
-                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                         <c:if test="${fn:length(sessionScope.certSearchPageHolder.source) > 0}">
                             <c:url value="/raop/searchcert/page?page=next" var="pagenextaction"/>
                             <c:url value="/raop/searchcert/page?page=prev" var="pageprevaction"/>
@@ -277,7 +279,7 @@
 </div> <!-- /span -->
 
 
-<%--<jsp:include page="../common/footer.jsp" />--%>
+
 <%@ include file="../../jspf/footer.jspf" %>
 <script type="text/javascript"
         src="${pageContext.request.contextPath}/resources/jquery/tablesorter/js/jquery.tablesorter.min.js"></script>

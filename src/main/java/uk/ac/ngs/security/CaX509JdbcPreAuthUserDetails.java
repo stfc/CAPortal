@@ -67,7 +67,7 @@ public class CaX509JdbcPreAuthUserDetails implements AuthenticationUserDetailsSe
             return new CaUser(dn, true, true, true, true, auths, cr);
         }
         log.info("Auth request END - FAIL");
-        throw new UsernameNotFoundException("User Not found [" + dn + "] [" + serial.toString() + "]");
+        throw new UsernameNotFoundException("User Not found [" + dn + "] [" + serial + "]");
     }
 
 
