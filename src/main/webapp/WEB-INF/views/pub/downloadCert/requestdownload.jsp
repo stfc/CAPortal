@@ -107,7 +107,7 @@
                         </c:if>
                     </s:bind>
                 </div>
-                <div class="row form-cols">
+                <div class="form-group form-cols">
                     <div class="col">
                         Certificate Serial Number
                     </div>
@@ -116,7 +116,7 @@
                         <form:errors path="certId" cssClass="text-error"/>
                     </div>
                 </div>
-                <div class="row form-cols">
+                <div class="form-group form-cols">
                     <div class="col">
                         Certificate Email Address
                     </div>
@@ -168,7 +168,7 @@
                         <td>Status</td>
                         <td><b>
                             <c:if test="${cert.status == 'VALID'}">
-                                <font color="green">${cert.status}</font>
+                                <span class="text-success">${cert.status}</font>
                             </c:if>
                             <c:if test="${cert.status != 'VALID'}">
                                 <font color="red">${cert.status}</font>

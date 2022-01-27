@@ -122,7 +122,7 @@
                    style="display: none;"></a>
 
                 <form action="" class="form-horizontal" role="form">
-                    <div class="row form-cols">
+                    <div class="form-group form-cols">
                         <div class="col">
                                 <label for="cnInputText">Hostname</label>
                         </div>
@@ -133,7 +133,7 @@
                             <div class="form-text">Hostname will make up the Common Name of your host certificate</div>
                         </div>
                     </div>
-                    <div class="row form-cols">
+                    <div class="form-group form-cols">
                         <div class="col">
                             <label for="raSelect">Your RA</label>
                             <span class="muted">(Registration Authority)</span>
@@ -150,7 +150,7 @@
                             <div class="form-text">The RA defines the certificate Locality and Org name</div>
                         </div>
                     </div>
-                    <div class="row form-cols">
+                    <div class="form-group form-cols">
                         <div class="col">
                             <label for="emailInputText">e-Mail</label>
                         </div>
@@ -161,7 +161,7 @@
                         </div>
 
                     </div>
-                    <div class="row form-cols">
+                    <div class="form-group form-cols">
                         <div class="col">
                             <label for="pinInputText">PIN</label>
                         </div>
@@ -171,7 +171,7 @@
                             <div class="form-text">For host cert requests, you may need to quote this to your RA to prove you submitted the CSR (usually not required)</div>
                         </div>
                     </div>
-                    <div class="row form-cols">
+                    <div class="form-group form-cols">
                         <div class="col">
                             <label for="sign_up_password">Key Password</label>
                         </div>
@@ -180,7 +180,7 @@
                             <div class="form-text">The password is used to encrypt your locally generated private key</div>
                         </div>
                     </div>
-                    <div class="row form-cols">
+                    <div class="form-group form-cols">
                         <div class="col">
                             <label for="sign_up_password_confirm">Confirm Password</label>
                         </div>
@@ -188,7 +188,7 @@
                             <input type="password" id="sign_up_password_confirm" class="form-control"/><span></span>
                         </div>
                     </div>
-                    <div class="row form-cols">
+                    <div class="form-group form-cols">
                         <div class="col">
                             <a id="createCSRSubmit" class="btn btn-sm btn-primary">
                                 Submit Request

@@ -80,10 +80,10 @@
                         <td>Status</td>
                         <td><b>
                             <c:if test="${certificateRow.status == 'VALID'}">
-                                <font color="green">${certificateRow.status}</font>
+                                <span class="text-success">${certificateRow.status}</span>
                             </c:if>
                             <c:if test="${certificateRow.status != 'VALID'}">
-                                <font color="red">${certificateRow.status}</font>
+                                <span class="text-danger">${certificateRow.status}</span>
                             </c:if>
                         </b></td>
                     </tr>
@@ -121,35 +121,35 @@
                    style="display: none;"></a>
 
                 <form action="" class="form-horizontal" role="form">
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="form-group form-cols">
+                        <div class="col">
                             <label for="emailInputText">e-Mail</label>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="text" id="emailInputText" value="${certificateRow.email}"
                                    class="form-control"/><span></span>
                             <div class="form-text">Email that is associated with your Certificate</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="form-group form-cols">
+                        <div class="col">
                             <label for="sign_up_password">Key Password</label>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="password" id="sign_up_password" class="form-control"/><span></span>
                             <div class="form-text">The password is used to encrypt your locally generated private key.</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-3 col-lg-3">
+                    <div class="form-group form-cols">
+                        <div class="col">
                             <label for="sign_up_password_confirm">Confirm Password</label>
                         </div>
-                        <div class="col-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="password" id="sign_up_password_confirm" class="form-control"/><span></span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-offset-3 col-8">
+                    <div class="form-group form-cols">
+                        <div class="col">
                             <br />
                             <a id="createCSRSubmit" class="btn btn-sm btn-primary">Submit Request</a>
                             <div class="form-text">This may take some time depending on your browser/computer (it generates a new public/private key-pair in the browser and sends the public key to the server)</div><br />

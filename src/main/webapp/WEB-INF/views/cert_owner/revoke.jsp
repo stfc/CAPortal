@@ -66,10 +66,10 @@
                         <td>Status</td>
                         <td><b>
                             <c:if test="${certificateRow.status == 'VALID'}">
-                                <font color="green">${certificateRow.status}</font>
+                                <span class="text-success">${certificateRow.status}</span>
                             </c:if>
                             <c:if test="${certificateRow.status != 'VALID'}">
-                                <font color="red">${certificateRow.status}</font>
+                                <span class="text-danger">${certificateRow.status}</span>
                             </c:if>
                         </b></td>
                     </tr>
@@ -105,7 +105,7 @@
                                action="${pageContext.request.contextPath}/cert_owner/revoke"
                                modelAttribute="revokeCertFormBean">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                        <div class="col-8 col-lg-5">
+                        <div class="col">
 
                             <input name="cert_key" type="hidden"
                                    value="${certificateRow.cert_key}"/>
@@ -114,7 +114,7 @@
                             <br/>
                             <form:errors path="reason" cssClass="text-error"/>
                         </div>
-                        <div class="col-1 col-lg-1">
+                        <div class="col">
                             <button type="submit" class="btn btn-sm btn-primary"
                                     onclick="return confirm('Are you sure you want to approve a full revocation of this certificate?');">
                                 Revoke Certificate

@@ -89,10 +89,10 @@
                         <td>Status</td>
                         <td><b>
                             <c:if test="${certificateRow.status == 'VALID'}">
-                                <font color="green">${certificateRow.status}</font>
+                                <span class="text-success">${certificateRow.status}</span>
                             </c:if>
                             <c:if test="${certificateRow.status != 'VALID'}">
-                                <font color="red">${certificateRow.status}</font>
+                                <span class="text-danger">${certificateRow.status}</span>
                             </c:if>
                         </b></td>
                     </tr>

@@ -99,7 +99,7 @@
 
     <form action="" class="form-horizontal" role="form">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        <div class="row form-cols">
+        <div class="form-group form-cols">
             <div class="col">
                 <label for="cnInputText">Name</label>
             </div>
@@ -109,7 +109,7 @@
                 <div class="form-text">Full name will make up the Common Name of your certificate</div>
             </div>
         </div>
-        <div class="row form-cols">
+        <div class="form-group form-cols">
             <div class="col">
                 <label for="raSelect">Your Institution</label>
             </div>
@@ -125,7 +125,7 @@
                 </div>
             </div>
         </div>
-        <div class="row form-cols">
+        <div class="form-group form-cols">
             <div class="col">
                 <label for="emailInputText">e-Mail</label>
             </div>
@@ -136,7 +136,7 @@
                 </div>
             </div>
         </div>
-        <div class="row form-cols">
+        <div class="form-group form-cols">
             <div class="col">
                 <label for="pinInputText">PIN</label>
             </div>
@@ -147,7 +147,7 @@
                 </div>
             </div>
         </div>
-        <div class="row form-cols">
+        <div class="form-group form-cols">
             <div class="col">
                 <label for="sign_up_password">Key Password</label>
             </div>
@@ -155,7 +155,7 @@
                 <input type="password" id="sign_up_password" class="form-control"/>
             </div>
         </div>
-        <div class="row form-cols">
+        <div class="form-group form-cols">
             <div class="col">
                 <label for="sign_up_password_confirm">Confirm Password</label>
             </div>
@@ -164,7 +164,8 @@
 
                 <div class="form-text">The password is used to encrypt your locally generated private key</div>
             </div>
-            <div class="row form-cols">
+        </div>
+            <div class="form-group form-cols">
                 <div class="col">
                     <button id="createCSRSubmit" class="btn btn-sm btn-primary">Submit Request</button>
                     <div class="form-text">This may take some time depending on your browser/computer (it generates a
@@ -174,7 +175,6 @@
                     <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
                 </div>
             </div>
-        </div>
     </form>
     <div id="responseMessage"></div>
     <a id="savetxt" class="btn btn-sm btn-primary">Save Private Key As Text File</a>
