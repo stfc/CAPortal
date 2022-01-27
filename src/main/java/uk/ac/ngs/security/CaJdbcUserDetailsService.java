@@ -15,7 +15,6 @@ package uk.ac.ngs.security;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,10 +22,8 @@ import uk.ac.ngs.dao.JdbcCaUserAuthDao;
 import uk.ac.ngs.domain.CertificateRow;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //import org.springframework.security.core.userdetails.memory.InMemoryDaoImpl;

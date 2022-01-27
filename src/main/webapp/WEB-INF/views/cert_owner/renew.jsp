@@ -176,13 +176,14 @@
 <script src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
 <!-- https://github.com/eligrey/FileSaver.js -->
+<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
 
 <script type="text/javascript">
 
     function emailValid() {
-        var element = $("#emailInputText");
+        const element = $("#emailInputText");
         //if (element.val().match(/^(([0-9a-zA-Z\+]+[\-\._])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}[,;]?)+$/) === null) {
         if (element.val().match(/^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$/) === null) {
             $(element).addClass("error").next().text("Invalid email");
@@ -194,8 +195,8 @@
     }
 
     function pwSame() {
-        var pw_conf = $("#sign_up_password_confirm");
-        var pw = $("#sign_up_password");
+        const pw_conf = $("#sign_up_password_confirm");
+        const pw = $("#sign_up_password");
         if ($(pw_conf).val() !== $(pw).val()) {
             $(pw_conf).addClass("error").next().text("Passwords don't match");
             return false;
@@ -207,7 +208,7 @@
 
     function pwValid() {
         //var element = $("#" + pwelement.attr("id"));
-        var element = $("#sign_up_password");
+        const element = $("#sign_up_password");
         if ($(element).val().length < 10) {
             $(element).addClass("error").next().text("Password too short");
             return false;
@@ -238,7 +239,7 @@
         $("#createCSRSubmit").tooltip();
 
         $('#savetxt').click(function () {
-            var textfile = new Blob([$('#csrTextArea').val()], {type: "text/plain;charset=utf-8"});
+            const textfile = new Blob([$('#csrTextArea').val()], {type: "text/plain;charset=utf-8"});
             saveAs(textfile, "privateKeyAndCsr.txt");
         });
 
@@ -305,24 +306,24 @@
 
 
     function doProcessing() {
-        var email = $('#emailInputText').val();
-        var pw = $('#sign_up_password').val();
-        var c = '${countryOID}'; // the OIDs are passed to jsp
-        var o = '${orgNameOID}';
-        var cn = '${cnOID}';
-        var ou = '${ouOID}';
-        var loc = '${locOID}';
-        var messageElement = $("#responseMessage");
+        const email = $('#emailInputText').val();
+        const pw = $('#sign_up_password').val();
+        const c = '${countryOID}'; // the OIDs are passed to jsp
+        const o = '${orgNameOID}';
+        const cn = '${cnOID}';
+        const ou = '${ouOID}';
+        const loc = '${locOID}';
+        const messageElement = $("#responseMessage");
 
-        var postTarget;
-        var csrTextAreaVal;
-        var dataPostEncodedVal;
+        let postTarget;
+        let csrTextAreaVal;
+        let dataPostEncodedVal;
 
-        var token = $("meta[name='_csrf']").attr("content");
-        var header = $("meta[name='_csrf_header']").attr("content");
+        const token = $("meta[name='_csrf']").attr("content");
+        const header = $("meta[name='_csrf_header']").attr("content");
 
         postTarget = $("#postLinkViaClient");
-        var pem = createCSR(cn, ou, loc, o, c, pw);
+        const pem = createCSR(cn, ou, loc, o, c, pw);
         csrTextAreaVal = pem.privateKey + pem.csr;
         dataPostEncodedVal = $.param({csr: pem.csr}) +
             "&" + $.param({email: email});
@@ -343,7 +344,7 @@
                         messageElement);
                     //$('#csrTextArea').show();
                     $('#csrTextArea').addClass("success");
-                    var info =
+                    const info =
                         'Save this file as a plain text file (not rich text with formatting).\n' +
                         'This file contains your encrypted private key and the RENEW certificate signing request (CSR).\n' +
                         'You MUST keep this file safe - you will need this later on. \n' +

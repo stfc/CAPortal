@@ -67,7 +67,7 @@ public class ViewCRR {
         if (requestId != null) {
             CrrRow crr = this.jdbcCrrDao.findById(requestId);
             if (crr != null) {
-                List<CrrRow> rows = new ArrayList<CrrRow>(1);
+                List<CrrRow> rows = new ArrayList<>(1);
                 rows.add(crr);
                 rows = this.jdbcCrrDao.setSubmitDateFromData(rows);
                 modelMap.put(CRR_ROW_MODELMAPPING, rows.get(0));

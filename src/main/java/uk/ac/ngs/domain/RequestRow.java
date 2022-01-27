@@ -151,13 +151,7 @@ public class RequestRow {
 
     public void setBulk(Long bulk) {
         this.bulk = bulk;
-    } 
-    /*public boolean getExported(){
-        return this.exported;
     }
-    public void setExported(boolean exported){
-        this.exported = exported; 
-    }*/
 
     /**
      * @return the dataNotBefore

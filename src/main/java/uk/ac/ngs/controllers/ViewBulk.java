@@ -65,12 +65,12 @@ public class ViewBulk {
             @RequestParam(value = "bulkId", required = false) Long bulkId, ModelMap modelMap) {
         log.debug("Populate Model");
         ViewBulkFormBean viewBulkFormBean = new ViewBulkFormBean();
-        viewBulkFormBean.setRows(new ArrayList<RequestWrapper>(0));
+        viewBulkFormBean.setRows(new ArrayList<>(0));
         modelMap.put("bulkView", viewBulkFormBean);
 
         if (bulkId != null) {
             //find all certs in bulk
-            Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class);
+            Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new EnumMap<>(JdbcRequestDao.WHERE_PARAMS.class);
             whereParams.put(JdbcRequestDao.WHERE_PARAMS.BULKID_EQ, "" + bulkId);
             List<RequestRow> otherBulks = this.jdbcRequestDao.findBy(whereParams, null, null);
             log.debug("Found [" + otherBulks.size() + "] request rows for bulkId [" + bulkId + "]");
@@ -78,7 +78,7 @@ public class ViewBulk {
             // wrap each RequestRow within a wrapper 'transfer' 
             // object so we can add additional properties for the view layer 
             // e.g. 'checked'.  
-            List<RequestWrapper> otherBulksWrapped = new ArrayList<RequestWrapper>(0);
+            List<RequestWrapper> otherBulksWrapped = new ArrayList<>(0);
             for (RequestRow otherBulk : otherBulks) {
                 RequestWrapper rr = new RequestWrapper(false, otherBulk);
                 otherBulksWrapped.add(rr);
@@ -109,7 +109,7 @@ public class ViewBulk {
         }
         long bulkId = bulkForm.getBulkId();
         List<RequestWrapper> bulkRows = bulkForm.getRows();
-        List<Long> checkedIds = new ArrayList<Long>(0);
+        List<Long> checkedIds = new ArrayList<>(0);
         log.debug("Bulks for APPROVE: [" + bulkRows.size() + "] for bulkId: [" + bulkId + "]");
         for (RequestWrapper rr : bulkRows) {
             log.debug("req_key: [" + rr.getRequestRow().getReq_key()
@@ -158,7 +158,7 @@ public class ViewBulk {
         }
         long bulkId = bulkForm.getBulkId();
         List<RequestWrapper> bulkRows = bulkForm.getRows();
-        List<Long> checkedIds = new ArrayList<Long>(0);
+        List<Long> checkedIds = new ArrayList<>(0);
         log.debug("Bulks for DELETE: [" + bulkRows.size() + "] for bulkId: [" + bulkId + "]");
         for (RequestWrapper rr : bulkRows) {
             log.debug("req_key: [" + rr.getRequestRow().getReq_key()

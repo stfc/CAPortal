@@ -56,7 +56,7 @@
                         <span class="muted">
                             _ matches any single char<br/>
                             % matches a string
-                        </font>
+                        </span>
                     </div>
                 </div>
                 <div class="row form-cols">

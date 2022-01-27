@@ -94,7 +94,7 @@ public class SearchCert {
         PartialPagedListHolder<CertificateRow> pagedListHolder;
         Object testNotNull = session.getAttribute(SearchCert.CERT_PAGE_LIST_HOLDER_SESSIONSCOPE);
         if (testNotNull == null) {
-            pagedListHolder = new PartialPagedListHolder<CertificateRow>(new ArrayList<CertificateRow>(0));
+            pagedListHolder = new PartialPagedListHolder<>(new ArrayList<>(0));
             session.setAttribute(SearchCert.CERT_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
         } else {
             pagedListHolder = (PartialPagedListHolder<CertificateRow>) testNotNull;
@@ -102,7 +102,7 @@ public class SearchCert {
 
         // Populate the RA list pull down
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
-        List<String> raArray = new ArrayList<String>(rows.size());
+        List<String> raArray = new ArrayList<>(rows.size());
         String userDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn();
         String l = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.L);
         String ou = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.OU);
@@ -256,7 +256,7 @@ public class SearchCert {
 
         // Typically, a PagedListHolder instance will be instantiated with a list of beans, 
         // put into the session, and exported as model (in populateModel as we redirect).
-        PartialPagedListHolder<CertificateRow> pagedListHolder = new PartialPagedListHolder<CertificateRow>(rows, totalRows);
+        PartialPagedListHolder<CertificateRow> pagedListHolder = new PartialPagedListHolder<>(rows, totalRows);
         pagedListHolder.setPageSize(limit);
         pagedListHolder.setRow(startRow);
         session.setAttribute(SearchCert.CERT_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
@@ -266,7 +266,7 @@ public class SearchCert {
     }
 
     private Map<String, Object> getRedirectParams(SearchCertFormBean searchCertFormBean) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         if (StringUtils.hasText(searchCertFormBean.getName())) {
             params.put("name", searchCertFormBean.getName());
         }
@@ -305,82 +305,6 @@ public class SearchCert {
         }
         return params;
     }
-    
-    /*private String buildGetRequestParams(SearchCertFormBean searchCertFormBean) {
-        try {
-            String enc = "UTF-8";
-            StringBuilder params = new StringBuilder("");
-            if (StringUtils.hasText(searchCertFormBean.getName())) {
-                params.append("name=");
-                params.append(URLEncoder.encode(searchCertFormBean.getName(), enc));
-                params.append("&");
-            }
-            if (StringUtils.hasText(searchCertFormBean.getDn())) {
-                params.append("dn=");
-                params.append(URLEncoder.encode(searchCertFormBean.getDn(), enc));
-                params.append("&");
-            }
-            if (StringUtils.hasText(searchCertFormBean.getData())) {
-                params.append("data=");
-                params.append(URLEncoder.encode(searchCertFormBean.getData(), enc));
-                params.append("&");
-            }
-            if (StringUtils.hasText(searchCertFormBean.getEmailAddress())) {
-                params.append("emailAddress=");
-                params.append(URLEncoder.encode(searchCertFormBean.getEmailAddress(), enc));
-                params.append("&");
-            }
-            if(searchCertFormBean.getSearchNullEmailAddress() != null){
-                params.append("searchNullEmailAddress=");
-                params.append(URLEncoder.encode(searchCertFormBean.getSearchNullEmailAddress().toString(), enc));
-                params.append("&");
-            }
-            if (StringUtils.hasText(searchCertFormBean.getRole())) {
-                params.append("role=");
-                params.append(URLEncoder.encode(searchCertFormBean.getRole(), enc));
-                params.append("&");
-            }
-            if (StringUtils.hasText(searchCertFormBean.getStatus())) {
-                params.append("status=");
-                params.append(URLEncoder.encode(searchCertFormBean.getStatus(), enc));
-                params.append("&");
-            }
-            if(searchCertFormBean.getNotExpired() != null){
-                params.append("notExpired=");
-                params.append(URLEncoder.encode(searchCertFormBean.getNotExpired().toString(), enc));
-                params.append("&");
-            }
-            if(searchCertFormBean.getStartRow() != null){ 
-                params.append("startRow=");
-                params.append(URLEncoder.encode(searchCertFormBean.getStartRow().toString(), enc));
-                params.append("&");
-            }
-            if(searchCertFormBean.getSerial() != null){ 
-                params.append("serial=");
-                params.append(URLEncoder.encode(searchCertFormBean.getSerial().toString(), enc));
-                params.append("&");
-            }
-            if(searchCertFormBean.getShowRowCount() != null){
-                params.append("showRowCount=");
-                params.append(URLEncoder.encode(searchCertFormBean.getShowRowCount().toString(), enc));
-                params.append("&");
-            }
-            if(searchCertFormBean.getRa() != null){
-                params.append("ra=");
-                params.append(URLEncoder.encode(searchCertFormBean.getRa().toString(), enc));
-                params.append("&");
-            }
-
-            // remove final & if present 
-            String getParams = params.toString();
-            if (getParams.endsWith("&")) {
-                getParams = getParams.substring(0, getParams.length() - 1);
-            }
-            return getParams;
-        } catch (UnsupportedEncodingException ex) {
-            throw new IllegalStateException(ex);
-        }
-    }*/
 
     /**
      * Handle POSTs to "/raop/searchcert/goto" to paginate to a specific row
@@ -488,7 +412,7 @@ public class SearchCert {
         // serial number overrides any other search criteria. 
         if (searchCertFormBean.getSerial() != null) {
             CertificateRow row = this.certDao.findById(searchCertFormBean.getSerial());
-            List<CertificateRow> rows = new ArrayList<CertificateRow>(0);
+            List<CertificateRow> rows = new ArrayList<>(0);
             if (row != null) {
                 rows.add(row);
                 row.setData(null);
@@ -514,7 +438,7 @@ public class SearchCert {
     private Map<JdbcCertificateDao.WHERE_PARAMS, String> getSearchParams(SearchCertFormBean searchCertFormBean) {
 
         Map<JdbcCertificateDao.WHERE_PARAMS, String> params =
-                new EnumMap<JdbcCertificateDao.WHERE_PARAMS, String>(JdbcCertificateDao.WHERE_PARAMS.class);
+                new EnumMap<>(JdbcCertificateDao.WHERE_PARAMS.class);
 
         if (StringUtils.hasText(searchCertFormBean.getName())) {
             params.put(JdbcCertificateDao.WHERE_PARAMS.CN_LIKE, this.prepareLikeValue(searchCertFormBean.getName()));

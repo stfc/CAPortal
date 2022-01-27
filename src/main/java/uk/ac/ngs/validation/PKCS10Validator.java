@@ -109,16 +109,7 @@ public class PKCS10Validator implements Validator {
             }
 
             //RSAPublicKeySpec rsaSpec = new RSAPublicKeySpec(rsa.getModulus(), rsa.getExponent());
-            /*PKCS10CertificationRequest req = (PKCS10CertificationRequest)o;
-             SubjectPublicKeyInfo pkInfo = req.getSubjectPublicKeyInfo();
-             RSAKeyParameters rsa = (RSAKeyParameters) PublicKeyFactory.createKey(pkInfo);
-             RSAPublicKeySpec rsaSpec = new RSAPublicKeySpec(rsa.getModulus(), rsa.getExponent());
-             KeyFactory kf = KeyFactory.getInstance("RSA");
-             PublicKey rsaKeyParams = kf.generatePublic(rsaSpec);
-             if (rsaKeyParams.getModulus().bitLength() < 2048) {
-             e.reject("pkcs10.validation.invalidbitlength", "Invalid bit length");// + rsa.getModulus().bitLength());
-             }*/
-            // Verify the signature 
+            // Verify the signature
             boolean valid = req.isSignatureValid((new JcaContentVerifierProviderBuilder()).build(rsaPub));
             if (!valid) {
                 e.reject("pkcs10.validation.failed", "Invalid PKCS10 - Could not validate signature");

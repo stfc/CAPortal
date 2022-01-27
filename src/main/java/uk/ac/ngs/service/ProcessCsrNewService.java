@@ -167,22 +167,7 @@ public class ProcessCsrNewService {
 
             String pkcs8StrEnc = null;
             if (createCsrOnServer) {
-                String ou = csrAttributes.ra.trim().split("\\s")[0];
-                String loc = csrAttributes.ra.trim().split("\\s")[1];
-                log.info("  HOST CSR created on server: Name[" + csrAttributes.cn + "] RA[" + csrAttributes.ra + "] email[" + email + "]");
-
-                X500NameBuilder x500NameBld = new X500NameBuilder(BCStyle.INSTANCE);
-                x500NameBld.addRDN(BCStyle.C, csrRequestValidationConfigParams.getCountryOID());
-                x500NameBld.addRDN(BCStyle.O, csrRequestValidationConfigParams.getOrgNameOID());
-                x500NameBld.addRDN(BCStyle.OU, ou);
-                x500NameBld.addRDN(BCStyle.L, loc);
-                x500NameBld.addRDN(BCStyle.CN, csrAttributes.cn);
-                X500Name subject = x500NameBld.build();
-
-                CsrAndPrivateKeyPemStringBuilder csrFactoryService = new CsrAndPrivateKeyPemStringBuilder();
-                String[] pems = csrFactoryService.getPkcs10_Pkcs8_AsPemStrings(subject, email, csrAttributes.pw);
-                csr = pems[0];
-                pkcs8StrEnc = pems[1];
+                log.error("DO NOT CREATE CSRS ON THE SERVER!");
             } else {
                 log.info("  CSR created on client");
             }
@@ -229,7 +214,7 @@ public class ProcessCsrNewService {
             return new ProcessCsrResult(req_key, csrWrapper, pkcs8StrEnc);
 
             // Need to thow more suitable runtime exceptions for this business tier. 
-        } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | OperatorCreationException | PKCSException | InvalidKeyException ex) {
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException ex) {
             Logger.getLogger(ProcessCsrNewService.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
@@ -240,7 +225,7 @@ public class ProcessCsrNewService {
         // Email the RAs
         boolean emailRaOnNew = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.ra.on.new"));
         if (emailRaOnNew) {
-            Set<String> raEmails = new HashSet<String>(); // use set so duplicates aren't added 
+            Set<String> raEmails = new HashSet<>(); // use set so duplicates aren't added
             // Find all the RA email addresses, iterate and send   
             for (CertificateRow raCert : raCerts) {
                 if (raCert.getEmail() != null) {
@@ -305,10 +290,6 @@ public class ProcessCsrNewService {
         requestRow.setStatus("NEW");
         requestRow.setRole("User");
         requestRow.setPublic_key(ConvertUtil.getDBFormattedRSAPublicKey(csrWrapper.getP10PubKey()));
-        //requestRow.setRao(null);
-        //requestRow.setScep_tid(null);
-        //requestRow.setLoa(null);
-        //requestRow.setBulk(null);
         return requestRow;
     }
 
@@ -340,27 +321,18 @@ public class ProcessCsrNewService {
      *
      * @param agent Records the name of the software used to create the CSR.
      */
-//    public synchronized void setAgent(String agent) {
-//        this.agent = agent;
-//    }
-    /**
+/**
      * Synchronized to allow re-setting of this property dynamically at runtime.
      * If set to true, the EmailService is used to notify RAs of the CSR.
      *
      * @param emailRaOnNew the emailRaOnNew to set.
      */
-//    public synchronized void setEmailRaOnNew(boolean emailRaOnNew) {
-//        this.emailRaOnNew = emailRaOnNew;
-//    }
-    /**
+/**
      * Synchronized to allow re-setting of this property dynamically at runtime.
      * If set to true, the EmailService is used to notify the user of their CSR.
      *
      * @param emailUserOnNew
      */
-//    public synchronized void setEmailUserOnNew(boolean emailUserOnNew) {
-//        this.emailUserOnNew = emailUserOnNew;
-//    }
 
     /**
      * @param emailService the emailService to set

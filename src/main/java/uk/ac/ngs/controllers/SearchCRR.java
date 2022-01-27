@@ -92,13 +92,13 @@ public class SearchCRR {
         PartialPagedListHolder<CrrRow> pagedListHolder =
                 (PartialPagedListHolder<CrrRow>) session.getAttribute(CRR_PAGE_LIST_HOLDER_SESSIONSCOPE);
         if (pagedListHolder == null) {
-            pagedListHolder = new PartialPagedListHolder<CrrRow>(new ArrayList<CrrRow>(0));
+            pagedListHolder = new PartialPagedListHolder<>(new ArrayList<>(0));
             session.setAttribute(CRR_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
         }
 
         // Populate the RA list pull down 
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
-        List<String> raArray = new ArrayList<String>(rows.size());
+        List<String> raArray = new ArrayList<>(rows.size());
         String userDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn();
         String l = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.L);
         String ou = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.OU);
@@ -240,14 +240,14 @@ public class SearchCRR {
 
         // Typically, a PagedListHolder instance will be instantiated with a list of beans, 
         // put into the session, and exported as model (in populateModel as we redirect).
-        PartialPagedListHolder<CrrRow> pagedListHolder = new PartialPagedListHolder<CrrRow>(rows, totalRows);
+        PartialPagedListHolder<CrrRow> pagedListHolder = new PartialPagedListHolder<>(rows, totalRows);
         pagedListHolder.setPageSize(limit);
         pagedListHolder.setRow(startRow);
         session.setAttribute(CRR_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
     }
 
     private Map<String, Object> getRedirectParams(SearchCrrFormBean searchCrrFormBean) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         if (StringUtils.hasText(searchCrrFormBean.getName())) {
             params.put("name", searchCrrFormBean.getName());
         }
@@ -274,62 +274,6 @@ public class SearchCRR {
         }
         return params;
     }
-    
-    /*private String buildGetRequestParams(SearchCrrFormBean searchCrrFormBean) {
-         try {
-            String enc = "UTF-8";
-            StringBuilder params = new StringBuilder("");
-            if (StringUtils.hasText(searchCrrFormBean.getName())) {
-                params.append("name=");
-                params.append(URLEncoder.encode(searchCrrFormBean.getName(), enc));
-                params.append("&");
-            }
-            if(StringUtils.hasText(searchCrrFormBean.getDn())){
-                params.append("dn=");
-                params.append(URLEncoder.encode(searchCrrFormBean.getDn(), enc));
-                params.append("&"); 
-            }
-            if(StringUtils.hasText(searchCrrFormBean.getData())){
-                params.append("data=");
-                params.append(URLEncoder.encode(searchCrrFormBean.getData(), enc));
-                params.append("&");
-            }
-            if(StringUtils.hasText(searchCrrFormBean.getRa())){
-                params.append("ra=");
-                params.append(URLEncoder.encode(searchCrrFormBean.getRa(), enc));
-                params.append("&");
-            }
-            if(StringUtils.hasText(searchCrrFormBean.getStatus())){
-                params.append("status=");
-                params.append(URLEncoder.encode(searchCrrFormBean.getStatus(), enc));
-                params.append("&");
-            }
-            if(searchCrrFormBean.getCrr_key() != null){
-                params.append("crr_key=");
-                params.append(URLEncoder.encode(searchCrrFormBean.getCrr_key().toString(), enc));
-                params.append("&");
-            }
-            if(searchCrrFormBean.getStartRow() != null){ 
-                params.append("startRow=");
-                params.append(URLEncoder.encode(searchCrrFormBean.getStartRow().toString(), enc));
-                params.append("&");
-            }
-            if(searchCrrFormBean.getShowRowCount() != null){
-                params.append("showRowCount=");
-                params.append(URLEncoder.encode(searchCrrFormBean.getShowRowCount().toString(), enc));
-                params.append("&");
-            }
-            
-            // remove final & if present 
-            String getParams = params.toString();
-            if (getParams.endsWith("&")) {
-                getParams = getParams.substring(0, getParams.length() - 1);
-            }
-            return getParams;
-        } catch (UnsupportedEncodingException ex) {
-            throw new IllegalStateException(ex);
-        }
-     }*/
 
 
     /**
@@ -441,7 +385,7 @@ public class SearchCRR {
 
         if (searchCrrFormBean.getCrr_key() != null) {
             CrrRow row = this.jdbcCrrDao.findById(searchCrrFormBean.getCrr_key());
-            List<CrrRow> rows = new ArrayList<CrrRow>(0);
+            List<CrrRow> rows = new ArrayList<>(0);
             if (row != null) {
                 rows.add(row);
                 row.setData(null);
@@ -450,7 +394,7 @@ public class SearchCRR {
 
         } else {
             // select RA from pulldown and perform search 
-            Map<JdbcCrrDao.WHERE_PARAMS, String> whereParams = new EnumMap<JdbcCrrDao.WHERE_PARAMS, String>(JdbcCrrDao.WHERE_PARAMS.class);
+            Map<JdbcCrrDao.WHERE_PARAMS, String> whereParams = new EnumMap<>(JdbcCrrDao.WHERE_PARAMS.class);
 
             String ra = searchCrrFormBean.getRa();
             if (StringUtils.hasText(ra) && !"all".equals(ra)) {

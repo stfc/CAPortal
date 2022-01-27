@@ -27,7 +27,7 @@ import javax.crypto.Cipher;
 import javax.crypto.EncryptedPrivateKeyInfo;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -38,10 +38,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.ExtensionsGenerator;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.crypto.prng.EntropySource;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMEncryptor;
-import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.PKCS8Generator;
@@ -54,9 +51,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemObjectGenerator;
-import org.bouncycastle.util.io.pem.PemReader;
-import org.bouncycastle.util.io.pem.PemWriter;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -126,10 +120,6 @@ public class TestBC_CreatePKCS10 {
         x500NameBld.addRDN(BCStyle.OU, "CLRC");
         x500NameBld.addRDN(BCStyle.L, "DL");
         x500NameBld.addRDN(BCStyle.CN, "david meredith");
-//        x500NameBld.addRDN(BCStyle.C, "AU");
-//        x500NameBld.addRDN(BCStyle.ST, "Victoria");
-//        x500NameBld.addRDN(BCStyle.L, "Melbourne");
-//        x500NameBld.addRDN(BCStyle.O, "The Legion of the Bouncy Castle");
 
         X500Name subject = x500NameBld.build();
 
@@ -156,12 +146,6 @@ public class TestBC_CreatePKCS10 {
         }
 
         // output the CSR pem string 
-        /*StringWriter writer = new StringWriter();
-         PemWriter pemWrite = new PemWriter(writer); 
-         PemObjectGenerator pog = new PemObject("PKCS10", req1.getEncoded());
-         pemWrite.writeObject(pog); 
-         pemWrite.close();
-         System.out.println(writer.toString()); */
         StringWriter writer = new StringWriter();
         PEMWriter pemWrite = new PEMWriter(writer);
         pemWrite.writeObject(req1);
@@ -221,8 +205,6 @@ public class TestBC_CreatePKCS10 {
         
         // Decrypt the private key file from String
         // http://stackoverflow.com/questions/2654949/how-to-read-a-password-encrypted-key-with-java?rq=1
-        //PemReader pemReader = new PemReader(new StringReader(pkcs8Str));
-        //PemObject  pkcs8Pem = pemReader.readPemObject();
         PEMParser keyPemParser = new PEMParser(new StringReader(pkcs8StrEnc));
         PemObject keyObj = keyPemParser.readPemObject();
         byte[] keyBytes = keyObj.getContent();
@@ -239,17 +221,7 @@ public class TestBC_CreatePKCS10 {
         PrivateKey priKeyDecrypted = kf.generatePrivate(pkcs8KeySpec);
 
         // Could use below by specifying the provider, 
-        /*EncryptedPrivateKeyInfo encryptPKInfo = new EncryptedPrivateKeyInfo(keyBytes);
-         Cipher cipher = Cipher.getInstance(encryptPKInfo.getAlgName(), "BC");
-         PBEKeySpec pbeKeySpec = new PBEKeySpec(passwd.toCharArray());
-         SecretKeyFactory secFac = SecretKeyFactory.getInstance(PKCS8Generator.PBE_SHA1_3DES.getId(), "BC"); //encryptPKInfo.getAlgName(), "BC");
-         Key pbeKey = secFac.generateSecret(pbeKeySpec);
-         AlgorithmParameters algParams = encryptPKInfo.getAlgParameters();
-         cipher.init(Cipher.DECRYPT_MODE, pbeKey, algParams);
-         KeySpec pkcs8KeySpec = encryptPKInfo.getKeySpec(cipher);
-         KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
-         PrivateKey priKey2 = kf.generatePrivate(pkcs8KeySpec);*/
-        // Assert that the two private keys are same 
+        // Assert that the two private keys are same
         assertEquals("RSA", priKey.getAlgorithm());
         assertEquals(priKey.getAlgorithm(), priKeyDecrypted.getAlgorithm());
 
@@ -262,33 +234,6 @@ public class TestBC_CreatePKCS10 {
         // Below is from: 
         //C:\Users\djm76\Documents\work\programming\java\javadocs\bcprov-jdk15on-150\org\bouncycastle\jce\provider\test\EncryptedPrivateKeyInfoTest.java 
 
-        /*String  alg = "1.2.840.113549.1.12.1.3"; // 3 key triple DES with SHA-1
-            
-         //
-         // set up the parameters
-         //
-         byte[]              salt = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-         int                 iterationCount = 100;
-         PBEParameterSpec    defParams = new PBEParameterSpec(salt, iterationCount);
-         AlgorithmParameters params = AlgorithmParameters.getInstance(alg, "BC");
-         params.init(defParams);
-            
-         //
-         // set up the key
-         //
-         char[]  password1 = { 'h', 'e', 'l', 'l', 'o' };
-         PBEKeySpec          pbeSpec = new PBEKeySpec(password1);
-         SecretKeyFactory    keyFact = SecretKeyFactory.getInstance(alg, "BC");
-         Cipher cipher = Cipher.getInstance(alg, "BC");
-         cipher.init(Cipher.WRAP_MODE, keyFact.generateSecret(pbeSpec), params);
-         byte[] wrappedKey = cipher.wrap(priKey);
-
-         //
-         // create encrypted object
-         //
-         EncryptedPrivateKeyInfo pInfo = new EncryptedPrivateKeyInfo(params, wrappedKey);
-         byte[] encrypteddata = pInfo.getEncryptedData();
-         */
     }
 
     /**
@@ -303,8 +248,6 @@ public class TestBC_CreatePKCS10 {
         // https://community.oracle.com/thread/1530354?start=0&tstart=0
         Security.addProvider(new BouncyCastleProvider());
 
-        //PEMParser keyPemParser = new PEMParser(new StringReader(getPkcs8ForgePriKeyPem_PBEWithMD5AndDES()));
-        //String passwd = "1234567890";
         PEMParser keyPemParser = new PEMParser(new StringReader(getPkcs8ForgePriKeyPem_EncryptedWithPBEWithSHA1AndDESede()));
         String passwd = "password";
         PemObject keyObj = keyPemParser.readPemObject();
@@ -340,9 +283,7 @@ public class TestBC_CreatePKCS10 {
         pemWrite3.close();
         String pkcs8StrDecryptedBC = writer3.toString().trim().replaceAll("\\r\\n", "\n");
         String pkcs8StrDecryptedOpenSSL = getPkcs8ForgePriKeyPem_DecryptedWithOpenSSL().trim().replaceAll("\\r\\n", "\n");
-        //System.out.println("["+pkcs8StrNoEncBC+"]");
-        //System.out.println("["+pkcs8StrNoEncOpenssL+"]");
-        assertTrue(pkcs8StrDecryptedBC.equals(pkcs8StrDecryptedOpenSSL));  
+        assertTrue(pkcs8StrDecryptedBC.equals(pkcs8StrDecryptedOpenSSL));
     }
 
 

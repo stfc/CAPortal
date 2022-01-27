@@ -296,9 +296,7 @@ public class CrrManagerService {
             notAfter = x509.getNotAfter();
             notBefore = x509.getNotBefore();
             issuerDN = x509.getIssuerDN().toString();
-        } catch (CertificateException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (UnsupportedEncodingException ex) {
+        } catch (CertificateException | UnsupportedEncodingException ex) {
             throw new IllegalArgumentException(ex);
         }
 

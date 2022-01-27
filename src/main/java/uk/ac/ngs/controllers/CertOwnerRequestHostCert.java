@@ -53,9 +53,6 @@ public class CertOwnerRequestHostCert {
     private JdbcRalistDao ralistDao;
     public static final String RA_ARRAY_REQUESTSCOPE = "ralistArray";
     private SecurityContextService securityContextService;
-    //private Validator csrValidator;
-    //private JdbcRequestDao jdbcRequestDao;
-    //private CsrManagerService csrManagerService;
     private CsrRequestValidationConfigParams csrRequestValidationConfigParams;
     private MutableConfigParams mutableConfigParams;
     private ProcessCsrNewService processCsrNewService;
@@ -66,7 +63,7 @@ public class CertOwnerRequestHostCert {
 
         // Populate the RA list pull down 
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
-        List<String> raArray = new ArrayList<String>(rows.size());
+        List<String> raArray = new ArrayList<>(rows.size());
 
         String userDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn();
         String l = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.L);

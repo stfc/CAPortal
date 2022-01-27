@@ -91,7 +91,7 @@ public class CsrManagerService {
     @Transactional
     public List<Long> updateCsrStatusCollection(List<Long> csrSerialIds, long raopId, CSR_STATUS newStatus) {
         log.info("Bulk updateCsrStatusCollection by RAOP: [" + raopId + "]");
-        List<Long> updatedSerials = new ArrayList<Long>(0);
+        List<Long> updatedSerials = new ArrayList<>(0);
         for (Long csrSerialId : csrSerialIds) {
             RequestRow csr = this.jdbcRequestDao.findById(csrSerialId);
             try {
@@ -125,10 +125,10 @@ public class CsrManagerService {
     @Transactional
     public List<Long> updateCsrStatusAllInBulk(long bulkId, long raopId, CSR_STATUS newStatus) {
         log.info("Bulk updateCsrStatusAllInBulk by RAOP: [" + raopId + "] on bulk: [" + bulkId + "]");
-        List<Long> updatedSerials = new ArrayList<Long>(0);
+        List<Long> updatedSerials = new ArrayList<>(0);
         // Create a map used to define our where clauses (where bulkid = '5' and status = 'valid') 
         Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams =
-                new EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class);
+                new EnumMap<>(JdbcRequestDao.WHERE_PARAMS.class);
         whereParams.put(JdbcRequestDao.WHERE_PARAMS.BULKID_EQ, "" + bulkId);
         // Query the DB for related bulks
         List<RequestRow> otherBulks = this.jdbcRequestDao.findBy(whereParams, null, null);

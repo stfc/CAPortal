@@ -14,7 +14,6 @@ package uk.ac.ngs.common;
 
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -38,9 +37,6 @@ public class ConvertUtil {
 
     private static final Logger log = Logger.getLogger(ConvertUtil.class.getName());
 
-    //public static boolean areStringsRFC2253ComparableEquivalents(String s1, String s2){     
-    //    return false; 
-    //}
     public static String getHash(String originalValue) {
         try {
             java.security.MessageDigest d = java.security.MessageDigest.getInstance("SHA-1");
@@ -251,17 +247,17 @@ public class ConvertUtil {
                                                 String exponentAsHex, String exponentAsDecimal, int modulusBitLength) {
 
         int length = modulusHexString.length();
-        String keyFormatString = "Modulus (" + modulusBitLength + " bit):\n" + "    ";
+        StringBuilder keyFormatString = new StringBuilder("Modulus (" + modulusBitLength + " bit):\n" + "    ");
 
         for (int i = 0, j = 1; i < length; i = i + 2, j++) {
             if (j == 15) {
                 j = 0;
-                keyFormatString = keyFormatString + modulusHexString.substring(i, i + 2) + ":\n" + "    ";
+                keyFormatString.append(modulusHexString.substring(i, i + 2)).append(":\n").append("    ");
             } else {
                 if (i == (length - 2)) {
-                    keyFormatString = keyFormatString + modulusHexString.substring(i, i + 2);
+                    keyFormatString.append(modulusHexString.substring(i, i + 2));
                 } else {
-                    keyFormatString = keyFormatString + modulusHexString.substring(i, i + 2) + ":";
+                    keyFormatString.append(modulusHexString.substring(i, i + 2)).append(":");
                 }
             }
         }

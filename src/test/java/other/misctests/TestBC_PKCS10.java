@@ -119,7 +119,7 @@ public class TestBC_PKCS10 {
 
     private JdbcRalistDao createMockJdbcRalistDao(String l, String ou) {
         // Mock the RalistDao object 
-        List<RalistRow> raListRow = new ArrayList<RalistRow>();
+        List<RalistRow> raListRow = new ArrayList<>();
         RalistRow row = new RalistRow();
         row.setActive(Boolean.TRUE);
         row.setL(l);
@@ -130,16 +130,6 @@ public class TestBC_PKCS10 {
         return daoMock;
     }
 
-
-    /*@Test
-    public void createCSR() throws Exception {
-        KeyPair pair = generateKeyPair();
-        PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
-                new X500Principal("CN=Requested Test Certificate"), pair.getPublic());
-        JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
-        ContentSigner signer = csBuilder.build(pair.getPrivate());
-        PKCS10CertificationRequest csr = p10Builder.build(signer);
-    }*/
 
     @Test
     public void expectedX500ToString() {
@@ -155,11 +145,6 @@ public class TestBC_PKCS10 {
         //System.out.println("" + xname.toString());
         assertEquals("C=UK,O=eScience,OU=CLRC,L=DL,CN=some valid body", xname.toString());
         RDN[] rdn = req.getSubject().getRDNs(); // return an array of RDNs in structure order.
-        /*for (int i = 0; i < rdn.length; i++) {
-         //System.out.println("ASN1: "+rdn[i].toASN1Primitive());
-         AttributeTypeAndValue tv = rdn[i].getFirst();
-         System.out.println("t: " + tv.getType().toString() + " v: " + tv.getValue().toString());
-         }*/
         // Note the order of the RDNs reflects the X500Name
         assertEquals(rdn[0].getFirst().getType(), c);
         assertEquals(rdn[1].getFirst().getType(), orgname);
@@ -254,11 +239,6 @@ public class TestBC_PKCS10 {
         assertEquals("C=UK,O=eScienceDev,OU=Manchester,L=MC,CN=grid course eight,E=leith_d@hotmail.com", xname.toString());
         RDN[] rdn = req.getSubject().getRDNs(); // return an array of RDNs in structure order.
         assertEquals(rdn[5].getFirst().getType(), email);
-        /*for (int i = 0; i < rdn.length; i++) {
-         //System.out.println("ASN1: "+rdn[i].toASN1Primitive());
-         AttributeTypeAndValue tv = rdn[i].getFirst();
-         System.out.println("t: " + tv.getType().toString() + " v: " + tv.getValue().toString());
-         }*/
         // Note the order of the RDNs reflects the X500Name
         assertEquals(rdn[0].getFirst().getType(), c);
         assertEquals(rdn[1].getFirst().getType(), orgname);
@@ -277,24 +257,12 @@ public class TestBC_PKCS10 {
         System.out.println("" + req.getSubject().toString());
         assertEquals("CN=some body,C=UK,L=DL,O=eScience,OU=CLRC", xname.toString());
         RDN[] rdn = req.getSubject().getRDNs(); // return an array of RDNs in structure order.
-        /*for (int i = 0; i < rdn.length; i++) {
-         AttributeTypeAndValue tv = rdn[i].getFirst();
-         System.out.println("t: " + tv.getType().toString() + " v: " + tv.getValue().toString());
-         //AttributeTypeAndValue[] tvs = rdn[i].getTypesAndValues(); 
-         //for(int ii=0; ii<tvs.length; ii++){
-         //    System.out.println("t: "+tvs[ii].getType().toString()+" v: "+tvs[ii].getValue().toString());
-         //}
-         }*/
         // Note the order of the RDNs reflects the X500Name
         assertEquals(rdn[0].getFirst().getType(), cn);
         assertEquals(rdn[1].getFirst().getType(), c);
         assertEquals(rdn[2].getFirst().getType(), loc);
         assertEquals(rdn[3].getFirst().getType(), orgname);
         assertEquals(rdn[4].getFirst().getType(), ou);
-//       ASN1ObjectIdentifier[] ids = xname.getAttributeTypes();
-//       for(int i=0; i<ids.length; i++){
-//           System.out.println(""+ids[i].getId());
-//       }
     }
 
     @Test
@@ -338,8 +306,6 @@ public class TestBC_PKCS10 {
 
         // get the algorithm of the pubkey RSA  
         AlgorithmIdentifier pubKeyAlgId = pkInfo.getAlgorithm();
-        //System.out.println(pubKeyAlgId.getAlgorithm().getId());   // 1.2.840.113549.1.1.1
-        //System.out.println(pubKeyAlgId.getAlgorithm().toString());// 1.2.840.113549.1.1.1
         assertEquals("1.2.840.113549.1.1.1", pubKeyAlgId.getAlgorithm().getId());
 
         // get the algorithm of the request (we expect SHA1 with RSA)  
@@ -383,28 +349,6 @@ public class TestBC_PKCS10 {
      *
      * @throws Exception
      */
-    /*@Test
-     public void testReCreateCsrFromPemVia_bcprov_jdk15_145() throws Exception {
-     Provider prov = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-     java.security.Security.insertProviderAt(prov, 1);
-
-     String csrPemStr = this.getForgeCreatedCsrPem2048();
-     PEMReader pemReader = new PEMReader(new StringReader(csrPemStr));
-     Object obj = pemReader.readObject();
-     PKCS10CertificationRequest req = (PKCS10CertificationRequest) obj;
-     req.verify(); 
-     PublicKey pkey = req.getPublicKey();
-
-     String dn = req.getCertificationRequestInfo().getSubject().toString();
-     assertEquals("CN=some body,C=UK,L=DL,O=eScience,OU=CLRC", dn);
-     assertTrue("RSA".equals(pkey.getAlgorithm()));
-
-     RSAPublicKey rsaPkey = (RSAPublicKey) pkey;
-     assertEquals(2048, rsaPkey.getModulus().bitLength());
-     //System.out.println(rsaPkey.getModulus().bitLength());
-     //System.out.println(rsaPkey.getPublicExponent().intValue());  
-     System.out.println(getDBFormattedRSAPublicKey(pkey)); 
-     }*/
     public static String getDBFormattedRSAPublicKey(PublicKey publicKey) {
         // modu, expHex and expDec are the same regardless of security provider: 
         RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
@@ -440,17 +384,17 @@ public class TestBC_PKCS10 {
             String exponentAsHex, String exponentAsDecimal, int modulusBitLength) {
 
         int length = modulusHexString.length();
-        String keyFormatString = "Modulus (" + modulusBitLength + " bit):\n" + "    ";
+        StringBuilder keyFormatString = new StringBuilder("Modulus (" + modulusBitLength + " bit):\n" + "    ");
 
         for (int i = 0, j = 1; i < length; i = i + 2, j++) {
             if (j == 15) {
                 j = 0;
-                keyFormatString = keyFormatString + modulusHexString.substring(i, i + 2) + ":\n" + "    ";
+                keyFormatString.append(modulusHexString.substring(i, i + 2)).append(":\n").append("    ");
             } else {
                 if (i == (length - 2)) {
-                    keyFormatString = keyFormatString + modulusHexString.substring(i, i + 2);
+                    keyFormatString.append(modulusHexString.substring(i, i + 2));
                 } else {
-                    keyFormatString = keyFormatString + modulusHexString.substring(i, i + 2) + ":";
+                    keyFormatString.append(modulusHexString.substring(i, i + 2)).append(":");
                 }
             }
         }
@@ -536,21 +480,6 @@ public class TestBC_PKCS10 {
      * 
      * @return PEM string
      */
-    /*private String getForgeCreatedCsrPem1024() {
-        String csrPem = "-----BEGIN CERTIFICATE REQUEST-----\n"
-                + "MIIBxDCCAS0CAQAwUDESMBAGA1UEAxMJc29tZSBib2R5MQswCQYDVQQGEwJVSzEL\n"
-                + "MAkGA1UEBxMCREwxETAPBgNVBAoTCGVTY2llbmNlMQ0wCwYDVQQLEwRDTFJDMIGf\n"
-                + "MA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKki1TBC35MjO43dULTOvhslneGllT\n"
-                + "CJGLJMyanC4RiEymKCRBGjrh9WNzA8pawH8ImeHWmkW1iuE2VmJh2RLtUTGqPAQJ\n"
-                + "yMcAK95gXzGHI/XRKaQYUgJAOrIYjnGvTelF2igWHrTuqA9QjcghnuV5Teztp6UT\n"
-                + "XB4/DEjrxpQVAwIDAQABoDQwFwYJKoZIhvcNAQkHMQoMCHBhc3N3b3JkMBkGCSqG\n"
-                + "SIb3DQEJAjEMDApNeSBjb21wYW55MA0GCSqGSIb3DQEBBQUAA4GBAHrz27fDtfyN\n"
-                + "H2Ceuik2BkwcU+bGjAenjHegiWX0+Kh0Y2UDKwXrd7L/raGxNqmDntS586SL9yG5\n"
-                + "O053OAqXnxe0YxhQbbFhpZzPbhwV/W1m/SPoxRuxUbUTluHtfHyux9dA45prKv/7\n"
-                + "hhe2MhlKyk/x4Rr7ruWUUXLH7XnA+aHk\n"
-                + "-----END CERTIFICATE REQUEST-----";
-        return csrPem;
-    }*/
 
     /**
      * Pem has following dn: <tt>CN=some valid body,L=DL,OU=CLRC,O=eScience,C=UK</tt>. 

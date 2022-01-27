@@ -31,19 +31,16 @@ public class FreemarkerEmailSender implements Sender {
 
     @Override
     public void send(SimpleMailMessage msg, Map<String, Object> hTemplateVariables, String templateFileName) {
-        MimeMessagePreparator preparator = new MimeMessagePreparator() {
-            @Override
-            public void prepare(MimeMessage mimeMessage) throws Exception {
-                MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
-                message.setTo(msg.getTo());
-                message.setFrom(msg.getFrom());
-                message.setSubject(msg.getSubject());
-                Configuration cfg = freemarkerConfig.createConfiguration();
-                cfg.setNumberFormat("computer"); // Otherwise numbers have , in them, which isn't great for our URLs!
-                String body = FreeMarkerTemplateUtils.processTemplateIntoString(cfg.getTemplate(templateFileName), hTemplateVariables);
-                log.info("body=" + body);
-                message.setText(body, true);
-            }
+        MimeMessagePreparator preparator = mimeMessage -> {
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
+            message.setTo(msg.getTo());
+            message.setFrom(msg.getFrom());
+            message.setSubject(msg.getSubject());
+            Configuration cfg = freemarkerConfig.createConfiguration();
+            cfg.setNumberFormat("computer"); // Otherwise numbers have , in them, which isn't great for our URLs!
+            String body = FreeMarkerTemplateUtils.processTemplateIntoString(cfg.getTemplate(templateFileName), hTemplateVariables);
+            log.info("body=" + body);
+            message.setText(body, true);
         };
 
         mailSender.send(preparator);

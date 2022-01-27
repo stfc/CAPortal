@@ -55,7 +55,7 @@ public class CsrRequestValidationConfigParams {
             throw new NullPointerException("ralistDao is null - use class setter");
         }
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
-        List<String> locArray = new ArrayList<String>(rows.size());
+        List<String> locArray = new ArrayList<>(rows.size());
         for (RalistRow row : rows) {
             locArray.add(row.getL().trim());
         }
@@ -70,7 +70,7 @@ public class CsrRequestValidationConfigParams {
             throw new NullPointerException("ralistDao is null - use class setter");
         }
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
-        List<String> ouArray = new ArrayList<String>(rows.size());
+        List<String> ouArray = new ArrayList<>(rows.size());
         for (RalistRow row : rows) {
             ouArray.add(row.getOu().trim());
         }

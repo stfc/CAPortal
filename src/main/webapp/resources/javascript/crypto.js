@@ -8,22 +8,22 @@
 /**
  * Create a new CSR using Forge JS with a 2048 key strength.
  *
- * @param string cn
- * @param string ou
- * @param string loc
- * @param string o
- * @param string c
- * @param string pw
- * @returns {{privateKey: *, csr: *, publicKey: *}}
+ * @param pw
+ * @param cn
+ * @param ou
+ * @param loc
+ * @param o
+ * @param c
+ * @param pw
  */
 function createCSR(cn, ou, loc, o, c, pw) {
 
     console.log('Generating 2048-bit key-pair...');
-    var keys = forge.pki.rsa.generateKeyPair({bits: 2048, workers: -1});
+    const keys = forge.pki.rsa.generateKeyPair({bits: 2048, workers: -1});
     console.log('Key-pair created.');
 
     console.log('Creating certification request (CSR) ...');
-    var csr = forge.pki.createCertificationRequest();
+    const csr = forge.pki.createCertificationRequest();
     csr.publicKey = keys.publicKey;
     // Notice we have to create the CSR with a DN that has the
     // following RDN structure order (C, O, OU, L, CN)
@@ -60,8 +60,8 @@ function createCSR(cn, ou, loc, o, c, pw) {
     // Specify a decent/recent encryption algorithm. If not specified, the
     // default algorithm is PBEWithMD5AndDES which BouncyCastle/java don't seem
     // to support, hence use 3des.
-    var algOpts = {algorithm: '3des'};
-    var pem = {
+    const algOpts = {algorithm: '3des'};
+    const pem = {
         //privateKey: forge.pki.privateKeyToPem(keys.privateKey),
         privateKey: forge.pki.encryptRsaPrivateKey(keys.privateKey, pw, algOpts),
         publicKey: forge.pki.publicKeyToPem(keys.publicKey),

@@ -81,8 +81,6 @@ public class CertOwnerBaseController {
         model.addAttribute("certHexSerial", cert.getSerialNumber().toString(16));
         model.addAttribute("revokeCertFormBean", new RevokeCertFormBean());
 
-        //model.addAttribute("countryOID", csrRequestValidationConfigParams.getCountryOID()); 
-        //model.addAttribute("orgNameOID", csrRequestValidationConfigParams.getOrgNameOID());  
         String certDn = certRow.getDn();
         model.addAttribute("countryOID", CertUtil.extractDnAttribute(certDn, CertUtil.DNAttributeType.C));
         model.addAttribute("orgNameOID", CertUtil.extractDnAttribute(certDn, CertUtil.DNAttributeType.O));

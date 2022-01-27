@@ -54,7 +54,7 @@ public class PubRequestUserCert {
         //log.debug("populateModel");
         // Populate the RA list pull down 
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
-        List<String> raArray = new ArrayList<String>(rows.size());
+        List<String> raArray = new ArrayList<>(rows.size());
 
         for (RalistRow row : rows) {
             // BUG - have had trouble submitting RA values that contain whitespace, 
@@ -72,10 +72,6 @@ public class PubRequestUserCert {
     /**
      * Invoked initially to add the 'newUserCertFormBean' model attribute.
      */
-    /*@ModelAttribute("newUserCertFormBean")
-    public NewUserCertFormBean createFormBean() {
-        return new NewUserCertFormBean();
-    }*/
 
 
     /**
@@ -177,23 +173,6 @@ public class PubRequestUserCert {
         return getReturnString(result, true);
     }
 
-
-
-
-
-    /*@RequestMapping(value = "submitRequest", method = RequestMethod.POST)
-    public @ResponseBody
-    String submitNewCertRequest(HttpEntity<String> entity){
-        //log.debug("Posted request headers [" + entity.getHeaders() + "]");
-        //log.debug("Posted request body [" + entity.getBody()+"]");
-        String[] bodyParams = entity.getBody().split("&");
-        if (bodyParams.length != 3) {
-            return "ERROR: invalid body params";
-        }
-        String pin = bodyParams[0].substring(4);
-        String email = bodyParams[1].substring(6);
-        String csr = bodyParams[2].substring(4);
-    }*/
 
     private String getReturnString(ProcessCsrResult result, boolean csrProvided) {
         String returnResult = "";

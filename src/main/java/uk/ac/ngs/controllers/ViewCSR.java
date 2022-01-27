@@ -16,15 +16,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.Attribute;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
-import org.bouncycastle.util.io.pem.PemReader;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,14 +43,9 @@ import uk.ac.ngs.service.CsrManagerService;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,15 +98,15 @@ public class ViewCSR {
 
                 // find all certs existing certs that have this DN  
                 Map<JdbcCertificateDao.WHERE_PARAMS, String> whereByParams =
-                        new EnumMap<JdbcCertificateDao.WHERE_PARAMS, String>(JdbcCertificateDao.WHERE_PARAMS.class);
+                        new EnumMap<>(JdbcCertificateDao.WHERE_PARAMS.class);
                 whereByParams.put(JdbcCertificateDao.WHERE_PARAMS.DN_LIKE, row.getDn());
                 List<CertificateRow> certRows = certDao.findBy(whereByParams, null, null);
 
                 // build lists of cert ids 
-                List<Long> statusRevokedCertIds = new ArrayList<Long>();
-                List<Long> statusValidExpiredIds = new ArrayList<Long>();
-                List<Long> statusValidNotExpiredIds = new ArrayList<Long>();
-                List<Long> statusOtherIds = new ArrayList<Long>();
+                List<Long> statusRevokedCertIds = new ArrayList<>();
+                List<Long> statusValidExpiredIds = new ArrayList<>();
+                List<Long> statusValidNotExpiredIds = new ArrayList<>();
+                List<Long> statusOtherIds = new ArrayList<>();
 
                 for (CertificateRow certRow : certRows) {
                     if ("REVOKED".equals(certRow.getStatus())) {
@@ -149,14 +139,14 @@ public class ViewCSR {
                     // that have the same bulkID and same Status values. 
 
                     // Create a map used to define our where clauses (where bulkid = '5' and status = 'valid') 
-                    Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class);
+                    Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new EnumMap<>(JdbcRequestDao.WHERE_PARAMS.class);
                     whereParams.put(JdbcRequestDao.WHERE_PARAMS.BULKID_EQ, "" + row.getBulk());
                     //whereParams.put(JdbcRequestDao.WHERE_PARAMS.STATUS_EQ, row.getStatus()); 
 
                     // Query the DB for related bulks
                     List<RequestRow> otherBulks = this.jdbcRequestDao.findBy(whereParams, null, null);
                     // Iterate the returned rows and extract the serial numbers/PKs and CNs of those rows
-                    Map<Long, String> csrReq_keysCNsInBulk = new HashMap<Long, String>(0);
+                    Map<Long, String> csrReq_keysCNsInBulk = new HashMap<>(0);
                     for (RequestRow requestRow : otherBulks) {
                         // store the serial/pk and CN in the map               
                         csrReq_keysCNsInBulk.put(requestRow.getReq_key(), requestRow.getCn());
@@ -255,7 +245,7 @@ public class ViewCSR {
                                     for (ASN1Encodable san : sansSequence) {
                                         // There is at least one tagged SAN in every sequence
                                         ASN1TaggedObject sanTagged = (ASN1TaggedObject) san;
-                                        ASN1OctetString sanOctectString = (ASN1OctetString) sanTagged.getObject();
+                                        ASN1OctetString sanOctectString = (ASN1OctetString) sanTagged.getLoadedObject();
                                         String sanString = new String(sanOctectString.getOctets(), StandardCharsets.UTF_8);
                                         if(!sanString.equals(row.getCn())) {
                                             sans.add(CertUtil.getPrefix(sanTagged.getTagNo()) + "=<span style=\"color:red;font-weight:bold\">" + sanString + "</span>");

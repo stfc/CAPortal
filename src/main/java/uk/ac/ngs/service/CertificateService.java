@@ -51,12 +51,6 @@ public class CertificateService {
     private final static Pattern DATA_EMAIL_PATTERN = Pattern.compile("emailAddress\\s?=\\s?([^\\n]+)$", flags);
     private final static Pattern DATA_ROLE_PATTERN = Pattern.compile("ROLE\\s?=\\s?([^\\n]+)$", flags);
     private final EmailValidator emailValidator = new EmailValidator();
-    
-    /*@Transactional
-    public int updateCertificateRow(CertificateRow certRow) {
-        int rowsUpdated = jdbcCertDao.updateCertificateRow(certRow);
-        return rowsUpdated;
-    }*/
 
     /**
      * Update certificate email value in <code>certificate</code> DB table and
@@ -196,7 +190,7 @@ public class CertificateService {
             String[] admin = this.mutableConfigParams.getProperty("senior.caops").split(";");
 
             Map<JdbcCertificateDao.WHERE_PARAMS, String> whereParams = new
-                    EnumMap<JdbcCertificateDao.WHERE_PARAMS, String>(JdbcCertificateDao.WHERE_PARAMS.class);
+                    EnumMap<>(JdbcCertificateDao.WHERE_PARAMS.class);
 
             for (String dn : admin) {
                 whereParams.put(JdbcCertificateDao.WHERE_PARAMS.DN_LIKE, dn);

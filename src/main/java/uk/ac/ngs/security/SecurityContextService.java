@@ -80,18 +80,6 @@ public class SecurityContextService {
     }
 
 
-    /*public final boolean hasRole(String role) {
-    boolean hasRole = false;
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
-    if (userDetails != null) {
-      Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) userDetails.getAuthorities();
-      if (isRolePresent(authorities, role)) {
-        hasRole = true;
-      }
-    } 
-    return hasRole;
-  }*/
-
     public X509Certificate getCredentials() {
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             return (X509Certificate) SecurityContextHolder.getContext().getAuthentication().getCredentials();
@@ -152,7 +140,7 @@ public class SecurityContextService {
 
     public List<GrantedAuthority> getGrantedAuthorities(CertificateRow cr) {
         // Get the status and determine the relevant roles cr.getStatus(); 
-        List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
+        List<GrantedAuthority> auths = new ArrayList<>();
         String role = getRoleFromDataColumn(cr);
         if ("VALID".equals(cr.getStatus())) {
             if ("User".equalsIgnoreCase(role)) {

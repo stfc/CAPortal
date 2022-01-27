@@ -54,7 +54,7 @@ public class PubViewRalist {
     public void populateModel(Model model, HttpSession session) {
         List<RalistRow> rows = this.ralistDao.findAllByActive(null, null, null);
         //log.debug("ralist rows size: "+rows.size());
-        PartialPagedListHolder<RalistRow> pagedListHolder = new PartialPagedListHolder<RalistRow>(rows);
+        PartialPagedListHolder<RalistRow> pagedListHolder = new PartialPagedListHolder<>(rows);
         model.addAttribute(RALIST_PAGE_LIST_HOLDER, pagedListHolder);
         session.setAttribute(LAST_RALIST_SEARCH_DATE_SESSION, new Date());
     }

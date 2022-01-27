@@ -92,7 +92,7 @@ public class JdbcCaUserAuthDao {
         String sql = "select cert_key, data, dn, email, status, role, notafter from certificate " +
                 "where status = 'VALID' and dn = :dn and notafter > :current_time";
         //Map<String, String> namedParameters = Collections.singletonMap("dn", dn);
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("dn", dn);
         namedParameters.put("current_time", Long.parseLong(currentTime));
         if (jdbcTemplate == null) {

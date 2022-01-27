@@ -108,7 +108,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('#selall').click(function () {
-            var checkBoxes = $(":checkbox");
+            const checkBoxes = $(":checkbox");
             checkBoxes.prop("checked", !checkBoxes.prop("checked"));
         });
         $("#bulkTab").tablesorter({sortList: [[1, 0], [2, 0]]});

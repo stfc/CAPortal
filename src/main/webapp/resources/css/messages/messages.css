@@ -1,6 +1,6 @@
 div.info,div.success,div.warning,div.error {
 	/*border: 1px solid;*/
-	margin: 10px 0px;
+	margin: 10px 0;
 	padding: 15px 10px 15px 50px;
 	background-repeat: no-repeat;
 	background-position: 10px center;
@@ -77,14 +77,14 @@ table.createp12 {
 	background-color: white;
 }
 table.createp12 th {
-	border-width: 0px;
+	border-width: 0;
 	padding: 4px;
 	border-style: solid;
 	border-color: gray;
 	background-color: rgb(255, 255, 250);
 }
 table.createp12 td {
-	border-width: 0px;
+	border-width: 0;
 	padding: 4px;
 	border-style: solid;
 	border-color: gray;

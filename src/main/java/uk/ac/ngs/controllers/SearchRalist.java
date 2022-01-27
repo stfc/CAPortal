@@ -58,14 +58,9 @@ public class SearchRalist {
     @ModelAttribute
     public void populateModel(Model model, HttpSession session) {
         // Populate model with an empty list if session var is not present (e.g. session expired) 
-        //PartialPagedListHolder<RalistRow> pagedListHolder = (PartialPagedListHolder<RalistRow>) session.getAttribute(RALIST_PAGE_LIST_HOLDER);
-        //if (pagedListHolder == null) {
-        //    pagedListHolder = new PartialPagedListHolder<RalistRow>(new ArrayList<RalistRow>(0));
-        //    session.setAttribute(RALIST_PAGE_LIST_HOLDER, pagedListHolder);
-        //}
         List<RalistRow> rows = this.ralistDao.findAllByActive(null, null, null);
         //log.debug("ralist rows size: "+rows.size());
-        PartialPagedListHolder<RalistRow> pagedListHolder = new PartialPagedListHolder<RalistRow>(rows);
+        PartialPagedListHolder<RalistRow> pagedListHolder = new PartialPagedListHolder<>(rows);
         model.addAttribute(RALIST_PAGE_LIST_HOLDER, pagedListHolder);
         session.setAttribute(LAST_RALIST_SEARCH_DATE_SESSION, new Date());
     }
@@ -95,11 +90,6 @@ public class SearchRalist {
         //log.debug("posted rows size: "+updatedRows.size()); 
         if (updatedRows != null && updatedRows.size() > 0) {
             // here iterate all the rows and issue update statements in a single tx  
-//            for(RalistRow row : updatedRows){
-//                //if(!row.getActive()){
-//                //    log.debug(row.getRa_id()); 
-//                //}
-//            }
         }
 
         return "redirect:/raop/searchralist";

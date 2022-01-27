@@ -92,12 +92,12 @@ public class SearchCSR {
         PartialPagedListHolder<RequestRow> pagedListHolder =
                 (PartialPagedListHolder<RequestRow>) session.getAttribute(SearchCSR.CSR_PAGE_LIST_HOLDER_SESSIONSCOPE);
         if (pagedListHolder == null) {
-            pagedListHolder = new PartialPagedListHolder<RequestRow>(new ArrayList<RequestRow>(0));
+            pagedListHolder = new PartialPagedListHolder<>(new ArrayList<>(0));
             session.setAttribute(SearchCSR.CSR_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
         }
         // Populate the RA list pull down 
         List<RalistRow> rows = this.ralistDao.findAllByActive(true, null, null);
-        List<String> raArray = new ArrayList<String>();
+        List<String> raArray = new ArrayList<>();
         String userDN = this.securityContextService.getCaUserDetails().getCertificateRow().getDn();
         String l = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.L);
         String ou = CertUtil.extractDnAttribute(userDN, CertUtil.DNAttributeType.OU);
@@ -162,30 +162,6 @@ public class SearchCSR {
      *
      * @return "redirect:/raop/searchcsr/search?multiple=search&params=go here"
      */
-    /*@RequestMapping(method = RequestMethod.POST)
-    public String submitSearch(
-            @Valid SearchCsrFormBean searchCsrFormBean, BindingResult result,
-            RedirectAttributes redirectAttrs, SessionStatus sessionStatus,
-            Model model, HttpSession session) {
-
-        if (result.hasErrors()) {
-            log.warn("binding and validation errors");
-            return "raop/searchcsr";
-        }
-
-        searchCsrFormBean.setStartRow(0); 
-        log.debug("adding message search submitted ok: ["+searchCsrFormBean.getRa()+"]"); 
-
-        // Store a success message for rendering on the next request after redirect
-        redirectAttrs.addFlashAttribute("message", "Search Submitted OK");
-        
-        
-        // Now submit to our GET /search handler to run the query 
-        //String url = response.encodeRedirectURL("/raop/searchcsr/search?"+this.buildGetRequestParams(searchCsrFormBean)); 
-        // http://forum.springsource.org/showthread.php?86633-Spring-3-annotated-controllers-redirection-strings-and-appending-parameters-to-URL
-        String url = "/raop/searchcsr/search?"+this.buildGetRequestParams(searchCsrFormBean); 
-        return "redirect:"+url; 
-    }*/
     @RequestMapping(method = RequestMethod.POST)
     public String submitSearch(
             @Valid SearchCsrFormBean searchCsrFormBean, BindingResult result,
@@ -242,7 +218,7 @@ public class SearchCSR {
     }*/
 
     private Map<String, Object> getParams(SearchCsrFormBean searchCsrFormBean) {
-        Map<String, Object> mav = new HashMap<String, Object>();
+        Map<String, Object> mav = new HashMap<>();
         if (StringUtils.hasText(searchCsrFormBean.getName())) {
             mav.put("name", searchCsrFormBean.getName());
         }
@@ -325,87 +301,11 @@ public class SearchCSR {
         List<RequestRow> rows = pair.first;
         int totalRows = pair.second;
 
-        PartialPagedListHolder<RequestRow> pagedListHolder = new PartialPagedListHolder<RequestRow>(rows, totalRows);
+        PartialPagedListHolder<RequestRow> pagedListHolder = new PartialPagedListHolder<>(rows, totalRows);
         pagedListHolder.setPageSize(limit);
         pagedListHolder.setRow(startRow);
         session.setAttribute(SearchCSR.CSR_PAGE_LIST_HOLDER_SESSIONSCOPE, pagedListHolder);
     }
-
-     /*private String buildGetRequestParams(SearchCsrFormBean searchCsrFormBean){
-         //try {
-            //String enc = "UTF-8";
-            StringBuilder params = new StringBuilder("");
-            if (StringUtils.hasText(searchCsrFormBean.getName())) {
-                params.append("name=");
-                //params.append(URLEncoder.encode(searchCsrFormBean.getName(), enc));
-                params.append(searchCsrFormBean.getName());
-                params.append("&");
-            }
-            if (StringUtils.hasText(searchCsrFormBean.getDn())) {
-                params.append("dn=");
-                //params.append(URLEncoder.encode(searchCsrFormBean.getDn(), enc));
-                params.append(searchCsrFormBean.getDn());
-                params.append("&");
-            }
-            if (StringUtils.hasText(searchCsrFormBean.getData())) {
-                params.append("data=");
-                //params.append(URLEncoder.encode(searchCsrFormBean.getData(), enc));
-                params.append(searchCsrFormBean.getData());
-                params.append("&");
-            }
-            if (StringUtils.hasText(searchCsrFormBean.getEmailAddress())) {
-                params.append("emailAddress=");
-                //params.append(URLEncoder.encode(searchCsrFormBean.getEmailAddress(), enc));
-                params.append(searchCsrFormBean.getEmailAddress());
-                params.append("&");
-            } 
-            if(searchCsrFormBean.getSearchNullEmailAddress() != null){
-                params.append("searchNullEmailAddress=");
-                //params.append(URLEncoder.encode(searchCsrFormBean.getSearchNullEmailAddress().toString(), enc));
-                params.append(searchCsrFormBean.getSearchNullEmailAddress().toString());
-                params.append("&");
-            }
-            if(searchCsrFormBean.getReq_key() != null){ 
-                params.append("req_key=");
-                //params.append(URLEncoder.encode(searchCsrFormBean.getReq_key().toString(), enc));
-                params.append(searchCsrFormBean.getReq_key().toString());
-                params.append("&");
-            }
-            if(StringUtils.hasText(searchCsrFormBean.getRa())){
-                params.append("ra="); 
-                //params.append(URLEncoder.encode(searchCsrFormBean.getRa(), enc));
-                params.append(searchCsrFormBean.getRa());
-                params.append("&"); 
-            }
-            if(StringUtils.hasText(searchCsrFormBean.getStatus())){
-                params.append("status="); 
-                //params.append(URLEncoder.encode(searchCsrFormBean.getStatus().toString(), enc));
-                params.append(searchCsrFormBean.getStatus().toString());
-                params.append("&"); 
-            }
-            if(searchCsrFormBean.getStartRow() != null){ 
-                params.append("startRow=");
-                //params.append(URLEncoder.encode(searchCsrFormBean.getStartRow().toString(), enc));
-                params.append(searchCsrFormBean.getStartRow().toString());
-                params.append("&");
-            }
-            if(searchCsrFormBean.getShowRowCount() != null){
-                params.append("showRowCount=");
-                //params.append(URLEncoder.encode(searchCsrFormBean.getShowRowCount().toString(), enc));
-                params.append(searchCsrFormBean.getShowRowCount().toString());
-                params.append("&");
-            }
-            
-            // remove final & if present 
-            String getParams = params.toString();
-            if (getParams.endsWith("&")) {
-                getParams = getParams.substring(0, getParams.length() - 1);
-            }
-            return getParams;
-        //} catch (UnsupportedEncodingException ex) {
-        //    throw new IllegalStateException(ex);
-        //}
-     }*/
 
     /**
      * Handle POSTs to "/raop/searchcsr/goto" to paginate to a specific row.
@@ -514,7 +414,7 @@ public class SearchCSR {
 
         if (searchCsrFormBean.getReq_key() != null) {
             RequestRow row = this.jdbcRequestDao.findById(searchCsrFormBean.getReq_key());
-            List<RequestRow> rows = new ArrayList<RequestRow>(0);
+            List<RequestRow> rows = new ArrayList<>(0);
             if (row != null) {
                 rows.add(row);
                 row.setData(null);
@@ -523,7 +423,7 @@ public class SearchCSR {
         } else {
             // select RA from pulldown and perform search
             Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new
-                    EnumMap<JdbcRequestDao.WHERE_PARAMS, String>(JdbcRequestDao.WHERE_PARAMS.class);
+                    EnumMap<>(JdbcRequestDao.WHERE_PARAMS.class);
 
             String ra = searchCsrFormBean.getRa();
             if (StringUtils.hasText(ra) && !"all".equals(ra)) {

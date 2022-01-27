@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class ViewBulkFormBean {
 
-    private List<RequestWrapper> rows = new ArrayList<RequestWrapper>(0);
+    private List<RequestWrapper> rows = new ArrayList<>(0);
     private Long bulkId;
 
     public ViewBulkFormBean() {

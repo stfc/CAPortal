@@ -70,9 +70,9 @@ public class GlobalControllerExceptionHandler {
         // send notification email 
         boolean emailOnError = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.admins.on.error"));
         if (emailOnError) {
-            Set<String> adminEmails = new HashSet<String>(); // use set so duplicates aren't added 
             String[] allemails = this.mutableConfigParams.getProperty("email.admin.addresses").split(",");
-            adminEmails.addAll(Arrays.asList(allemails));
+            // use set so duplicates aren't added
+            Set<String> adminEmails = new HashSet<>(Arrays.asList(allemails));
             this.emailService.sendAdminsOnError(adminEmails, e, req.getRequestURL().toString());
         }
 

@@ -168,13 +168,6 @@ public class JdbcRequestDao {
         return this.jdbcTemplate.queryForObject(p.first, p.second, Integer.class);
     }
 
-    /*public List<RequestRow> findByPublicKeyNotDeleted(String public_key){
-         String query = SELECT_PROJECT + "where public_key = :public_key and status <> 'DELETED'";
-          Map<String, Object> namedParameters = new HashMap<String, Object>();
-          namedParameters.put("public_key", public_key); 
-          return this.jdbcTemplate.query(query, namedParameters, new RequestRowMapper()); 
-    }*/
-
     /**
      * Count the number of rows that have the given public key with a <tt>status</tt>
      * that is not <tt>DELETED</tt>.
@@ -186,7 +179,7 @@ public class JdbcRequestDao {
     public int countByPublicKeyNotDeleted(String public_key) {
         //String query = SELECT_PROJECT + "where public_key = :public_key and status <> 'DELETED'";
         String query = SELECT_COUNT + "where public_key = :public_key and status <> 'DELETED'";
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("public_key", public_key);
         //return this.jdbcTemplate.query(query, namedParameters, new RequestRowMapper()); 
         return this.jdbcTemplate.queryForObject(query, namedParameters, Integer.class);
@@ -219,19 +212,11 @@ public class JdbcRequestDao {
                 + "(SELECT req_key FROM certificate WHERE dn = :dn AND status = 'VALID' AND notafter > :currentTime)"
                 //+ "(SELECT req_key FROM certificate WHERE dn ILIKE :dn AND status = 'VALID' AND notafter > :currentTime)" 
                 + " AND bulk IS NOT NULL";
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("dn", rfc2253RenewDN);
         namedParameters.put("currentTime", Long.valueOf(currentTimeUTC));
-      
-        /*Long maxBulkId = this.jdbcTemplate.query(query, namedParameters, new ResultSetExtractor<Long>() {
-            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-               Long retVal = rs.next() ? rs.getLong("max") : null; // rs.getLong() returns 0 for SQL NULL 
-               if(retVal != null && retVal == 0) return null; 
-               else return retVal; 
-            }
-        }); */
 
-        // queryForObject returns null in case of SQL NULL (note, the use of the 
+        // queryForObject returns null in case of SQL NULL (note, the use of the
         // SQL max() function means the query always returns a value and so we don't 
         // get an 'IncorrectResultSizeDataAccessException' if there is no bulk 
         Number number = this.jdbcTemplate.queryForObject(query, namedParameters, Long.class);
@@ -256,7 +241,7 @@ public class JdbcRequestDao {
     public int countByDnWhereStatusNewApprovedRenew(String rfc2253DN) {
         String query = SELECT_COUNT +
                 " where dn ILIKE :dn and (status='NEW' or status = 'APPROVED' or status = 'RENEW')";
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("dn", rfc2253DN);
         return this.jdbcTemplate.queryForObject(query, namedParameters, Integer.class);
     }
@@ -269,7 +254,7 @@ public class JdbcRequestDao {
      * @return row or null if no row is found
      */
     public RequestRow findById(long req_key) {
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("req_key", req_key);
         try {
             return this.jdbcTemplate.queryForObject(SQL_SELECT_BY_ID, namedParameters, new RequestRowMapper());
@@ -326,7 +311,7 @@ public class JdbcRequestDao {
         if (csr.getReq_key() <= 0) {
             throw new IllegalArgumentException("Invalid csr, csr.req_key is zero or negative");
         }
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("req_key", csr.getReq_key());
         namedParameters.put("format", csr.getFormat());
         namedParameters.put("data", csr.getData());
@@ -439,7 +424,7 @@ public class JdbcRequestDao {
                                                            Map<WHERE_PARAMS, String> whereByParams, Integer limit, Integer offset, boolean orderby) {
 
         String whereClause = "";
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         if (whereByParams != null && !whereByParams.isEmpty()) {
             StringBuilder whereBuilder = new StringBuilder("where ");
             if (whereByParams.containsKey(WHERE_PARAMS.RA_EQ)) {
@@ -570,8 +555,6 @@ public class JdbcRequestDao {
         dataColumnBlob = dataColumnBlob + "NOTBEFORE = " + (new Date()) + NEWLINE;
         dataColumnBlob = dataColumnBlob + "PIN = " + pinHash + NEWLINE;
         // We never use ADDITIONAL_ATTRIBUTE_EMAIL - is this correct?
-        // result = result + "ADDITIONAL_ATTRIBUTE_EMAIL = " + getEmail() + NEWLINE;
-        //dataColumnBlob = dataColumnBlob + "CWIZPIN = " + getPinElementValue() + NEWLINE;
 
         dataColumnBlob = dataColumnBlob + "RA = " + csrWrapper.getP10Ou() + " " + csrWrapper.getP10Loc() + NEWLINE;
         dataColumnBlob = dataColumnBlob + "ROLE = " + role + NEWLINE;
@@ -591,14 +574,6 @@ public class JdbcRequestDao {
         if (Csr_Types.RENEW.equals(csrWrapper.getCsr_type())) {
             dataColumnBlob = dataColumnBlob + "RENEWAL = true" + NEWLINE;
         }
-        /*else {
-         // For now, we are only going add RENEWAL=false if this is a HOST
-         // certificate request (to satisfy the signing foybales). 
-         // TODO - RENEWAL=false for both HOST and USER certificates. 
-         if (Profile.UKHOST.equals(this.profile)) {
-         dataColumnBlob = dataColumnBlob + "RENEWAL = false" + NEWLINE;
-         }
-         }*/
 
         dataColumnBlob = dataColumnBlob + footer + NEWLINE;
         dataColumnBlob = dataColumnBlob + csrWrapper.getCsrPemString();

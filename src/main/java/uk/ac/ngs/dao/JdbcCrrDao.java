@@ -123,7 +123,7 @@ public class JdbcCrrDao {
      * @return or null if no row is found.
      */
     public CrrRow findById(long crr_key) {
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("crr_key", crr_key);
         try {
             return this.jdbcTemplate.queryForObject(SELECT_BY_ID, namedParameters, new CrrRowMapper());
@@ -301,7 +301,7 @@ public class JdbcCrrDao {
     }
 
     private Map<String, Object> buildParameterMap(CrrRow crr) {
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("cert_key", crr.getCert_key());
         namedParameters.put("submit_date", crr.getSubmit_date());
         namedParameters.put("format", crr.getFormat());
@@ -328,7 +328,7 @@ public class JdbcCrrDao {
                                                            Map<WHERE_PARAMS, String> whereByParams, Integer limit, Integer offset, boolean orderby) {
 
         String whereClause = "";
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         if (whereByParams != null && !whereByParams.isEmpty()) {
             StringBuilder whereBuilder = new StringBuilder("where ");
             if (whereByParams.containsKey(WHERE_PARAMS.RA_EQ)) {

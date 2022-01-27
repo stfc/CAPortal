@@ -16,19 +16,19 @@ MvcUtil.showErrorResponse = function showErrorResponse(text, element) {
 };
 
 MvcUtil.showResponse = function(type, text, element) {
-    var responseElementId = element.attr("id") + "Response";
-    var responseElement = $("#" + responseElementId);
-    if (responseElement.length == 0) {
+    const responseElementId = element.attr("id") + "Response";
+    let responseElement = $("#" + responseElementId);
+    if (responseElement.length === 0) {
         // responseElement.length = The number of elements currently matched.
         // responseElement does not exist, so insert a new responseElement after element.  
-        if (type == 'success') {
+        if (type === 'success') {
             responseElement = $('<div id="' + responseElementId + '" class="' + type + '">' + text + '</div>').insertAfter(element);
         } else {
             responseElement = $('<span id="' + responseElementId + '" class="' + type + '" style="display:none">' + text + '</span>').insertAfter(element);
         }
     } else {
         // responseElement already exists, so replace it. 
-        if (type == 'success') {
+        if (type === 'success') {
             responseElement.replaceWith('<div id="' + responseElementId + '" class="' + type + '">' + text + '</div>');
         } else {
             responseElement.replaceWith('<span id="' + responseElementId + '" class="' + type + '" style="display:none">' + text + '</span>');

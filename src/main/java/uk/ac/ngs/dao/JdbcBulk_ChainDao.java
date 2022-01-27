@@ -56,18 +56,13 @@ public class JdbcBulk_ChainDao {
         log.debug("select newid from bulk_chain where oldid = " + oldId);
 
         String query = "SELECT newid FROM bulk_chain WHERE oldid = :oldId";
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("oldId", oldId);
 
         // If newBulkId is not null, then a certificate from this bulk has 
         // already been renewed (or a renew was previously submitted but was not approved, i.e. pending/deleted). 
         // In this case, the newid already exists for this bulk and we must re-use it. 
-        Long newBulkId = this.jdbcTemplate.query(query, namedParameters, new ResultSetExtractor<Long>() {
-            @Override
-            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getLong("newid") : null;
-            }
-        });
+        Long newBulkId = this.jdbcTemplate.query(query, namedParameters, rs -> rs.next() ? rs.getLong("newid") : null);
 
         if (newBulkId != null) {
             log.debug("newid exists reusing - " + newBulkId);
@@ -87,12 +82,7 @@ public class JdbcBulk_ChainDao {
             // @see: http://www.postgresql.org/docs/8.3/static/sql-lock.html 
             this.jdbcTemplate.getJdbcOperations().execute("LOCK TABLE bulk_chain IN SHARE ROW EXCLUSIVE MODE");
 
-            newBulkId = this.jdbcTemplate.query(query, namedParameters, new ResultSetExtractor<Long>() {
-                @Override
-                public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-                    return rs.next() ? rs.getLong("newid") : null;
-                }
-            });
+            newBulkId = this.jdbcTemplate.query(query, namedParameters, rs -> rs.next() ? rs.getLong("newid") : null);
             if (newBulkId == null) {
                 log.debug("newid was null, inserting new row into bulk_chain");
 

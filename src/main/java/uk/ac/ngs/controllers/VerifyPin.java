@@ -107,28 +107,4 @@ public class VerifyPin {
     }
 
 
-    /*private String getHash(String originalValue) {
-        try {
-            java.security.MessageDigest d = null;
-            d = java.security.MessageDigest.getInstance("SHA-1");
-            //d = java.security.MessageDigest.getInstance("MD5");
-            d.reset();
-            d.update(originalValue.getBytes("UTF-8"));  //originally was: d.update(originalValue.getBytes());
-            byte[] b = d.digest();
-
-            StringBuffer sb = new StringBuffer(b.length * 2);
-            for (int i = 0; i < b.length; i++) {
-                int v = b[i] & 0xff;
-                if (v < 16) {
-                    sb.append('0');
-                }
-                sb.append(Integer.toHexString(v));
-            }
-            return sb.toString().toUpperCase();
-        } catch (Exception ep) {
-            ep.printStackTrace();
-            return null;
-        }
-    }*/
-
 }

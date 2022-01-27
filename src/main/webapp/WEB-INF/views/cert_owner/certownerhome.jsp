@@ -153,8 +153,8 @@
 <%@ include file="../../jspf/footer.jspf" %>
 <script type="text/javascript">
     function emailValid() {
-        var inputEmail = $("#emailInputText");
-        var currEmail = $("#currEmail").text();
+        const inputEmail = $("#emailInputText");
+        const currEmail = $("#currEmail").text();
         //adds error text and disables save button if not an email address or email same as current email
         if (inputEmail.val().match(/^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$/) === null || inputEmail.val() === currEmail) {
             $(inputEmail).addClass("error").next().text("Invalid email");

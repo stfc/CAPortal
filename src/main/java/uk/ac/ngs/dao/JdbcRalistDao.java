@@ -75,19 +75,6 @@ public class JdbcRalistDao {
      * @param offset results by this number of rows (null for no offset)
      * @return
      */
-    /*public List<RalistRow> findAll(Integer limit, Integer offset) {
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
-        String query = SQL_SELECT_ALL+ORDER_BY;
-        if (limit != null) {
-            query += LIMIT_ROWS;
-            namedParameters.put("limit", limit);
-        }
-        if (offset != null) {
-            query += OFFSET_ROWS;
-            namedParameters.put("offset", offset);
-        }
-        return this.jdbcTemplate.query(query, namedParameters, new JdbcRalistDao.RalistRowMapper());
-    }*/
 
     /**
      * Return all the rows in the <code>ralist</code> table according to
@@ -99,7 +86,7 @@ public class JdbcRalistDao {
      * @return
      */
     public List<RalistRow> findAllByActive(Boolean active, Integer limit, Integer offset) {
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         String query = SQL_SELECT_ALL;
         if (active != null) {
             query += "where active = :active ";

@@ -54,12 +54,9 @@ public class TestBC_x509 {
     //
     @Test
     public void testParseSampleX509_Via_bcprov_jdk15on_1_50() throws Exception {
-         String x509Pem = this.getSampleX509(); 
-         //PemReader pemReader = new PemReader(new StringReader(x509Pem));
-         //PemObject obj = pemReader.readPemObject();
-         //byte[] pembytes = obj.getContent();
-         
-         CertificateFactory cf = CertificateFactory.getInstance("X.509");
+         String x509Pem = this.getSampleX509();
+
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
          InputStream is = new ByteArrayInputStream(x509Pem.getBytes(StandardCharsets.UTF_8));
          X509Certificate certObj = (X509Certificate) cf.generateCertificate(is);
          //System.out.println(certObj.getSubjectDN().getName()); 

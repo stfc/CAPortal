@@ -275,9 +275,6 @@
                 </table>
             </div>
         </div> <!-- /container -->
-    </div>
-</div> <!-- /span -->
-
 
 
 <%@ include file="../../jspf/footer.jspf" %>

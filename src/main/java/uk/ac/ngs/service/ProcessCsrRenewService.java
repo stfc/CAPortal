@@ -62,8 +62,6 @@ public class ProcessCsrRenewService {
     private CsrRequestDbValidator csrRequestDbValidator;
     private JdbcRequestDao jdbcRequestDao;
     private JdbcBulk_ChainDao jdbcBulk_ChainDao;
-    //    private String agent = "Portal";
-//    private boolean emailRaOnRenew = true;
     private EmailService emailService;
     private JdbcCertificateDao certDao;
     private MutableConfigParams mutableConfigParams;
@@ -124,33 +122,12 @@ public class ProcessCsrRenewService {
                 log.info("Self RENEW requests an email change from [" + clientEmail + "] to [" + newEmail + "]");
                 clientEmail = newEmail.trim();
                 emailUpdate = true;
-            }  
-            /*
-            boolean emailUpdate; 
-            if(newEmail == null || "".equals(newEmail.trim()) ) { 
-                 newEmail = clientEmail; // newEmail is same as existing email  
-                 emailUpdate = false; 
-            } else {
-                log.info("Self RENEW requests an email change from ["+ clientEmail + "] to ["+newEmail+"]");
-                emailUpdate = true; 
             }
-            */
 
 
             String pkcs8StrEnc = null;
             if (createKeysOnServer) {
-                X500NameBuilder x500NameBld = new X500NameBuilder(BCStyle.INSTANCE);
-                x500NameBld.addRDN(BCStyle.C, csrRequestValidationConfigParams.getCountryOID());
-                x500NameBld.addRDN(BCStyle.O, csrRequestValidationConfigParams.getOrgNameOID());
-                x500NameBld.addRDN(BCStyle.OU, ou);
-                x500NameBld.addRDN(BCStyle.L, loc);
-                x500NameBld.addRDN(BCStyle.CN, cn);
-                X500Name subject = x500NameBld.build();
-
-                CsrAndPrivateKeyPemStringBuilder csrFactoryService = new CsrAndPrivateKeyPemStringBuilder();
-                String[] pems = csrFactoryService.getPkcs10_Pkcs8_AsPemStrings(subject, clientEmail, pw); // change clientEmail to newEmail
-                csr = pems[0];
-                pkcs8StrEnc = pems[1];
+                log.error("DO NOT CREATE KEYS ON THE SERVER");
             }
 
             // Determine renew profile
@@ -211,7 +188,7 @@ public class ProcessCsrRenewService {
             boolean emailRaOnRenew = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.ra.on.renew"));
 
             if (emailRaOnRenew) {
-                Set<String> raEmails = new HashSet<String>(0); // use set so duplicates aren't added
+                Set<String> raEmails = new HashSet<>(0); // use set so duplicates aren't added
                 // Find all the RA email addresses, iterate and send
                 List<CertificateRow> raCerts = this.certDao.findActiveRAsBy(csrWrapper.getP10Loc(), csrWrapper.getP10Ou());
                 for (CertificateRow raCert : raCerts) {
@@ -231,22 +208,7 @@ public class ProcessCsrRenewService {
             }
             return new ProcessCsrResult(req_key, csrWrapper, pkcs8StrEnc);
 
-        } catch (IOException ex) {
-            Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (InvalidKeyException ex) {
-            Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (NoSuchProviderException ex) {
-            Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (OperatorCreationException ex) {
-            Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        } catch (PKCSException ex) {
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException ex) {
             Logger.getLogger(ProcessCsrRenewService.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
@@ -274,10 +236,6 @@ public class ProcessCsrRenewService {
         requestRow.setStatus("RENEW");
         requestRow.setRole(role);
         requestRow.setPublic_key(ConvertUtil.getDBFormattedRSAPublicKey(csrWrapper.getP10PubKey()));
-        //requestRow.setRao(null);
-        //requestRow.setScep_tid(null);
-        //requestRow.setLoa(null);
-        //requestRow.setBulk(null);
         return requestRow;
     }
 
@@ -317,18 +275,12 @@ public class ProcessCsrRenewService {
      * Synchronized to allow re-setting of this property dynamically at runtime. 
      * @param agent Records the name of the software used to create the CSR. 
      */
-//    public synchronized void setAgent(String agent) {
-//        this.agent = agent;
-//    }
 
     /**
      * Synchronized to allow re-setting of this property dynamically at runtime. 
      * If set to true, the EmailService is used to notify RAs of the the CSR. 
      * @param emailRaOnRenew the emailRaOnRenew to set
      */
-//    public synchronized void setEmailRaOnRenew(boolean emailRaOnRenew) {
-//        this.emailRaOnRenew = emailRaOnRenew;
-//    }
 
     /**
      * @param emailService the emailService to set

@@ -113,8 +113,6 @@ public class GeneralTests {
         // Tue Apr 23 13:47:13 2013 UTC
         DateFormat df = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy zzz");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        //System.out.println("currentTime dave: " + df.format(new Date()));
-        //System.out.println("currentTime dave: "+new Date().toString());   
     }
 
     @Test
@@ -188,10 +186,8 @@ public class GeneralTests {
         String dateString = utcDateFormat.format(new Date()); 
         int raopId = 12345; 
         data = data.replaceAll("-----END HEADER-----", "RAOP = "+raopId+"\n-----END HEADER-----"); 
-        data = data.replaceAll("-----END HEADER-----", "LAST_ACTION_DATE = "+dateString+"\n-----END HEADER-----"); 
-        //System.out.println(data);
+        data = data.replaceAll("-----END HEADER-----", "LAST_ACTION_DATE = "+dateString+"\n-----END HEADER-----");
 
-        //System.out.println(data); 
         String expectedData = "-----BEGIN HEADER-----\n"
                 + "CWIZPIN = FDCF0BE59E0F8283A38CCDC454F6C17263DDBDDF\n"
                 + "NOTBEFORE = Tue Apr 23 13:32:57 BST 2013\n"

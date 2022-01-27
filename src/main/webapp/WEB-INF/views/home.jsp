@@ -25,8 +25,12 @@
             <img src="${pageContext.request.contextPath}/resources/images/user1.png" class="img-responsive centeredImg" alt="user icon" width="160"/><br />
             <h2 data-toggle="tooltip" data-placement="top" title="You do not currently have a valid certificate and have not yet applied for one">I am a new user</h2>
             <div class="form-group">
-                <a class="btn btn-info wrapped-btn" href="${pageContext.request.contextPath}/pub/requestUserCert/submitNewUserCertRequest" data-toggle="tooltip" data-placement="bottom" title="Apply for a new user certificate">Request New User Certificate</a>
-                <a class="btn btn-info wrapped-btn" href="http://ca.grid-support.ac.uk" data-toggle="tooltip" data-placement="bottom" title="Visit the CA Helpdesk for information and assistance">Go To CA Helpdesk</a>
+                <a class="btn btn-info wrapped-btn" href="${pageContext.request.contextPath}/pub/requestUserCert/submitNewUserCertRequest"
+                   data-toggle="tooltip" data-placement="bottom" title="Apply for a new user certificate">Request New
+                    User Certificate</a>
+                <a class="btn btn-info wrapped-btn" href="https:///ca.grid-support.ac.uk" data-toggle="tooltip"
+                   data-placement="bottom" title="Visit the CA Helpdesk for information and assistance">Go To CA
+                    Helpdesk</a>
                 <a class="btn btn-info wrapped-btn" href="${pageContext.request.contextPath}/pub/viewralist" data-toggle="tooltip" data-placement="bottom" title="Find your nearest Registration Authority">Find My Local RA</a>
             </div>
         </div>

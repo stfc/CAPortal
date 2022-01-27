@@ -75,7 +75,7 @@
                     </tr>
                     <tr>
                         <td>Status</td>
-                        <td><b><font color="red">${crr.status}</font></b></td>
+                        <td><b><span class="text-danger">${crr.status}</span></b></td>
                     </tr>
                     <tr>
                         <td>Cert's Serial Number</td>

@@ -167,7 +167,7 @@ public class ProcessRevokeService {
         if (emailRaOnRevoke) {
             String loc = CertUtil.extractDnAttribute(revokeCert.getDn(), CertUtil.DNAttributeType.L);
             String ou = CertUtil.extractDnAttribute(revokeCert.getDn(), CertUtil.DNAttributeType.OU);
-            Set<String> raEmails = new HashSet<String>(); // use set so duplicates aren't added 
+            Set<String> raEmails = new HashSet<>(); // use set so duplicates aren't added
             // Find all the RA email addresses, iterate and send   
             List<CertificateRow> raCerts = this.certDao.findActiveRAsBy(loc, ou);
             for (CertificateRow raCert : raCerts) {
@@ -224,9 +224,6 @@ public class ProcessRevokeService {
      * If set to true, the EmailService is used to notify RAs of the the revocation. 
      * @param emailRaOnRevoke the emailRaOnRenew to set
      */
-//    public synchronized void setEmailRaOnRevoke(boolean emailRaOnRevoke) {
-//        this.emailRaOnRevoke = emailRaOnRevoke;
-//    }
 
     /**
      * @param emailService the emailService to set

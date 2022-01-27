@@ -23,9 +23,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 /**
  * Handles requests for the application home page.
  */
@@ -33,8 +30,6 @@ import java.util.Locale;
 @RequestMapping("/")
 public class HomeController {
 
-    // private static final Logger log =
-    // LoggerFactory.getLogger(HomeController.class);
     private static final Log log = LogFactory.getLog(HomeController.class);
 
     /**
@@ -55,10 +50,5 @@ public class HomeController {
     /**
      * Simply selects the /cert_owner/home view to render by returning its name.
      */
-    // @RequestMapping(value = "/cert_owner/", method = RequestMethod.GET)
-    // public String certOwnerHome(Locale locale, Model model) {
-    // log.info("Controller /cert_owner/");
-    // return "/cert_owner/home";
-    // }
 
 }

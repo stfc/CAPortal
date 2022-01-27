@@ -55,7 +55,7 @@ public class JdbcCertificateDaoTest {
     @Test
     public void testFindBy() {
         System.out.println("findBy");
-        Map<WHERE_PARAMS, String> params = new HashMap<WHERE_PARAMS, String>();
+        Map<WHERE_PARAMS, String> params = new HashMap<>();
         params.put(WHERE_PARAMS.CN_LIKE, "david meredith");
         params.put(WHERE_PARAMS.ROLE_LIKE, "CA Operator"); 
         params.put(WHERE_PARAMS.STATUS_LIKE, "VALID"); 

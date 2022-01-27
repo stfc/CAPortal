@@ -66,7 +66,7 @@ public class EmailService {
                                        String recipientEmail, String raCNs, String raEmails) {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(recipientEmail);
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
 
         vars.put("clientCN", requestorCN);
         vars.put("requestedDN", requestedDN);
@@ -92,7 +92,7 @@ public class EmailService {
                                        String recipientEmail, String raCNs, String raEmails) {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(recipientEmail);
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
 
         vars.put("cn", CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.CN));
         vars.put("dn", dn);
@@ -124,7 +124,7 @@ public class EmailService {
             msg.setTo(adminEmail);
             //msg.setFrom("support@grid-support.ac.uk");
             msg.setSubject("UK CA Portal error notification");
-            Map<String, Object> vars = new HashMap<String, Object>();
+            Map<String, Object> vars = new HashMap<>();
             vars.put("basePortalUrl", basePortalUrl);
             if (cause != null) {
                 vars.put("exception", cause);
@@ -166,9 +166,7 @@ public class EmailService {
             // Create a thread safe "copy" of the template message and customize it 
             SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
             msg.setTo(raEmail);
-            //msg.setFrom("support@grid-support.ac.uk");
-            //msg.setSubject("UK CA Certificate Renew Request");
-            Map<String, Object> vars = new HashMap<String, Object>();
+            Map<String, Object> vars = new HashMap<>();
             vars.put("param1", requestedRevokeDN);
             vars.put("basePortalUrl", basePortalUrl);
             vars.put("revoke_cert_key", crrId);
@@ -200,9 +198,7 @@ public class EmailService {
             // Create a thread safe "copy" of the template message and customize it 
             SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
             msg.setTo(raEmail);
-            //msg.setFrom("support@grid-support.ac.uk");
-            //msg.setSubject("UK CA Certificate Renew Request");
-            Map<String, Object> vars = new HashMap<String, Object>();
+            Map<String, Object> vars = new HashMap<>();
             vars.put("param1", requestedDN);
             vars.put("basePortalUrl", basePortalUrl);
             vars.put("req_key", req_key);
@@ -237,9 +233,7 @@ public class EmailService {
             // Create a thread safe "copy" of the template message and customize it 
             SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
             msg.setTo(raEmail);
-            //msg.setFrom("support@grid-support.ac.uk");
-            //msg.setSubject("UK CA Certificate Renew Request");
-            Map<String, Object> vars = new HashMap<String, Object>();
+            Map<String, Object> vars = new HashMap<>();
             vars.put("param1", requestedRenewDN);
             vars.put("basePortalUrl", basePortalUrl);
             vars.put("req_key", req_key);
@@ -273,7 +267,7 @@ public class EmailService {
         log.debug("sendRaEmailOnEmailChange method");
         StringBuilder emailDebug = new StringBuilder("Emailing old and new email addresses [");
         //sends email to both old and new email addresses
-        Set<String> oldNewEmails = new HashSet<String>(); // use set so duplicates aren't added
+        Set<String> oldNewEmails = new HashSet<>(); // use set so duplicates aren't added
         oldNewEmails.add(oldEmail);
         oldNewEmails.add(newEmail);
 
@@ -284,7 +278,7 @@ public class EmailService {
             SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
             msg.setTo(email);
             msg.setSubject("UK CA Email Updated");
-            Map<String, Object> vars = new HashMap<String, Object>();
+            Map<String, Object> vars = new HashMap<>();
             vars.put("cert_dn", certDn);
             vars.put("requester_dn", requesterDn);
             vars.put("basePortalUrl", basePortalUrl);
@@ -318,7 +312,7 @@ public class EmailService {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(newEmail);
         msg.setSubject("UK CA Email Updated");
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("cert_dn", certDn);
         vars.put("requester_dn", requesterDn);
         vars.put("basePortalUrl", basePortalUrl);
@@ -350,7 +344,7 @@ public class EmailService {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(userEmail);
         msg.setSubject("UK CA Role Updated");
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("cert_dn", certDn);
         vars.put("basePortalUrl", basePortalUrl);
         vars.put("req_key", cert_key);
@@ -444,9 +438,6 @@ public class EmailService {
     /**
      * @param emailUserRoleChangeTemplate the emailUserRoleChangeTemplate to set
      */
-    /*public void setEmailUserRoleChangeTemplate(String emailUserRoleChangeTemplate){
-        this.emailAdminsRoleChangeTemplate = emailUserRoleChangeTemplate;
-    }*/
 
     /**
      * @param emailAdminsOnErrorTemplate the emailAdminsOnErrorTemplate to set

@@ -54,16 +54,10 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <!--<th>ra_id</th>-->
-                            <!--<th>order_id</th>-->
                             <th>L (Location)</th>
                             <th>OU (Org Unit)</th>
-                            <!--<th>Active</th>--!>
-                            <!--<th>RA Operators/Contacts</th>-->
                         </tr>
                         </thead>
-                        <!-- the form:checkbox path variable is relative to form:form modelAttribute
-                                           variable, so path="source" evaluates to path="editRalistFormBean.source[n].active" -->
 
                         <tbody>
                         <c:set var="count" value="0" scope="page"/>
@@ -71,14 +65,10 @@
                             <c:set var="count" value="${count + 1}" scope="page"/>
                             <tr>
                                 <td>${editRalistFormBean.row + count}</td>
-                                    <%--<td>${rarow.ra_id}</td>--%>
-                                    <%--<td>${rarow.order_id}</td>--%>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/pub/viewRAs?ou=${rarow.ou}">${rarow.ou}</a>
                                 </td>
                                 <td>${rarow.l}</td>
-                                    <%--<td>${rarow.active}</td>--%>
-                                    <%--<td><a href="${pageContext.request.contextPath}/pub/viewRAs?ou=${rarow.ou}">RAs</a></td>--%>
                             </tr>
                         </c:forEach>
                         </tbody>

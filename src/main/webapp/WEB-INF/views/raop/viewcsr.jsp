@@ -64,8 +64,8 @@
                         <td>CN</td>
                         <c:url value="/raop/searchcert/search?name=${csr.cn}&ra=all&status=VALID&notExpired=true&roll=all&searchNullEmailAddress=false"
                                var="backsearchcert"/>
-                        <td><a href="${backsearchcert}">${csr.cn}</a> &larr; <font class="muted">search for matching
-                            certificates</font></td>
+                        <td><a href="${backsearchcert}">${csr.cn}</a> &larr; <span class="muted">search for matching
+                            certificates</span></td>
                     </tr>
                     <tr>
                         <td>DN</td>
@@ -123,7 +123,7 @@
                     </tr>
                     <tr>
                         <td>Status</td>
-                        <td><b><font color="red">${csr.status}</font></b></td>
+                        <td><b><span class="text-danger">${csr.status}</span></b></td>
                     </tr>
                     <tr>
                         <td>Role</td>
@@ -246,7 +246,7 @@
 <%@ include file="../../jspf/footer.jspf" %>
 <script>
     function confirmApprove() {
-        var r = confirm("Are you sure you want to Approve this request?");
+        const r = confirm("Are you sure you want to Approve this request?");
         return r;
     }
 </script>

@@ -168,7 +168,7 @@ public class JdbcCertificateDao {
         calendarLocal.add(Calendar.DAY_OF_MONTH, notafterTolerance);
 
         String currentTimeUTC = getDateFormat().format(calendarLocal.getTime());
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("currentTime", Long.valueOf(currentTimeUTC));
         namedParameters.put("dn", rfc2253DN);
         //log.debug("notafter: ["+namedParameters.get("currentTime")+"]"); 
@@ -185,7 +185,7 @@ public class JdbcCertificateDao {
      * @return
      */
     public List<CertificateRow> findAll(Integer limit, Integer offset) {
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("limit", limit);
         namedParameters.put("offset", offset);
         return this.jdbcTemplate.query(SQL_SELECT_ALL, namedParameters, new CertificateRowMapper());
@@ -208,7 +208,7 @@ public class JdbcCertificateDao {
      * @return row or null if no row is found
      */
     public CertificateRow findById(long cert_key) {
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("cert_key", cert_key);
         try {
             return this.jdbcTemplate.queryForObject(SQL_SELECT_BY_ID, namedParameters, new CertificateRowMapper());
@@ -256,7 +256,7 @@ public class JdbcCertificateDao {
      */
     public List<CertificateRow> findActiveRAsBy(String loc, String ou) {
         String currentTime = getDateFormat().format(new Date());
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("current_time", Long.parseLong(currentTime));
 
         // Build the RA filter 
@@ -298,7 +298,7 @@ public class JdbcCertificateDao {
         if (certRow.getCert_key() <= 0) {
             throw new IllegalArgumentException("Invalid certificateRow, cert_key is zero or negative");
         }
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("data", certRow.getData());
         namedParameters.put("dn", certRow.getDn());
         namedParameters.put("cn", certRow.getCn());
@@ -397,7 +397,7 @@ public class JdbcCertificateDao {
                                                            Map<WHERE_PARAMS, String> whereByParams, Integer limit, Integer offset, boolean orderby) {
 
         String whereClause = "";
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         if (whereByParams != null && !whereByParams.isEmpty()) {
             StringBuilder whereBuilder = new StringBuilder("where ");
 

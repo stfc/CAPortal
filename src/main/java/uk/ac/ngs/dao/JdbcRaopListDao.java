@@ -97,7 +97,7 @@ public class JdbcRaopListDao {
      * @return list of records that satisfy the specified search parameters.
      */
     public List<RaopListRow> findBy(String ou, String l, String cn, Boolean active) {
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         StringBuilder whereBuilder = new StringBuilder();
         if (ou != null) {
             whereBuilder.append("and ou = :ou ");
@@ -132,7 +132,7 @@ public class JdbcRaopListDao {
      */
     public RaopListRow findBy(long ra_id) {
         String query = SELECT_PROJECT + " where ra_id = :ra_id";
-        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("ra_id", ra_id);
         try {
             return this.jdbcTemplate.queryForObject(query, namedParameters, new RaopRowMapper());

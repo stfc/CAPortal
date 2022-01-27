@@ -82,7 +82,7 @@ public class RaOpHome {
 
         // Fetch a list of pending CSRs for the RA (NEW and RENEW) 
         // NEW
-        Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new HashMap<JdbcRequestDao.WHERE_PARAMS, String>();
+        Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new HashMap<>();
         whereParams.put(JdbcRequestDao.WHERE_PARAMS.RA_EQ, ra);
         whereParams.put(JdbcRequestDao.WHERE_PARAMS.STATUS_EQ, "NEW");
         List<RequestRow> newRequestRows = jdbcRequestDao.findBy(whereParams, null, null);
@@ -95,7 +95,7 @@ public class RaOpHome {
         model.addAttribute("renew_reqrows", renewRequestRows);
 
         // Fetch a list of pending CRRs for the RA 
-        Map<JdbcCrrDao.WHERE_PARAMS, String> crrWhereParams = new HashMap<JdbcCrrDao.WHERE_PARAMS, String>();
+        Map<JdbcCrrDao.WHERE_PARAMS, String> crrWhereParams = new HashMap<>();
         crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.STATUS_EQ, "NEW"); //NEW,APPROVED,ARCHIVED,DELETED 
         crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.DN_LIKE, "%L=" + L + ",OU=" + OU + "%");
         List<CrrRow> crrRows = jdbcCrrDao.findBy(crrWhereParams, null, null);

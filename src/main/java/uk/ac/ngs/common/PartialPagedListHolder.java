@@ -45,7 +45,7 @@ public class PartialPagedListHolder<E> implements Serializable {
      * @see #setSource
      */
     public PartialPagedListHolder() {
-        this(new ArrayList<E>(0));
+        this(new ArrayList<>(0));
     }
 
     /**

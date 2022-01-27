@@ -218,14 +218,14 @@
 <script src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
 <!-- https://github.com/eligrey/FileSaver.js -->
-<script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
 
 <script type="text/javascript">
 
     function pwSame() {
-        var pw_conf = $("#sign_up_password_confirm");
-        var pw = $("#sign_up_password");
+        const pw_conf = $("#sign_up_password_confirm");
+        const pw = $("#sign_up_password");
         if ($(pw_conf).val() !== $(pw).val()) {
             $(pw_conf).addClass("error").next().text("Passwords don't match");
             return false;
@@ -237,7 +237,7 @@
 
     function pwValid() {
         //var element = $("#" + pwelement.attr("id"));
-        var element = $("#sign_up_password");
+        const element = $("#sign_up_password");
         if ($(element).val().length < 10) {
             $(element).addClass("error").next().text("Password too short (min 10 characters)");
             return false;
@@ -248,7 +248,7 @@
     }
 
     function pinValid() {
-        var element = $("#pinInputText");
+        const element = $("#pinInputText");
         if (element.val().match(/^[\sa-zA-Z0-9_]{10,50}$/) === null) {
             $(element).addClass("error").next().text("Invalid PIN (min 10 characters a to z 0 to 9)");
             return false;
@@ -259,7 +259,7 @@
     }
 
     function emailValid() {
-        var element = $("#emailInputText");
+        const element = $("#emailInputText");
         //if (element.val().match(/^(([0-9a-zA-Z]+[\-\._])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}[,;]?)+$/) === null) {
         if (element.val().match(/^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$/) === null) {
             $(element).addClass("error").next().text("Invalid email");
@@ -272,7 +272,7 @@
 
     function cnValid() {
         //if(true) return true;
-        var element = $("#cnInputText");
+        const element = $("#cnInputText");
 //              if(element.val().match(/^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$/) === null){
         if (element.val().match(/^([a-z]{1,30}\/)?(?=.{1,254}$)((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}$/i) === null) {
             //if(element.val().match(/^(?=.{1,254}$)((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}$/i) === null){
@@ -285,7 +285,7 @@
     }
 
     function raValid() {
-        var element = $("#raSelect");
+        const element = $("#raSelect");
         if ($(element).val() === null) {
             $(element).addClass("error").next().text("Invalid RA selection");
             return false;
@@ -309,26 +309,26 @@
     }
 
     function doProcessing() {
-        var ra = $('#raSelect').val();
-        var cn = $('#cnInputText').val().trim();
-        var email = $('#emailInputText').val();
-        var pw = $('#sign_up_password').val();
-        var pin = $('#pinInputText').val();
-        var ou_loc = ra.split(" ");
-        var ou = ou_loc[0];
-        var loc = ou_loc[1];
-        var c = '${countryOID}';
-        var o = '${orgNameOID}';
-        var messageElement = $("#responseMessage");
+        const ra = $('#raSelect').val();
+        const cn = $('#cnInputText').val().trim();
+        const email = $('#emailInputText').val();
+        const pw = $('#sign_up_password').val();
+        const pin = $('#pinInputText').val();
+        const ou_loc = ra.split(" ");
+        const ou = ou_loc[0];
+        const loc = ou_loc[1];
+        const c = '${countryOID}';
+        const o = '${orgNameOID}';
+        const messageElement = $("#responseMessage");
 
-        var postTarget;
-        var csrTextAreaVal;
-        var dataPostEncodedVal;
-        var token = $("meta[name='_csrf']").attr("content");
-        var header = $("meta[name='_csrf_header']").attr("content");
+        let postTarget;
+        let csrTextAreaVal;
+        let dataPostEncodedVal;
+        const token = $("meta[name='_csrf']").attr("content");
+        const header = $("meta[name='_csrf_header']").attr("content");
 
         postTarget = $("#postLinkCsr");
-        var pem = createCSR(cn, ou, loc, o, c, pw);
+        const pem = createCSR(cn, ou, loc, o, c, pw);
         csrTextAreaVal = pem.privateKey + pem.csr;
         dataPostEncodedVal =
             $.param({pin: pin}) +
@@ -350,7 +350,7 @@
                         messageElement);
                     $('#csrTextArea').addClass("success");
                     //$('#doneButton').show();
-                    var info =
+                    const info =
                         'Save this file as a plain text file (not rich text with formatting).\n' +
                         'This file contains your encrypted private key and the certificate signing request (CSR).\n' +
                         'You MUST keep this file safe - you will need this later on. \n' +
@@ -403,7 +403,7 @@
         };
 
         $('#savetxt').click(function () {
-            var textfile = new Blob([$('#csrTextArea').val()], {type: "text/plain;charset=utf-8"});
+            const textfile = new Blob([$('#csrTextArea').val()], {type: "text/plain;charset=utf-8"});
             saveAs(textfile, $('#cnInputText').val().replace(/[.]/g, '_') + "PrivateKeyAndCsr.txt");
         });
         $("#refreshButton").click(function () {

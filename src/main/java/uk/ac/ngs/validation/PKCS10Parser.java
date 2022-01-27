@@ -38,9 +38,7 @@ public class PKCS10Parser {
      * @return PKCS10 object or null if can't bind the given csrPem String
      */
     public PKCS10CertificationRequest parseCsrPemString(String csrPemStr) {
-        PemReader pemReader = null;
-        try {
-            pemReader = new PemReader(new StringReader(csrPemStr));
+        try (PemReader pemReader = new PemReader(new StringReader(csrPemStr))) {
             PemObject obj = pemReader.readPemObject();
             if (obj == null) {
                 return null;
@@ -51,11 +49,8 @@ public class PKCS10Parser {
         } catch (IOException ex) {
             Logger.getLogger(PKCS10Parser.class.getName()).log(Level.WARNING,
                     null, ex);
-        } finally {
-            try {
-                pemReader.close();
-            } catch (IOException e) { /* have tried to be good citizen*/ }
         }
+        /* have tried to be good citizen*/
         return null;
     }
 }

@@ -110,11 +110,9 @@ public class PubViewRaContacts {
         } else {
             // escape reflected untrusted content   
             model.put("ou", HtmlUtils.htmlEscapeHex(ou));
-            //List<RaopListRow> rows = this.jdbcRaopListDao.findBy(ou, null, null, Boolean.TRUE);
-            //model.put("raRows", rows);
 
 
-            List<ViewRaContact> contacts = new ArrayList<ViewRaContact>(0);
+            List<ViewRaContact> contacts = new ArrayList<>(0);
             List<CertificateRow> certRows = this.certDao.findActiveRAsBy(null, ou);
             for (CertificateRow certRow : certRows) {
                 String loc = CertUtil.extractDnAttribute(certRow.getDn(), CertUtil.DNAttributeType.L);

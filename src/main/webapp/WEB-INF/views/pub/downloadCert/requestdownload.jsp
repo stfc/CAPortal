@@ -168,10 +168,10 @@
                         <td>Status</td>
                         <td><b>
                             <c:if test="${cert.status == 'VALID'}">
-                                <span class="text-success">${cert.status}</font>
+                                <span class="text-success">${cert.status}</span>
                             </c:if>
                             <c:if test="${cert.status != 'VALID'}">
-                                <font color="red">${cert.status}</font>
+                                <span class="text-danger">${cert.status}</span>
                             </c:if>
                         </b></td>
                     </tr>
@@ -287,7 +287,7 @@
 <script src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
 <!-- https://github.com/eligrey/FileSaver.js -->
-<script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
 
 <script type="text/javascript">
@@ -361,7 +361,7 @@
                 alert("Please use 'Choose File' and 'Load File' buttons to select your private key (or paste private key into textarea)");
             } else {
                 //regex to ensure only private key used from text pasted in
-                var regexPrivKey = $("#certkey").val().match(/(-----BEGIN \b(ENCRYPTED|RSA)\b PRIVATE KEY-----)[\s\S]*(-----END \b(ENCRYPTED|RSA)\b PRIVATE KEY-----)/);
+                const regexPrivKey = $("#certkey").val().match(/(-----BEGIN \b(ENCRYPTED|RSA)\b PRIVATE KEY-----)[\s\S]*(-----END \b(ENCRYPTED|RSA)\b PRIVATE KEY-----)/);
                 if (regexPrivKey === null) {
                     alert("Private key not found, please ensure correct file has been selected or pasted into text area.");
                 } else {
@@ -378,7 +378,7 @@
                             if (privateKey.n.toString() !== cert.publicKey.n.toString()) {
                                 alert("Private and public key modulo do not match. Are you sure you uploaded the correct file?")
                             } else {
-                                var chain = [cert];
+                                const chain = [cert];
                                 //create PKCS12
                                 console.log('\nCreating PKCS#12...');
                                 const newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(privateKey, chain, password,

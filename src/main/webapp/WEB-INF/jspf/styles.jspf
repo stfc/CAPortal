@@ -31,9 +31,7 @@
         display:none;
     }
     .boxContainer {
-        border: #000;
-        border-style: solid;
-        border-width: 2px;
+        border: 2px solid #000;
     }
     .popover-content, .popover-content .body {
         width: 100%;
@@ -52,8 +50,7 @@
         white-space: normal;
         max-width: 275px;
         display: block;
-        margin: 0 auto;
-        margin-bottom: 5px;
+        margin: 0 auto 5px;
     }
     #spacedH1 {
         margin-bottom: 6%;

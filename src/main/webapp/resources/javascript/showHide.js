@@ -2,8 +2,8 @@
 	//When passed an element id it will hide the element if visible and show it if hidden
 	function showHide(id) {
 		console.log("Info"+id);
-       var e = document.getElementById(id);
-       if(e.style.display == 'block')
+        const e = document.getElementById(id);
+        if(e.style.display === 'block')
           e.style.display = 'none';
        else
           e.style.display = 'block';

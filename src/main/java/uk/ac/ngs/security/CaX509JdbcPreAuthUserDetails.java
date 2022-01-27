@@ -86,8 +86,4 @@ public class CaX509JdbcPreAuthUserDetails implements AuthenticationUserDetailsSe
         this.caJdbcUserDetailsService = caJdbcUserDetailsService;
     }
 
-    /*@Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return caJdbcUserDetailsService.loadUserByUsername(s);
-    }*/
 }
