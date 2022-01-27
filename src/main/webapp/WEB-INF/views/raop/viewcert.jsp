@@ -28,256 +28,238 @@
 <c:url value="/raop/searchcert" var="searchcert"/>
 
 
-<%--<ul class="breadcrumb">
-    <li><a href="${searchcert}"><<< Search Cert</a> <span class="divider">/</span></li>
-</ul>--%>
-
 <!-- Wrap all page content here -->
 <div id="wrap" class="container">
     <div class="row">
-        <div class="col">
-            <h2>View Certificate</h2>
-            <c:if test="${errorMessage != null}">
-                <div id="message" class="error">${errorMessage}</div>
-            </c:if>
-            <c:if test="${not empty message}">
-                <div id="message" class="success">${message}</div>
-            </c:if>
-            <c:if test="${not empty emailUpdateOkMessage}">
-                <div id="message" class="success">${emailUpdateOkMessage}</div>
-            </c:if>
-            <c:if test="${not empty emailUpdateFailMessage}">
-                <div id="message" class="error">${emailUpdateFailMessage}</div>
-            </c:if>
-            <c:if test="${not empty roleChangeOkMessage}">
-                <div id="message" class="success">${roleChangeOkMessage}</div>
-            </c:if>
-            <c:if test="${not empty roleChangeFailMessage}">
-                <div id="message" class="error">${roleChangeFailMessage}</div>
-            </c:if>
-            <h4>Last Page Refresh: (${lastViewRefreshDate})</h4>
-            <br/>
-                <table class="table table-hover table-condensed">
-                    <thead>
-                    <tr>
-                        <th>Certificate Attribute</th>
-                        <th>Value</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Serial Number (cert_key)</td>
-                        <td>${cert.cert_key}, (hex: ${hexSerial})</td>
-                    </tr>
-                    <tr>
-                        <td>Common Name (CN)</td>
-                        <c:url value="/raop/searchcsr/search?name=${cert.cn}&ra=all&status=all&searchNullEmailAddress=false"
-                               var="backsearchcsroncn"/>
-                        <td><a href="${backsearchcsroncn}">${cert.cn}</a> &larr; <font class="muted">search for matching
-                            CSRs for CN</font></td>
-                    </tr>
-                    <tr>
-                        <td>Distinguished Name (DN)</td>
-                        <%--<c:url value="/raop/searchcsr/search?dn=${cert.dn}" var="backsearchcsrondn"/>
-                        <td><a href="${backsearchcsrondn}">${cert.dn}</a> &larr; <font class="muted">search for matching CSRs for DN</font></td>
-                        --%>
-                        <td>${cert.dn}</td>
-                    </tr>
-                    <tr>
-                        <td>Issuer DN</td>
-                        <td>${certObj.issuerDN}</td>
-                    </tr>
-                    <tr>
-                        <td>SANs (if any)</td>
-                        <td><c:forEach var="san" items="${sans}">${san} </c:forEach></td>
-                    </tr>
-                    <tr>
-                        <td>Email</td>
-                        <td><a href="mailto:${cert.email}" id="currEmail">${cert.email}</a>
-                            <form:form method="post"
-                                       action="${pageContext.request.contextPath}/raop/viewcert/rachangemail">
-                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                <div id="inputEmail">
-                                    <input id="emailInputText" name="email" value="${cert.email}"/><span></span>
-                                </div>
-                                <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
-                                <c:if test="${canEditEmail}">
-                                    <button type="button" id="changeEmail" class="btn btn-primary btn-xs">Change host
-                                        email
-                                    </button>
-                                    <button type="submit" id="saveEmail" class="btn btn-primary btn-xs"
-                                            onclick="return confirm('Are you sure you want to change the host email address?')">
-                                        Save
-                                    </button>
-                                    <a onclick="location.reload(true);">Cancel</a>
-                                </c:if>
-                            </form:form>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Status</td>
-                        <td><b>
-                            <c:if test="${cert.status == 'VALID'}">
-                                <font color="green">${cert.status}</font>
-                            </c:if>
-                            <c:if test="${cert.status != 'VALID'}">
-                                <font color="red">${cert.status}</font>
-                            </c:if>
-                        </b></td>
-                    </tr>
-                    <tr>
-                        <td>Role</td>
-                        <td>${cert.role}</td>
-                    </tr>
-                    <tr>
-                        <td>Pin</td>
-                        <td>${pin}</td>
-                    </tr>
-                    <tr>
-                        <td>Last Action Date</td>
-                        <td>${lastActionDate}</td>
-                    </tr>
-                    <tr>
-                        <td>Profile</td>
-                        <td>${profile}</td>
-                    </tr>
-                    <tr>
-                        <td>Not Before (Starts)</td>
-                        <td>${certObj.notBefore}</td>
-                    </tr>
-                    <tr>
-                        <td>Not After (Expires)</td>
-                        <td>${certObj.notAfter}</td>
-                    </tr>
+        <h2>View Certificate</h2>
+        <c:if test="${errorMessage != null}">
+            <span id="message" class="error">${errorMessage}</span>
+        </c:if>
+        <c:if test="${not empty message}">
+            <span id="message" class="success">${message}</span>
+        </c:if>
+        <c:if test="${not empty emailUpdateOkMessage}">
+            <span id="message" class="success">${emailUpdateOkMessage}</span>
+        </c:if>
+        <c:if test="${not empty emailUpdateFailMessage}">
+            <span id="message" class="error">${emailUpdateFailMessage}</span>
+        </c:if>
+        <c:if test="${not empty roleChangeOkMessage}">
+            <span id="message" class="success">${roleChangeOkMessage}</span>
+        </c:if>
+        <c:if test="${not empty roleChangeFailMessage}">
+            <span id="message" class="error">${roleChangeFailMessage}</span>
+        </c:if>
+        <h4>Last Page Refresh: (${lastViewRefreshDate})</h4>
+        <br/>
+        <table class="table table-hover table-condensed">
+            <thead>
+            <tr>
+                <th>Certificate Attribute</th>
+                <th>Value</th>
+            </tr>
+            </thead>
 
-                    <tr>
-                        <td>Signature Algorithm</td>
-                        <td>${certObj.sigAlgName}</td>
-                    </tr>
-                    <tr>
-                        <td>Type</td>
-                        <td>${certObj.type}</td>
-                    </tr>
-                    <tr>
-                        <td>Version</td>
-                        <td>${certObj.version}</td>
-                    </tr>
-
-                    </tbody>
-                </table>
-
-                <h3>Actions</h3>
-
-                <!-- Always show any form revoke error messages out of the
-                conditional view (if) statements below -->
-                <c:if test="${formRevokeErrorMessage != null}">
-                    <div id="message" class="error">${formRevokeErrorMessage}</div>
-                </c:if>
-
-                <!-- Not all certs can be revoked  -->
-                <c:if test="${canRevokeCert}">
-                <!-- Only home RA or CAOP can do full revoke -->
-                <c:if test="${viewerCanFullRevoke}">
-                    <div class="row form-cols">
-                        <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcert/fullrevoke"
-                                   modelAttribute="revokeCertFormBean">
-                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                            <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
-                            <div class="col">
-                                <form:input path="reason" class="form-control"
-                                            placeholder="Reason to revoke (value is required)"/>
-                            </div>
-                            <button type="submit" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Are you sure you want to approve a full revocation of this certificate?');">
-                                Revoke Certificate
+            <tbody>
+            <tr>
+                <td>Serial Number (cert_key)</td>
+                <td>${cert.cert_key}, (hex: ${hexSerial})</td>
+            </tr>
+            <tr>
+                <td>Common Name (CN)</td>
+                <c:url value="/raop/searchcsr/search?name=${cert.cn}&ra=all&status=all&searchNullEmailAddress=false"
+                       var="backsearchcsroncn"/>
+                <td><a href="${backsearchcsroncn}">${cert.cn}</a> &larr; <span class="muted">search for matching CSRs for CN</span>
+                </td>
+            </tr>
+            <tr>
+                <td>Distinguished Name (DN)</td>
+                <td>${cert.dn}</td>
+            </tr>
+            <tr>
+                <td>Issuer DN</td>
+                <td>${certObj.issuerDN}</td>
+            </tr>
+            <tr>
+                <td>SANs (if any)</td>
+                <td><c:forEach var="san" items="${sans}">${san} </c:forEach></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><a href="mailto:${cert.email}" id="currEmail">${cert.email}</a>
+                    <form:form method="post"
+                               action="${pageContext.request.contextPath}/raop/viewcert/rachangemail">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        <div id="inputEmail">
+                            <input id="emailInputText" name="email" value="${cert.email}"/><span></span>
+                        </div>
+                        <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
+                        <c:if test="${canEditEmail}">
+                            <button type="button" id="changeEmail" class="btn btn-primary btn-xs">Change host
+                                email
                             </button>
-                        </form:form>
+                            <button type="submit" id="saveEmail" class="btn btn-primary btn-xs"
+                                    onclick="return confirm('Are you sure you want to change the host email address?')">
+                                Save
+                            </button>
+                            <a onclick="location.reload(true);">Cancel</a>
+                        </c:if>
+                    </form:form>
+                </td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td><b>
+                    <c:if test="${cert.status == 'VALID'}">
+                        <span class="text-success">${cert.status}</span>
+                    </c:if>
+                    <c:if test="${cert.status != 'VALID'}">
+                        <span class="text-danger">${cert.status}</span>
+                    </c:if>
+                </b></td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>${cert.role}</td>
+            </tr>
+            <tr>
+                <td>Pin</td>
+                <td>${pin}</td>
+            </tr>
+            <tr>
+                <td>Last Action Date</td>
+                <td>${lastActionDate}</td>
+            </tr>
+            <tr>
+                <td>Profile</td>
+                <td>${profile}</td>
+            </tr>
+            <tr>
+                <td>Not Before (Starts)</td>
+                <td>${certObj.notBefore}</td>
+            </tr>
+            <tr>
+                <td>Not After (Expires)</td>
+                <td>${certObj.notAfter}</td>
+            </tr>
+
+            <tr>
+                <td>Signature Algorithm</td>
+                <td>${certObj.sigAlgName}</td>
+            </tr>
+            <tr>
+                <td>Type</td>
+                <td>${certObj.type}</td>
+            </tr>
+            <tr>
+                <td>Version</td>
+                <td>${certObj.version}</td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <h3>Actions</h3>
+        <!-- Always show any form revoke error messages out of the
+        conditional view (if) statements below -->
+        <c:if test="${formRevokeErrorMessage != null}">
+            <div id="message" class="error">${formRevokeErrorMessage}</div>
+        </c:if>
+
+        <!-- Not all certs can be revoked  -->
+        <c:if test="${canRevokeCert}">
+        <!-- Only home RA or CAOP can do full revoke -->
+        <c:if test="${viewerCanFullRevoke}">
+            <div class="row form-cols">
+                <form:form method="post" action="${pageContext.request.contextPath}/raop/viewcert/fullrevoke"
+                           modelAttribute="revokeCertFormBean">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
+                    <div class="col">
+                        <form:input path="reason" class="form-control"
+                                    placeholder="Reason to revoke (value is required)"/>
                     </div>
                     <div class="col">
-                        (Certificate will be <b>SUSPENDED</b> and an <b>APPROVED</b> revocation
-                        request will be created)
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Are you sure you want to approve a full revocation of this certificate?');">
+                            Revoke Certificate
+                        </button>
                     </div>
-                    <br/>
-                </c:if>
-
-                <!-- Any RA/CAOP can request a revoke -->
-                <c:if test="${!viewerCanFullRevoke}">
-                <div class="row form-cols">
-                    <form:form method="post"
-                               action="${pageContext.request.contextPath}/raop/viewcert/requestrevoke"
-                               modelAttribute="revokeCertFormBean">
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                        <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
-                        <div class="col">
-                            <form:input path="reason" class="form-control"
-                                        placeholder="Reason to revoke (value is required)"/>
-                        </div>
-                        <div class="col">
-                            <button type="submit" class="btn btn-sm btn-primary"
-                                    onclick="return confirm('Are you sure you want to request revocation of this certificate?');">
-                                Request Revocation
-                            </button>
-                        </div>
-                    </form:form>
-                </div>
-
-                <p class=col">
-                    (Certificate will be <b>SUSPENDED</b> and a <b>NEW</b>
-                    revocation request will be created)</p>
+                </form:form>
             </div>
-            </c:if>
+            <div class="row">
+                <p>Certificate will be <b>SUSPENDED</b> and an <b>APPROVED</b> revocation request will be created</p>
+            </div>
+            <br/>
+        </c:if>
 
-            </c:if>
-
-            <!-- Ability to Promote/Demote Certificates -->
-            <c:if test="${viewerCanPromoteDemote}">
-                <div>
-                    <div>
-                        <h3>Promote/Demote</h3><br/>
-                        <p>Current Role: ${cert.role}</p>
+        <!-- Any RA/CAOP can request a revoke -->
+        <c:if test="${!viewerCanFullRevoke}">
+            <div class="row form-cols">
+                <form:form method="post"
+                           action="${pageContext.request.contextPath}/raop/viewcert/requestrevoke"
+                           modelAttribute="revokeCertFormBean">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
+                    <div class="col">
+                        <form:input path="reason" class="form-control"
+                                    placeholder="Reason to revoke (value is required)"/>
                     </div>
-                    <div>
-                        <form:form method="post"
-                                   action="${pageContext.request.contextPath}/raop/viewcert/changerole">
-                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                            <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
-                            <div class="row form-cols">
-                                <div class="col">
-                                    <select name="operation" style="width: 150px; height: 35px">
-                                        <c:if test="${canPromote}">
-                                            <option selected value="promote">
-                                                Promote
-                                            </option>
-                                        </c:if>
-                                        <c:if test="${canDemote}">
-                                            <option value="demote">
-                                                Demote
-                                            </option>
-                                        </c:if>
-                                    </select>
-                                </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-sm btn-primary"
+                                onclick="return confirm('Are you sure you want to request revocation of this certificate?');">
+                            Request Revocation
+                        </button>
+                    </div>
+                </form:form>
+            </div>
+            <div class="row">
+                <p>Certificate will be <b>SUSPENDED</b> and a <b>NEW</b> revocation request will be created</p>
+            </div>
+            <br />
+        </c:if>
+    </div>
+    </c:if>
+    <div class="row">
+        <!-- Ability to Promote/Demote Certificates -->
+        <c:if test="${viewerCanPromoteDemote}">
+            <h3>Promote/Demote</h3><br/>
+            <p>Current Role: ${cert.role}</p>
+            <form:form method="post"
+                       action="${pageContext.request.contextPath}/raop/viewcert/changerole">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                <input name="cert_key" type="hidden" value="${cert.cert_key}"/>
+                <div class="row form-cols">
+                    <div class="col">
+                        <select name="operation" style="width: 150px; height: 35px">
+                            <c:if test="${canPromote}">
+                                <option selected value="promote">
+                                    Promote
+                                </option>
+                            </c:if>
+                            <c:if test="${canDemote}">
+                                <option value="demote">
+                                    Demote
+                                </option>
+                            </c:if>
+                        </select>
+                    </div>
 
-                                <div class="col">
-                                    <button type="submit" class="btn btn-sm btn-primary"
-                                            onclick="return confirm('Are you sure you want to perform this application?');">
-                                        Apply
-                                    </button>
-                                </div>
-                            </div>
-                        </form:form>
+                    <div class="col">
+                        <button type="submit" class="btn btn-sm btn-primary"
+                                onclick="return confirm('Are you sure you want to perform this application?');">
+                            Apply
+                        </button>
                     </div>
                 </div>
-            </c:if>
-        </div>
-        <div class="col">
-            <br/>
-            <h4>Data</h4>
-            <textarea rows="15" class="form-control" readonly="readonly">${cert.data}</textarea>
-            <br/><br/>
-        </div>
+            </form:form>
+        </c:if>
+        <h4>Data</h4>
+        <textarea rows="15" class="form-control" readonly="readonly">${cert.data}</textarea>
     </div>
 </div>
-
 
 <%@ include file="../../jspf/footer.jspf" %>
 <script type="text/javascript">
