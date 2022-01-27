@@ -245,7 +245,7 @@ public class ViewCSR {
                                     for (ASN1Encodable san : sansSequence) {
                                         // There is at least one tagged SAN in every sequence
                                         ASN1TaggedObject sanTagged = (ASN1TaggedObject) san;
-                                        ASN1OctetString sanOctectString = (ASN1OctetString) sanTagged.getLoadedObject();
+                                        ASN1OctetString sanOctectString = (ASN1OctetString) sanTagged.getBaseObject();
                                         String sanString = new String(sanOctectString.getOctets(), StandardCharsets.UTF_8);
                                         if(!sanString.equals(row.getCn())) {
                                             sans.add(CertUtil.getPrefix(sanTagged.getTagNo()) + "=<span style=\"color:red;font-weight:bold\">" + sanString + "</span>");

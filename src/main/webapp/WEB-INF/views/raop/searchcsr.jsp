@@ -209,8 +209,8 @@
                             <td>${csr.cn}</td>
                             <td class="vertAlign">
                                 <button type="button" class="btn btn-sm dnPop" data-container="body"
-                                        data-toggle="popover"
-                                        data-placement="top" data-content="${csr.dn}">DN
+                                        data-bs-toggle="popover"
+                                        data-bs-placement="top" data-bs-content="${csr.dn}">DN
                                 </button>
                             </td>
                             <td><a href="${viewbulk}">${csr.bulk}</a></td>
