@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 
 <%--<%@ page session="false"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -7,18 +7,21 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 
-<!DOCTYPE html>
+<!doctype html>
 
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Submit New User Certificate Request</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="Page for requesting new user certs for public."/>
     <meta name="author" content="David Meredith"/>
     <meta name="author" content="Sam Worley"/>
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <!-- default header name is X-CSRF-TOKEN -->
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <!-- Styles -->
     <%@ include file="../../../jspf/styles.jspf" %>
     <link href="${pageContext.request.contextPath}/resources/css/messages/messages.css" rel="stylesheet"/>
@@ -26,11 +29,7 @@
 
 <body id="certBody">
 <%@ include file="../../../jspf/header.jspf" %>
-<div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content"></div>
-    </div>
+<div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -75,144 +74,112 @@
     </div>
 </div>
 <!-- Wrap all page content here -->
-<div id="wrap">
-    <div class="row">
-        <div class="col-xs-offset-1">
-            <div class="row">
-                <div class="col-xs-10"><h2>Request New User Certificate</h2></div>
-                <div class="col-xs-offset-11">
-                    <a href="#" id="helpMod" style="color: inherit;">
-                        <span class="helperIcon glyphicon glyphicon-question-sign" style="font-size: xx-large;"></span>
-                    </a>
-                </div>
-            </div>
-            <ul>
-                <li>When clicking 'Submit Request' a new <abbr title="Certificate Signing Request">CSR</abbr> is
-                    created by your <strong>browser</strong>.
-                </li>
-                <li><strong>ONLY the public key</strong> is sent to the server as a <abbr
-                        title="Certificate Signing Request">CSR</abbr>.
-                </li>
-                <li>The private key and password are <strong>NOT</strong> sent to the server.</li>
-            </ul>
-            <br/>
-            <!--
-            Define links that are used as the form action, one of these
-            will be used depending on the server configuration.
-            -->
-            <a id="postLinkCsr" href="${pageContext.request.contextPath}/pub/requestUserCert/postCsr"
-               style="display: none;"></a>
-            <a id="postLinkCsrAttributes"
-               href="${pageContext.request.contextPath}/pub/requestUserCert/postCsrAttributes"
-               style="display: none;"></a>
+<div id="wrap" class="container">
+    <h2>Request New User Certificate <a data-bs-toggle="modal" data-bs-target="#helpModal"><i
+            class="bi bi-question-circle"></i></a></h2>
+    <ul>
+        <li>When clicking 'Submit Request' a new <abbr title="Certificate Signing Request">CSR</abbr> is
+            created by your <strong>browser</strong>.
+        </li>
+        <li><strong>ONLY the public key</strong> is sent to the server as a <abbr
+                title="Certificate Signing Request">CSR</abbr>.
+        </li>
+        <li>The private key and password are <strong>NOT</strong> sent to the server.</li>
+    </ul>
+    <br/>
+    <!--
+    Define links that are used as the form action, one of these
+    will be used depending on the server configuration.
+    -->
+    <a id="postLinkCsr" href="${pageContext.request.contextPath}/pub/requestUserCert/postCsr"
+       style="display: none;"></a>
+    <a id="postLinkCsrAttributes"
+       href="${pageContext.request.contextPath}/pub/requestUserCert/postCsrAttributes"
+       style="display: none;"></a>
 
-            <form action="" class="form-horizontal" role="form">
-                <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
-                        <strong><a href="#" id="cnInputTextTitle" tabindex="-1" data-toggle="tooltip"
-                                   data-placement="right"
-                                   title="Full name will make up the Common Name of your certificate">Name</a></strong>
-                        <font class="muted">(firstname lastname)</font>
-                    </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
-                        <input type="text" id="cnInputText" class="form-control"
-                               onChange="javascript:this.value=this.value.toLowerCase();"/>
-                        <span></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
-                        <strong><a href="#" id="raSelectTitle" tabindex="-1" data-toggle="tooltip"
-                                   data-placement="right"
-                                   title="After applying for your certificate, you will need to visit your local/nearest institution RA and provide photo-ID">Your
-                            Institution</a></strong>
-                        <font class="muted">(Registration Authority)</font>
-                    </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
-                        <select id="raSelect" class="form-control">
-                            <option selected disabled>Please Select...</option>
-                            <c:forEach items="${ralistArray}" var="ra">
-                                <option>${ra}</option>
-                            </c:forEach>
-                        </select> <span></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
-                        <strong><a href="#" id="emailInputTextTitle" tabindex="-1" data-toggle="tooltip"
-                                   data-placement="right"
-                                   title="You will receive an email to this address with the
-                                certificate ID/Serial number, which you will need to download your signed certfiicate">
-                            e-Mail</a></strong>
-                    </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
-                        <input type="text" id="emailInputText" class="form-control"
-                               placeholder="some@domain.com"/><span></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
-                        <strong><a href="#" id="pinInputTextTitle" tabindex="-1" data-toggle="tooltip"
-                                   data-placement="right"
-                                   title="You will need to quote this to your RA to prove you submitted the certificate request">PIN</a></strong>
-                    </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
-                        <input type="text" id="pinInputText" class="form-control"
-                               placeholder="memorable phrase"/><span></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
-                        <strong><a href="#" id="sign_up_passwordTitle" tabindex="-1" data-toggle="tooltip"
-                                   data-placement="right"
-                                   title="The password is used to encrypt your locally generated private key.">Key
-                            Password</a></strong>
-                    </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
-                        <input type="password" id="sign_up_password" class="form-control"/><span></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-3 col-lg-3">
-                        <strong><a href="#" id="sign_up_password_confirmTitle" tabindex="-1" data-toggle="tooltip"
-                                   data-placement="right"
-                                   title="The password is used to encrypt your locally generated private key.">Confirm
-                            Password</a></strong>
-                    </div>
-                    <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
-                        <input type="password" id="sign_up_password_confirm" class="form-control"/><span></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-offset-3">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-offset-3 col-xs-8">
-                        <a id="createCSRSubmit" class="btn btn-sm btn-primary" data-toggle="tooltip"
-                           data-placement="right"
-                           title="This may take some time depending on your browser/computer (it generates a
-                                    new public/private key-pair in your browser and sends the public key to the server)">
-                            Submit Request
-                        </a>&nbsp;
-                        <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
-                    </div>
-                </div>
-            </form>
-            <div id="responseMessage"></div>
-            <div class="col-xs-11">
-                <a id="flashdown" href="#">Save Private Key As Text File</a>
-                <a id="savetxt" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right"
-                   title="Prompts .txt file download">
-                    Save Private Key As Text File
-                </a>
+    <form action="" class="form-horizontal" role="form">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        <div class="form-group form-cols">
+            <div class="col">
+                <label for="cnInputText">Name</label>
             </div>
-            <div class="col-xs-11">
-                <!--<textarea id="csrTextArea" class="form-control" readonly style="height: 200px;"></textarea>-->
-                <textarea id="csrTextArea" style="width: 900px; height: 200px;" readonly aria-readonly="true"></textarea>
+            <div class="col">
+                <input type="text" id="cnInputText" class="form-control"
+                       onChange="javascript:this.value=this.value.toLowerCase();" placeholder="firstname lastname"/>
+                <div class="form-text">Full name will make up the Common Name of your certificate</div>
             </div>
         </div>
-    </div>
+        <div class="form-group form-cols">
+            <div class="col">
+                <label for="raSelect">Your Institution</label>
+            </div>
+            <div class="col">
+                <select id="raSelect" class="form-control">
+                    <option selected disabled>Please Select...</option>
+                    <c:forEach items="${ralistArray}" var="ra">
+                        <option>${ra}</option>
+                    </c:forEach>
+                </select>
+                <div class="form-text">After applying for your certificate, you will need to visit your local/nearest
+                    institution RA and provide photo-ID
+                </div>
+            </div>
+        </div>
+        <div class="form-group form-cols">
+            <div class="col">
+                <label for="emailInputText">e-Mail</label>
+            </div>
+            <div class="col">
+                <input type="text" id="emailInputText" class="form-control" placeholder="some@domain.com"/>
+                <div class="form-text">You will receive an email to this address with the certificate ID/Serial number,
+                    which you will need to download your signed certificate
+                </div>
+            </div>
+        </div>
+        <div class="form-group form-cols">
+            <div class="col">
+                <label for="pinInputText">PIN</label>
+            </div>
+            <div class="col">
+                <input type="text" id="pinInputText" class="form-control" placeholder="memorable phrase"/>
+                <div class="form-text">You will need to quote this to your RA to prove you submitted the certificate
+                    request
+                </div>
+            </div>
+        </div>
+        <div class="form-group form-cols">
+            <div class="col">
+                <label for="sign_up_password">Key Password</label>
+            </div>
+            <div class="col">
+                <input type="password" id="sign_up_password" class="form-control"/>
+            </div>
+        </div>
+        <div class="form-group form-cols">
+            <div class="col">
+                <label for="sign_up_password_confirm">Confirm Password</label>
+            </div>
+            <div class="col">
+                <input type="password" id="sign_up_password_confirm" class="form-control"/>
+
+                <div class="form-text">The password is used to encrypt your locally generated private key</div>
+            </div>
+        </div>
+            <div class="form-group form-cols">
+                <div class="col">
+                    <button id="createCSRSubmit" class="btn btn-sm btn-primary">Submit Request</button>
+                    <div class="form-text">This may take some time depending on your browser/computer (it generates a
+                        new public/private key-pair in your browser and sends the public key to the server)
+                    </div>
+                    <br />
+                    <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
+                </div>
+            </div>
+    </form>
+    <div id="responseMessage"></div>
+    <a id="savetxt" class="btn btn-sm btn-primary">Save Private Key As Text File</a>
+    <label for="csrTextArea"></label><textarea id="csrTextArea" style="width: 900px; height: 200px;" readonly
+                                               aria-readonly="true"></textarea>
 </div>
 
 <!-- footer includes shared .js files -->
@@ -326,6 +293,9 @@
         var csrTextAreaVal;
         var dataPostEncodedVal;
 
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
         postTarget = $("#postLinkCsr");
         var pem = createCSR(cn, ou, loc, o, c, pw);
         csrTextAreaVal = pem.privateKey + pem.csr;
@@ -338,6 +308,7 @@
         $.ajax({
             type: "POST", url: postTarget.attr("href"),
             data: dataPostEncodedVal,
+            headers: {"X-CSRF-TOKEN": token},
             success: function (text) {
                 if (text.substring(0, 7) === "SUCCESS") {
                     MvcUtil.showSuccessResponse('SUCCESS - Next steps:' +

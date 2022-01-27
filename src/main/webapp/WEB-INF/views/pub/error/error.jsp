@@ -4,14 +4,14 @@
     Author     : djm76
 --%>
 
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%--<%@ page session="false"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
     <title>Error Occurred</title>
 </head>
 <body>

@@ -134,7 +134,7 @@ public class CertUtil {
 
     public static String getPrefix(int tagNumber) {
         String prefix = "";
-        switch ((int) tagNumber) {
+        switch (tagNumber) {
             case 0:
                 prefix = "otherName";
                 break;
@@ -173,7 +173,7 @@ public class CertUtil {
         Collection<List<?>> sans = cert.getSubjectAlternativeNames();
         ArrayList<String> outputSans = new ArrayList<>();
         for (List<?> san: sans) {
-            outputSans.add(getPrefix((int) san.get(0)) + "=" + (String) san.get(1)); // index 0 is the identifier - DNSName etc.
+            outputSans.add(getPrefix((int) san.get(0)) + "=" + san.get(1)); // index 0 is the identifier - DNSName etc.
         }
         return outputSans;
     }

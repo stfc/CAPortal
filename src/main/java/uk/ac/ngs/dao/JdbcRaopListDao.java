@@ -118,7 +118,7 @@ public class JdbcRaopListDao {
         // if one of the params was set above, then insert the where clause 
         String sqlWhere = "";
         if (whereBuilder.toString().startsWith("and ")) {
-            sqlWhere = " where " + whereBuilder.toString().substring(4);
+            sqlWhere = " where " + whereBuilder.substring(4);
         }
         return this.jdbcTemplate.query(SELECT_PROJECT + sqlWhere,
                 namedParameters, new RaopRowMapper());

@@ -1,16 +1,16 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%@page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<!DOCTYPE html>
+<!doctype html>
 
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Cert Owner Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -26,9 +26,9 @@
 <%--<jsp:include page="../common/header.jsp"/>--%>
 <%@ include file="../../jspf/header.jspf" %>
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
 
             <h3>Your Certificate Details</h3>
             <c:if test="${not empty emailUpdateOkMessage}">
@@ -37,7 +37,7 @@
             <c:if test="${not empty emailUpdateFailMessage}">
                 <div class="error">${emailUpdateFailMessage}</div>
             </c:if>
-            <div class="col-xs-11 col-lg-10">
+            <div class="col-11 col-lg-10">
                 <table class="table table-hover table-condensed">
                     <thead>
                     <tr>
@@ -68,6 +68,7 @@
                             <c:if test="${fn:contains(certificateRow.cn, '.')}">
                                 <form:form method="post"
                                            action="${pageContext.request.contextPath}/cert_owner/changemail">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     <div id="inputEmail">
                                         <input name="email" id="emailInputText"
                                                value="${certificateRow.email}"/><span></span>
@@ -88,10 +89,10 @@
                         <td>Status</td>
                         <td><b>
                             <c:if test="${certificateRow.status == 'VALID'}">
-                                <font color="green">${certificateRow.status}</font>
+                                <span class="text-success">${certificateRow.status}</span>
                             </c:if>
                             <c:if test="${certificateRow.status != 'VALID'}">
-                                <font color="red">${certificateRow.status}</font>
+                                <span class="text-danger">${certificateRow.status}</span>
                             </c:if>
                         </b></td>
                     </tr>
@@ -146,9 +147,6 @@
 
             <br/><br/>
 
-            <%-- <p>
-            Your principal object is....: <%= request.getUserPrincipal() %>
-            </p> --%>
         </div>
     </div>
 </div>

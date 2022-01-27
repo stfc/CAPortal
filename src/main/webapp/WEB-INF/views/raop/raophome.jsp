@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -20,20 +20,20 @@
 
 <body>
 <%@ include file="../../jspf/header.jspf" %>
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
 
-            <h2>Pending Requests for Your RA [<font class="text-info">${ra}</font>]</h2>
+            <h2>Pending Requests for Your RA [<span class="text-info">${ra}</span>]</h2>
             <h4>(RAs, please bookmark this page to view your pending requests)</h4>
             <br/>
             [<b>${fn:length(new_reqrows)}</b>] <b>NEW</b>,
             [<b>${fn:length(renew_reqrows)}</b>] <b>RENEW</b>,
             [<b>${fn:length(crr_reqrows)}</b>] <b>REVOKE</b>
-            &nbsp;&nbsp;&nbsp;&nbsp;Last Refreshed: <b>${lastPageRefreshDate}</b>
+            Last Refreshed: <b>${lastPageRefreshDate}</b>
             <br/>
             <br/>
-            <div class="col-xs-11">
+            <div class="col-11">
                 <table class="table tablecondensed">
                     <thead>
                     <tr>

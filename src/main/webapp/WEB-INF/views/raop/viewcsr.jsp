@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -6,8 +6,8 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -33,10 +33,10 @@
 --%>
 
 <!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
-            <div class="col-xs-11 col-lg-10">
+        <div class="col-offset-1">
+            <div class="col-11 col-lg-10">
                 <h2>View CSR - Signing Request</h2>
 
                 <c:if test="${errorMessage != null}">
@@ -78,7 +78,7 @@
                         <td><c:forEach var="san" items="${sans}">${san} </c:forEach></td>
                     </tr>
                     <tr>
-                        <td>&nbsp;&nbsp;&nbsp;VALID/Non-Expired Certs with same DN:</td>
+                        <td>VALID/Non-Expired Certs with same DN:</td>
                         <td>
                             <c:forEach var="_certID" items="${validNotExpiredCertIdsWithDN}">
                                 <a href="${pageContext.request.contextPath}/raop/viewcert?certId=${_certID}">${_certID}</a>
@@ -86,7 +86,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>&nbsp;&nbsp;&nbsp;REVOKED Certs with same DN:</td>
+                        <td>REVOKED Certs with same DN:</td>
                         <td>
                             <c:forEach var="_certID" items="${revokedCertIdsWithDN}">
                                 <a href="${pageContext.request.contextPath}/raop/viewcert?certId=${_certID}">${_certID}</a>
@@ -94,7 +94,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>&nbsp;&nbsp;&nbsp;Expired Certs with same DN:</td>
+                        <td>Expired Certs with same DN:</td>
                         <td>
                             <c:forEach var="_certID" items="${validExpiredCertIdsWithDN}">
                                 <a href="${pageContext.request.contextPath}/raop/viewcert?certId=${_certID}">${_certID}</a>
@@ -102,7 +102,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>&nbsp;&nbsp;&nbsp;OTHER Certs with same DN:</td>
+                        <td>OTHER Certs with same DN:</td>
                         <td>
                             <c:forEach var="_certID" items="${otherCertIdsWithDN}">
                                 <a href="${pageContext.request.contextPath}/raop/viewcert?certId=${_certID}">${_certID}</a>
@@ -132,7 +132,7 @@
                     <tr>
                         <td>Submitted By</td>
                         <c:url value="/raop/viewcert?certId=${ownerserial}" var="backsearchcert2"/>
-                        <td><a href="${backsearchcert2}">${ownerserial}</a>&nbsp;&nbsp;${ownerdn}</td>
+                        <td><a href="${backsearchcert2}">${ownerserial}</a>${ownerdn}</td>
                     </tr>
                     <tr>
                         <td>Submitted On</td>
@@ -141,7 +141,7 @@
                     <tr>
                         <td>Pin</td>
                         <td>
-                            ${pin}&nbsp;&nbsp;
+                            ${pin}
                             <%--<a href="${pageContext.request.contextPath}/raop/verifyPin?pin=${pin}">Verify (opens in new window)</a>--%>
                             <a href="JavaScript:newPopup('${pageContext.request.contextPath}/raop/verifyPin?pin=${pin}');">Verify
                                 Pin (opens in new window)</a>
@@ -164,7 +164,7 @@
                             <c:choose>
                                 <c:when test="${not empty csr.bulk}">
                                     <span class="glyphicon glyphicon-ok"
-                                          style="color:green; font-size: large;"></span> &nbsp; <br/>
+                                          style="color:green; font-size: large;"></span>  <br/>
                                     <button type="button" class="btn btn-xs btn-primary"
                                             onclick="window.location='${pageContext.request.contextPath}/raop/viewbulk?bulkId=${csr.bulk}';">
                                         Manage Bulk
@@ -203,11 +203,12 @@
                                            modelAttribute="csr">
                                     <form:hidden path="status"/>
                                     <form:hidden path="req_key"/>
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     <button type="submit" class="btn btn-sm btn-primary"
                                             onclick="return confirm('Are you sure you want to Approve this request?');">
                                         Approve Request
                                     </button>
-                                    &nbsp;&nbsp;
+
                                 </form:form>
                             </td>
                         </c:if>
@@ -217,6 +218,7 @@
                                            modelAttribute="csr">
                                     <form:hidden path="status"/>
                                     <form:hidden path="req_key"/>
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     <button type="submit" class="btn btn-sm btn-danger"
                                             onclick="return confirm('Are you sure you want to Delete this request?');">
                                         Delete Request
@@ -229,7 +231,7 @@
                 </table>
             </div>
 
-            <div class="col-xs-11 col-md-9 col-lg-8">
+            <div class="col-11 col-md-9 col-lg-8">
                 <br/><br/>
                 <h4>Data</h4>
                 <textarea rows="15" class="form-control" readonly="readonly">${csr.data}</textarea>
@@ -240,7 +242,7 @@
 </div>
 
 
-<%--<jsp:include page="../common/footer.jsp" />--%>
+
 <%@ include file="../../jspf/footer.jspf" %>
 <script>
     function confirmApprove() {

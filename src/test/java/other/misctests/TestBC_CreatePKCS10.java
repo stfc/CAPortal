@@ -166,7 +166,7 @@ public class TestBC_CreatePKCS10 {
         PEMWriter pemWrite = new PEMWriter(writer);
         pemWrite.writeObject(req1);
         pemWrite.close();
-        System.out.println(writer.toString());
+        System.out.println(writer);
 
         // Output un-encrypted private key pkcs8 Pem string
         JcaPKCS8Generator pkcs8GeneratorNoEnc = new JcaPKCS8Generator(priKey, null);
@@ -338,8 +338,8 @@ public class TestBC_CreatePKCS10 {
         PEMWriter pemWrite3 = new PEMWriter(writer3);
         pemWrite3.writeObject(pkcs8PemDecryptedBC);
         pemWrite3.close();
-        String pkcs8StrDecryptedBC = writer3.toString().trim().replaceAll("\\r\\n", "\n");;
-        String pkcs8StrDecryptedOpenSSL = getPkcs8ForgePriKeyPem_DecryptedWithOpenSSL().trim().replaceAll("\\r\\n", "\n");; 
+        String pkcs8StrDecryptedBC = writer3.toString().trim().replaceAll("\\r\\n", "\n");
+        String pkcs8StrDecryptedOpenSSL = getPkcs8ForgePriKeyPem_DecryptedWithOpenSSL().trim().replaceAll("\\r\\n", "\n");
         //System.out.println("["+pkcs8StrNoEncBC+"]");
         //System.out.println("["+pkcs8StrNoEncOpenssL+"]");
         assertTrue(pkcs8StrDecryptedBC.equals(pkcs8StrDecryptedOpenSSL));  

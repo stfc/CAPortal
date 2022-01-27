@@ -1,30 +1,30 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%@page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
     <title>Cert Renew</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="Renew certificate page for UK CA certificate owners"/>
     <meta name="author" content="David Meredith"/>
-    <!-- Styles -->
-    <%--<jsp:include page="../common/styles.jsp" />--%>
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <!-- default header name is X-CSRF-TOKEN -->
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <%@ include file="../../jspf/styles.jspf" %>
     <link href="${pageContext.request.contextPath}/resources/css/messages/messages.css" rel="stylesheet"/>
 </head>
 
 <body id="certBody">
 <%@ include file="../../jspf/header.jspf" %>
-<!-- Wrap all page content here -->
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1">
+        <div class="col-offset-1">
             <h2>Renew Certificate</h2>
             <ul>
                 <li>When clicking 'Submit Request' a new <abbr title="Certificate Signing Request">CSR</abbr> is
@@ -47,7 +47,7 @@
                 <div class="success">${renewOkMessage}</div>
             </c:if>
             <br/>
-            <div class="col-xs-11 col-lg-10">
+            <div class="col-11 col-lg-10">
                 <table class="table table-hover table-condensed">
                     <thead>
                     <tr>
@@ -80,10 +80,10 @@
                         <td>Status</td>
                         <td><b>
                             <c:if test="${certificateRow.status == 'VALID'}">
-                                <font color="green">${certificateRow.status}</font>
+                                <span class="text-success">${certificateRow.status}</span>
                             </c:if>
                             <c:if test="${certificateRow.status != 'VALID'}">
-                                <font color="red">${certificateRow.status}</font>
+                                <span class="text-danger">${certificateRow.status}</span>
                             </c:if>
                         </b></td>
                     </tr>
@@ -121,68 +121,52 @@
                    style="display: none;"></a>
 
                 <form action="" class="form-horizontal" role="form">
-                    <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
-                            <strong><a href="#" id="emailTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="Email that is associated with your Certificate">e-Mail</a></strong>
+                    <div class="form-group form-cols">
+                        <div class="col">
+                            <label for="emailInputText">e-Mail</label>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="text" id="emailInputText" value="${certificateRow.email}"
                                    class="form-control"/><span></span>
+                            <div class="form-text">Email that is associated with your Certificate</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
-                            <strong><a href="#" id="sign_up_passwordTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="The password is used to encrypt your locally generated private key.">Key
-                                Password</a></strong>
+                    <div class="form-group form-cols">
+                        <div class="col">
+                            <label for="sign_up_password">Key Password</label>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="password" id="sign_up_password" class="form-control"/><span></span>
+                            <div class="form-text">The password is used to encrypt your locally generated private key.</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-xs-3 col-lg-3">
-                            <strong><a href="#" id="sign_up_password_confirmTitle" tabindex="-1" data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="The password is used to encrypt your locally generated private key.">Confirm
-                                Password</a></strong>
+                    <div class="form-group form-cols">
+                        <div class="col">
+                            <label for="sign_up_password_confirm">Confirm Password</label>
                         </div>
-                        <div class="col-xs-8 col-sm-6 col-md-5 col-lg-3">
+                        <div class="col">
                             <input type="password" id="sign_up_password_confirm" class="form-control"/><span></span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-xs-offset-3 col-xs-8">
-                            <a id="createCSRSubmit" class="btn btn-sm btn-primary"
-                               data-toggle="tooltip"
-                               data-placement="right"
-                               title="This may take some time depending on your browser/computer
-                                       (it generates a new public/private key-pair in the browser and sends the public key to the server)">
-                                Submit Request
-                            </a>&nbsp;
+                    <div class="form-group form-cols">
+                        <div class="col">
+                            <br />
+                            <a id="createCSRSubmit" class="btn btn-sm btn-primary">Submit Request</a>
+                            <div class="form-text">This may take some time depending on your browser/computer (it generates a new public/private key-pair in the browser and sends the public key to the server)</div><br />
                             <a id="refreshButton" class="btn btn-sm btn-info">Clear / Refresh</a>
                         </div>
                     </div>
                 </form>
             </c:if>
             <div id="responseMessage"></div>
-            <div class="col-xs-11">
-                <a id="flashdown" href="#">Save Private Key As Text File</a>
-                <a id="savetxt" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="right"
-                   title="Prompts .txt file download">
+            <div class="col-11">
+                <a id="savetxt" class="btn btn-sm btn-primary">
                     Save Private Key As Text File
                 </a>
             </div>
-            <div class="col-xs-11">
-                <%--<textarea id="csrTextArea" class="form-control" readonly style="height: 200px;"></textarea>--%>
+            <div class="col-11">
                 <textarea id="csrTextArea" style="width: 900px; height: 200px;"></textarea>
             </div>
-            <%-- <p>
-            Your principal object is....: <%= request.getUserPrincipal() %>
-            </p> --%>
         </div>
     </div>
 </div>
@@ -334,6 +318,9 @@
         var csrTextAreaVal;
         var dataPostEncodedVal;
 
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
         postTarget = $("#postLinkViaClient");
         var pem = createCSR(cn, ou, loc, o, c, pw);
         csrTextAreaVal = pem.privateKey + pem.csr;
@@ -343,6 +330,7 @@
         $.ajax({
             type: "POST", url: postTarget.attr("href"),
             data: dataPostEncodedVal,
+            headers: {"X-CSRF-TOKEN": token},
             success: function (text) {
                 if (text.substring(0, 7) === "SUCCESS") {
                     MvcUtil.showSuccessResponse('SUCCESS - Next steps:' +

@@ -1,6 +1,6 @@
-<%@page contentType="text/html" pageEncoding="windows-1252" %>
+
 <%@ page session="false" %>
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/favicon.ico" type="image/x-icon"/>
@@ -16,9 +16,9 @@
 
 <body>
 <%@ include file="../../jspf/header.jspf" %>
-<div id="wrap">
+<div id="wrap" class="container">
     <div class="row">
-        <div class="col-xs-offset-1 col-xs-11">
+        <div class="col-offset-1 col-11">
             <h1>Access Denied</h1>
             <p class="text-info">You have been denied access due to one of the following reasons:</p>
             <ul>

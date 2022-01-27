@@ -35,7 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/cert_owner/**").authenticated()
                 .and()
                 .x509().authenticationUserDetailsService(caX590AuthMan())
-                .and().csrf().disable()
+                .and()
                 .exceptionHandling().accessDeniedPage("/denied").authenticationEntryPoint(authenticationEntryPoint());
     }
 

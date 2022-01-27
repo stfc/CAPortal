@@ -86,13 +86,10 @@ public class VerifyPin {
         String pinPlain = verifyPinFormBean.getPinVerification();
 
         // Try and recreate the pinHash using SHA-1 
-        boolean verifiedOK = false;
+        boolean verifiedOK = DigestUtils.sha1Hex(pinPlain).equalsIgnoreCase(pinHash);
 
         // First do a regular sha1hex hash 
-        if (DigestUtils.sha1Hex(pinPlain).equalsIgnoreCase(pinHash)) {
-            verifiedOK = true;
-        }
-        // if it did not verify, try appending null char and the string 'exit' 
+        // if it did not verify, try appending null char and the string 'exit'
         // followed by newline which simulates a known OpenCA bug (OpenCA 
         // erroneously appends these extra chars when calculating the original hash)
         if (!verifiedOK && DigestUtils.sha1Hex(pinPlain + "\u0000exit\n").equalsIgnoreCase(pinHash)) {

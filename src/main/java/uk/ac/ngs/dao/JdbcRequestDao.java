@@ -567,7 +567,7 @@ public class JdbcRequestDao {
             dataColumnBlob += "BULK = " + bulk + NEWLINE;
         }
         dataColumnBlob = dataColumnBlob + "SERIAL = " + req_key + NEWLINE; //getRequestPrimaryKey() + NEWLINE; // next request key PK
-        dataColumnBlob = dataColumnBlob + "NOTBEFORE = " + (new Date()).toString() + NEWLINE;
+        dataColumnBlob = dataColumnBlob + "NOTBEFORE = " + (new Date()) + NEWLINE;
         dataColumnBlob = dataColumnBlob + "PIN = " + pinHash + NEWLINE;
         // We never use ADDITIONAL_ATTRIBUTE_EMAIL - is this correct?
         // result = result + "ADDITIONAL_ATTRIBUTE_EMAIL = " + getEmail() + NEWLINE;
