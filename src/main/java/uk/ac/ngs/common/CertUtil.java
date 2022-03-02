@@ -12,12 +12,26 @@
  */
 package uk.ac.ngs.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import uk.ac.ngs.domain.RequestRow;
+
 import javax.security.auth.x500.X500Principal;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * Utility class for certificate related functions. Stateless and thread safe.
@@ -25,6 +39,7 @@ import java.util.List;
  * @author David Meredith (some modifications, javadoc)
  */
 public class CertUtil {
+    private static final Log log = LogFactory.getLog(CertUtil.class);
 
     public enum DNAttributeType {
         CN, L, OU, O, C, E, EMAILADDRESS
@@ -167,6 +182,86 @@ public class CertUtil {
                 break;
         }
         return prefix;
+    }
+
+    public static ArrayList<String> getSansCSR(Matcher certmatcher, RequestRow row) {
+        if (certmatcher.find()) {
+            String pemString = certmatcher.group();
+            try {
+                ArrayList<String> sans = new ArrayList<>();
+                PEMParser pemParser = new PEMParser(new StringReader(pemString));
+                PKCS10CertificationRequest certObj = (PKCS10CertificationRequest) pemParser.readObject();
+                /*
+                 * Extensions and SANs follow the below ASN1 format, which is why the code below is _complicated_:
+                 *
+                 * TAGGED [0]:
+                 *   SEQUENCE
+                 *   {
+                 *       OBJECT IDENTIFIER=ExtensionRequest (1.2.840.113549.1.9.14)
+                 *       SET
+                 *       {
+                 *           SEQUENCE
+                 *           {
+                 *               SEQUENCE
+                 *               {
+                 *                   OBJECT IDENTIFIER=SubjectAltName (2.5.29.17)
+                 *                   OCTET STRING, encapsulates:
+                 *                       SEQUENCE
+                 *                       {
+                 *                           TAGGED [2] IMPLICIT :
+                 *                               OCTET STRING=
+                 *                                   67 72 69 64 2D 73 75 70   grid-sup
+                 *                                   70 6F 72 74 2E 61 63 2E   port.ac.
+                 *                                   75 6B                     uk
+                 *                           TAGGED [2] IMPLICIT :
+                 *                               OCTET STRING=
+                 *                                   77 77 77 2E 63 61 2E 67   www.ca.g
+                 *                                   72 69 64 2D 73 75 70 70   rid-supp
+                 *                                   6F 72 74 2E 61 63 2E 75   ort.ac.u
+                 *                                   6B                        k
+                 *                           TAGGED [2] IMPLICIT :
+                 *                               OCTET STRING=
+                 *                                   77 77 77 2E 67 72 69 64   www.grid
+                 *                                   2D 73 75 70 70 6F 72 74   -support
+                 *                                   2E 61 63 2E 75 6B         .ac.uk
+                 *                       }
+                 *
+                 *               }
+                 *           }
+                 *       }
+                 */
+
+                Attribute[] erAttributes = certObj.getAttributes(new ASN1ObjectIdentifier("1.2.840.113549.1.9.14")); // Get the ExtensionRequest attributes
+                for(Attribute a : erAttributes) {
+                    ASN1Set set = a.getAttrValues();
+                    if(set != null) {
+                        ASN1Encodable asn1Encodable = set.getObjectAt(0); // Assume first object we get from this is the extension requests
+                        Extensions extensions = Extensions.getInstance(asn1Encodable);
+                        if(extensions != null) {
+                            Extension sansExtension = extensions.getExtension(new ASN1ObjectIdentifier("2.5.29.17")); // Get SANs extension
+                            ASN1Sequence sansSequence = ASN1Sequence.getInstance(sansExtension.getExtnValue().getOctets()); // convert to a sequence (as above)
+                            if(sansSequence != null) {
+                                for (ASN1Encodable san : sansSequence) {
+                                    // There is at least one tagged SAN in every sequence
+                                    ASN1TaggedObject sanTagged = (ASN1TaggedObject) san;
+                                    ASN1OctetString sanOctectString = (ASN1OctetString) sanTagged.getBaseObject();
+                                    String sanString = new String(sanOctectString.getOctets(), StandardCharsets.UTF_8);
+                                    if(!sanString.equals(row.getCn())) {
+                                        sans.add(CertUtil.getPrefix(sanTagged.getTagNo()) + "=<span style=\"color:red;font-weight:bold\">" + sanString + "</span>");
+                                    } else {
+                                        sans.add(CertUtil.getPrefix(sanTagged.getTagNo()) + "=" + sanString);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return sans;
+            } catch (IOException ex) {
+                log.error(ex);
+            }
+        }
+        return null;
     }
 
     public static ArrayList<String> getSans(X509Certificate cert) throws CertificateParsingException {

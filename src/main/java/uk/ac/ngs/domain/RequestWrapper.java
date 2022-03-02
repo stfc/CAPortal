@@ -13,6 +13,12 @@
 
 package uk.ac.ngs.domain;
 
+import uk.ac.ngs.common.CertUtil;
+
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Transfer bean for use in view layer.
  * This bean adds extra properties such as the checked that are not required
@@ -22,6 +28,7 @@ package uk.ac.ngs.domain;
  * @author David Meredith
  */
 public class RequestWrapper {
+    private final static Pattern DATA_CERT_PATTERN = Pattern.compile("-----BEGIN CERTIFICATE REQUEST-----(.+?)-----END CERTIFICATE REQUEST-----", Pattern.DOTALL);
     private boolean checked;
     private RequestRow requestRow;
 
@@ -79,5 +86,18 @@ public class RequestWrapper {
      */
     public void setRequestRow(RequestRow requestRow) {
         this.requestRow = requestRow;
+    }
+
+    /**
+     *
+     * @return whether a certificate in the row has SANs or not
+     */
+    public boolean hasSans() {
+        Matcher certmatcher = DATA_CERT_PATTERN.matcher(requestRow.getData());
+        ArrayList<String> sans = CertUtil.getSansCSR(certmatcher, this.requestRow);
+        if(sans != null) {
+            return sans.size() > 1;
+        }
+        return false;
     }
 }
