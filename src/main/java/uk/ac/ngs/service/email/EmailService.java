@@ -169,7 +169,7 @@ public class EmailService {
             Map<String, Object> vars = new HashMap<>();
             vars.put("param1", requestedRevokeDN);
             vars.put("basePortalUrl", basePortalUrl);
-            vars.put("revoke_cert_key", crrId);
+            vars.put("crrId", crrId);
             try {
                 this.mailSender.send(msg, vars, this.emailRaRevokeTemplate);
             } catch (MailException ex) {
