@@ -69,7 +69,7 @@
                                 </button>
                             </td>
                             <td> ${rowWrapper.requestRow.status} </td>
-                            <td> <c:when test="${rowWrapper.hasSans()}"><b>YES</b> - Check request</c:when><c:otherwise>No</c:otherwise></td>
+                            <td> TBC </td>
                             <form:hidden path="rows[${status.index}].requestRow.req_key"/>
                             <form:hidden path="rows[${status.index}].requestRow.cn"/>
                             <c:choose>
