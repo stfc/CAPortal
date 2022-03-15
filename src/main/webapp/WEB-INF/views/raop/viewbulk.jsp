@@ -48,7 +48,7 @@
                         <th>Common Name:</th>
                         <th>Distinguished Name:</th>
                         <th>Status:</th>
-                        <th>Has SANs:</th>
+                        <th>Has SANs?</th>
                         <th class="sorter-false">Select/Deselect</th>
                     </tr>
                     </thead>
@@ -69,7 +69,16 @@
                                 </button>
                             </td>
                             <td> ${rowWrapper.requestRow.status} </td>
-                            <td> TBC </td>
+
+                            <c:choose>
+                                <c:when test="${rowWrapper.hasSans() == true}">
+                                    <td><b>YES - CHECK REQUEST!</b></td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td>No</td>
+                                </c:otherwise>
+                            </c:choose>
+
                             <form:hidden path="rows[${status.index}].requestRow.req_key"/>
                             <form:hidden path="rows[${status.index}].requestRow.cn"/>
                             <c:choose>
