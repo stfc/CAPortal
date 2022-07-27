@@ -51,47 +51,6 @@ public class GlobalControllerExceptionHandler {
         return mav;
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public ModelAndView defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
-        // If the exception is annotated with @ResponseStatus rethrow it and let
-        // the framework handle it, see: http://spring.io/blog/2013/11/01/exception-handling-in-spring-mvc 
-        if (AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class) != null) {
-            throw e;
-        }
-        if (e instanceof HttpRequestMethodNotSupportedException) {
-            throw e;
-        }
-
-        // log the error 
-        log.error("Global Exception handled with no @ResponsStatus: ");
-        log.error(e);
-        e.printStackTrace();
-
-        // send notification email 
-        boolean emailOnError = Boolean.parseBoolean(this.mutableConfigParams.getProperty("email.admins.on.error"));
-        if (emailOnError) {
-            String[] allemails = this.mutableConfigParams.getProperty("email.admin.addresses").split(",");
-            // use set so duplicates aren't added
-            Set<String> adminEmails = new HashSet<>(Arrays.asList(allemails));
-            this.emailService.sendAdminsOnError(adminEmails, e, req.getRequestURL().toString());
-        }
-
-        // Otherwise setup and send the user to a default error-view.
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("exception", e);
-        mav.addObject("url", req.getRequestURL());
-        mav.setViewName(DEFAULT_ERROR_VIEW);
-        return mav;
-    }
-
-    /**
-     * @param emailService the emailService to set
-     */
-    @Inject
-    public void setEmailService(EmailService emailService) {
-        this.emailService = emailService;
-    }
-
     @Inject
     public void setMutableConfigParams(MutableConfigParams mutableConfigParams) {
         this.mutableConfigParams = mutableConfigParams;
