@@ -57,10 +57,7 @@ function createCSR(cn, ou, loc, o, c, pw) {
     console.log('Certification request (CSR) created.');
 
     // PEM-format keys and csr
-    // Specify a decent/recent encryption algorithm. If not specified, the
-    // default algorithm is PBEWithMD5AndDES which BouncyCastle/java don't seem
-    // to support, hence use 3des.
-    const algOpts = {algorithm: '3des'};
+    const algOpts = {algorithm: 'aes256', prfAlgorithm: 'sha256'};
     const pem = {
         //privateKey: forge.pki.privateKeyToPem(keys.privateKey),
         privateKey: forge.pki.encryptRsaPrivateKey(keys.privateKey, pw, algOpts),

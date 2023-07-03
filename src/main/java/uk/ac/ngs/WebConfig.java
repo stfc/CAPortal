@@ -113,6 +113,7 @@ public class WebConfig implements WebMvcConfigurer {
         emailService.setEmailUserNewHostCertTemplate("emailUserNewHostCertTemplate.html");
         emailService.setEmailAdminsOnErrorTemplate("emailAdminsOnErrorTemplate.html");
         emailService.setEmailRaEmailChangeTemplate("emailRaEmailChangeTemplate.html");
+        emailService.setEmailRaHostRenewTemplate("emailRaHostRenewTemplate.html");
         emailService.setBasePortalUrl(basePortalUrl);
         return emailService;
     }

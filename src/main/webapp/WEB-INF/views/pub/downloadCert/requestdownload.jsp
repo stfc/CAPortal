@@ -284,7 +284,7 @@
 <!-- footer includes shared .js files -->
 <%@ include file="../../../jspf/footer.jspf" %>
 <!-- Stuff for crypto / csrs -->
-<script src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
 <!-- https://github.com/eligrey/FileSaver.js -->
 <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
@@ -382,7 +382,7 @@
                                 //create PKCS12
                                 console.log('\nCreating PKCS#12...');
                                 const newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(privateKey, chain, password,
-                                    {generateLocalKeyId: true, friendlyName: 'myUkCaCertficate', algorithm: '3des'});
+                                    {generateLocalKeyId: true, friendlyName: 'myUkCaCertificate', algorithm: 'aes256'});
                                 const newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
                                 console.log('\nBase64-encoded new PKCS#12:');
                                 const b64p12 = forge.util.encode64(newPkcs12Der);
@@ -392,7 +392,7 @@
                             alert("Please enter the correct password for the private key");
                         }
                     } catch (ex) {
-                        alert("Could not create private key object - please check provided password and private key text");
+                        alert("Could not create private key object - please contact support@grid-support.ac.uk");
                         if (ex.stack) {
                             console.log('Error name:', ex.name);
                             console.log('Error message:', ex.message);
