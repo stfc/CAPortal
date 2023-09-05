@@ -382,7 +382,7 @@
                                 //create PKCS12
                                 console.log('\nCreating PKCS#12...');
                                 const newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(privateKey, chain, password,
-                                    {generateLocalKeyId: true, friendlyName: 'myUkCaCertificate', algorithm: 'aes256'});
+                                    {generateLocalKeyId: true, friendlyName: 'myUkCaCertificate', algorithm: '3des'});
                                 const newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
                                 console.log('\nBase64-encoded new PKCS#12:');
                                 const b64p12 = forge.util.encode64(newPkcs12Der);
