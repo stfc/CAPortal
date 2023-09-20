@@ -48,6 +48,7 @@ public class EmailService {
     private String emailAdminsRoleChangeTemplate;
     private String emailAdminsOnErrorTemplate;
     private String emailAdminsOnNewRaTemplate;
+    private  String emailRaHostRenewTemplate;
     private String basePortalUrl;
 
     public EmailService() {
@@ -223,9 +224,10 @@ public class EmailService {
      * @param raEmails
      * @param req_key
      * @param emailUpdated
+     * @param b
      */
     public void sendRaEmailOnCsrRenew(String requestedRenewDN, Set<String> raEmails,
-                                      long req_key, boolean emailUpdated) {
+                                      long req_key, boolean emailUpdated, boolean isHostCert) {
         StringBuilder emailDebug = new StringBuilder("Emailing following RAs on RENEW [");
         for (String raEmail : raEmails) {
             emailDebug.append(raEmail);
@@ -244,7 +246,11 @@ public class EmailService {
                 vars.put("emailUpdatedTxt", "This renewal does not include a change of email address.");
             }
             try {
-                this.mailSender.send(msg, vars, this.emailRaRenewTemplate);
+                if (isHostCert) {
+                    this.mailSender.send(msg, vars, this.emailRaHostRenewTemplate);
+                } else {
+                    this.mailSender.send(msg, vars, this.emailRaRenewTemplate);
+                }
             } catch (MailException ex) {
                 log.error(ex.getMessage());
             }
@@ -370,6 +376,13 @@ public class EmailService {
      */
     public void setEmailTemplate(SimpleMailMessage emailTemplate) {
         this.emailTemplate = emailTemplate;
+    }
+
+    /**
+     * @param emailRaHostRenewTemplate the emailRaRenewTemplate to set
+     */
+    public void setEmailRaHostRenewTemplate(String emailRaHostRenewTemplate) {
+        this.emailRaHostRenewTemplate = emailRaHostRenewTemplate;
     }
 
     /**

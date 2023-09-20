@@ -14,11 +14,6 @@ package uk.ac.ngs.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.pkcs.PKCSException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -40,7 +35,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -166,7 +160,7 @@ public class ProcessCsrRenewService {
 
             String agent = this.mutableConfigParams.getProperty("db.request.row.data.col.version.value");
             long req_key = this.jdbcRequestDao.getNextPrimaryKey();
-            RequestRow requestRow = this.createRequestRow(csrWrapper, clientEmail, role, req_key, agent); // change to newEmail 
+            RequestRow requestRow = this.createRequestRow(csrWrapper, clientEmail, role, req_key, agent, renewProfile.equals(CSR_Flags.Profile.UKHOST) ? true : false); // change to newEmail
 
             // If we are supporting bulk (bulk_chain and seq_bulk are supported), then map/correlate bulk ids in bulk_chain. 
             boolean doBulkChain = Boolean.parseBoolean(this.mutableConfigParams.getProperty("support.bulk.on.renew"));
@@ -204,7 +198,7 @@ public class ProcessCsrRenewService {
                     raEmails.addAll(Arrays.asList(allemails));
                 }
 
-                this.emailService.sendRaEmailOnCsrRenew(csrWrapper.getP10Req().getSubject().toString(), raEmails, req_key, emailUpdate);
+                this.emailService.sendRaEmailOnCsrRenew(csrWrapper.getP10Req().getSubject().toString(), raEmails, req_key, emailUpdate, renewProfile.equals(CSR_Flags.Profile.UKHOST) ? true : false);
             }
             return new ProcessCsrResult(req_key, csrWrapper, pkcs8StrEnc);
 
@@ -215,7 +209,7 @@ public class ProcessCsrRenewService {
     }
 
     private RequestRow createRequestRow(PKCS10_RequestWrapper csrWrapper,
-                                        String email, String role, long req_key, String agent) throws IOException {
+                                        String email, String role, long req_key, String agent, boolean isHostCert) throws IOException {
         // Create DB request row 
         // Note the following pre-conditions for our CA DB: 
         // requestRow.setDn() has to be in RFC2253 with this OID structure order: (CN, L, OU, O, C) 
@@ -233,7 +227,12 @@ public class ProcessCsrRenewService {
         requestRow.setCn(csrWrapper.getP10CN());
         requestRow.setEmail(email);
         requestRow.setRa(csrWrapper.getP10Ou() + " " + csrWrapper.getP10Loc());
-        requestRow.setStatus("RENEW");
+        // Automatically approve hostcert renewal CSRs
+        if (isHostCert) {
+            requestRow.setStatus("APPROVED");
+        } else {
+            requestRow.setStatus("RENEW");
+        }
         requestRow.setRole(role);
         requestRow.setPublic_key(ConvertUtil.getDBFormattedRSAPublicKey(csrWrapper.getP10PubKey()));
         return requestRow;
