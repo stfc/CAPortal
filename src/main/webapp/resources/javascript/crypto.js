@@ -52,12 +52,13 @@ function createCSR(cn, ou, loc, o, c, pw) {
     ]);
 
 
-    // sign certification request
-    csr.sign(keys.privateKey);
+    // sign certification request, with SHA256 signature (Rocky 9 requirement)
+    csr.sign(keys.privateKey, forge.md.sha256.create());
     console.log('Certification request (CSR) created.');
 
     // PEM-format keys and csr
-    const algOpts = {algorithm: 'aes256', prfAlgorithm: 'sha256'};
+    // Annoyingly, MacOS Keychain required 3des, which I know isn't ideal, but we need to support Macs
+    const algOpts = {algorithm: '3des'};
     const pem = {
         //privateKey: forge.pki.privateKeyToPem(keys.privateKey),
         privateKey: forge.pki.encryptRsaPrivateKey(keys.privateKey, pw, algOpts),
