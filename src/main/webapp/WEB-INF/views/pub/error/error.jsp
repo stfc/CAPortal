@@ -20,7 +20,7 @@ An error page with hidden stack-trace suitable for tech support.
 -->
 <h1>Application Error</h1>
 
-<!-- You could use ${requestScope['javax.servlet.forward.request_uri']}
+<!-- You could use ${requestScope['jakarta.servlet.forward.request_uri']}
         but it's a lot more verbose and doesn't give you the full page URL. -->
 <c:if test="${not empty url}">
     <p>

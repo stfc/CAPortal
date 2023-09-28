@@ -33,7 +33,7 @@ import uk.ac.ngs.service.ProcessCsrResult;
 import uk.ac.ngs.validation.CsrRequestValidationConfigParams;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;

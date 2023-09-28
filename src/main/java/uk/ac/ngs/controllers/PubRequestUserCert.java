@@ -26,7 +26,7 @@ import uk.ac.ngs.service.ProcessCsrResult;
 import uk.ac.ngs.validation.CsrRequestValidationConfigParams;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

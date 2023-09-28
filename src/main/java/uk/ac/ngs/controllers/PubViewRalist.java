@@ -24,7 +24,7 @@ import uk.ac.ngs.dao.JdbcRalistDao;
 import uk.ac.ngs.domain.RalistRow;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
 

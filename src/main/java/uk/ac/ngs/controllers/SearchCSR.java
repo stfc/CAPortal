@@ -34,7 +34,7 @@ import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.*;
 

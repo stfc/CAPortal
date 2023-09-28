@@ -28,7 +28,7 @@ import uk.ac.ngs.domain.CertificateRow;
 import uk.ac.ngs.domain.RaopListRow;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;

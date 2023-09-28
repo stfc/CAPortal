@@ -33,7 +33,7 @@ import uk.ac.ngs.service.CertUtil;
 import uk.ac.ngs.service.CrrManagerService;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

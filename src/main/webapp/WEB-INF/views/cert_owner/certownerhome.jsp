@@ -56,11 +56,11 @@
                     </tr>
                     <tr>
                         <td>Distinguished Name (DN)</td>
-                        <td>${cert.subjectDN}</td>
+                        <td>${cert.subjectX500Principal.getName()}</td>
                     </tr>
                     <tr>
                         <td>Issuer DN</td>
-                        <td>${cert.issuerDN}</td>
+                        <td>${cert.issuerX500Principal.getName()}</td>
                     </tr>
                     <tr>
                         <td>Email</td>

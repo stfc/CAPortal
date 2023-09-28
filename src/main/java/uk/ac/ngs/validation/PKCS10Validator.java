@@ -49,7 +49,7 @@ public class PKCS10Validator implements Validator {
 
     // In future we could inject the required parameters 
     private final SignatureAlgorithmIdentifierFinder algFinder = new DefaultSignatureAlgorithmIdentifierFinder();
-    private final AlgorithmIdentifier algIdExpected = algFinder.find("SHA1WITHRSAENCRYPTION"); // or "SHA1withRSA", "SHA1withRSAEncryption" 
+    private final AlgorithmIdentifier algIdExpected = algFinder.find("SHA256WITHRSAENCRYPTION"); // or "SHA1withRSA", "SHA1withRSAEncryption"
     private final PKCS10Parser csrParser = new PKCS10Parser();
     private final CsrRequestValidationConfigParams validationConfigParams;
 
@@ -90,7 +90,7 @@ public class PKCS10Validator implements Validator {
             // Test the algorithm of the request (we expect SHA1 with RSA)  
             AlgorithmIdentifier reqSigAlgId = req.getSignatureAlgorithm();
             if (!reqSigAlgId.getAlgorithm().getId().equals(algIdExpected.getAlgorithm().getId())) {
-                e.reject("pkcs10.validation.failed", "Invalid PKCS10 signature - Required SHA1withRSA");
+                e.reject("pkcs10.validation.failed", "Invalid PKCS10 signature - Required SHA256withRSA");
                 return;
             }
 

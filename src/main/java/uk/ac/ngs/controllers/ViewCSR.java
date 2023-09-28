@@ -42,7 +42,7 @@ import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CsrManagerService;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
