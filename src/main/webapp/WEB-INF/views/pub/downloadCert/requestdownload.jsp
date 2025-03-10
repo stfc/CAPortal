@@ -287,7 +287,7 @@
 <script src="https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/base64.js"></script>
 <!-- https://github.com/eligrey/FileSaver.js -->
-<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/javascript/FileSaver.js"></script>
 <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
 
 <script type="text/javascript">
