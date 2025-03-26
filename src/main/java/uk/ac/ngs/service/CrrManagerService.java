@@ -139,7 +139,7 @@ public class CrrManagerService {
         // search for an existing CRR for this cert? 
         CertificateRow certRow = this.jdbcCertDao.findById(cert_key_toRevoke);
         if (certRow == null) {
-            throw new RuntimeException("Invalid certifiate row - no row found with id [" + cert_key_toRevoke + "]");
+            throw new RuntimeException("Invalid certificate row - no row found with id [" + cert_key_toRevoke + "]");
         }
         // update the certrow status 
         certRow.setStatus("SUSPENDED");
@@ -253,13 +253,13 @@ public class CrrManagerService {
         if (this.jdbcCrrDao.updateCrrRow(crrRow) != 1) {
             throw new RuntimeException("Multiple crr rows attempted for udpate");
         }
-        // no need to upate the certrow
+        // no need to update the certrow
     }
     
 
    
 
-    /* Sample CRR Data colunn
+    /* Sample CRR Data column
     -----BEGIN HEADER-----
     TYPE = CRR
     SERIAL = 209665
@@ -295,7 +295,7 @@ public class CrrManagerService {
             X509Certificate x509 = this.jdbcCertDao.getX509CertificateFromData(certRowToRevoke);
             notAfter = x509.getNotAfter();
             notBefore = x509.getNotBefore();
-            issuerDN = x509.getIssuerDN().toString();
+            issuerDN = x509.getIssuerX500Principal().toString();
         } catch (CertificateException | UnsupportedEncodingException ex) {
             throw new IllegalArgumentException(ex);
         }
