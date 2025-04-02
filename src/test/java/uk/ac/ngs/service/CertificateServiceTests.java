@@ -51,8 +51,10 @@ public class CertificateServiceTests {
     private String requesterDn = "CN=TestUser";
     private long cert_key = 1000L;
     private String newEmail = "newEmail@example.com";
-    private LocalDate localDate = LocalDate.now().plusDays(1);
-    private Date datePlusOneDay = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    private LocalDate plusOneDayLocalDate = LocalDate.now().plusDays(1);
+    private Date datePlusOneDay = Date.from(plusOneDayLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    private LocalDate oldLocalDate = LocalDate.now().minusDays(10);
+    private Date oldDate = Date.from(oldLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
     private CertificateService certificateService;
 
@@ -110,20 +112,21 @@ public class CertificateServiceTests {
         certRow.setCn("INVALID_CN");
         certRow.setDn(newEmail);
         certRow.setStatus("INVALID");
-        certRow.setNotAfter(new Date());
+        certRow.setNotAfter(oldDate);
 
         when(jdbcCertDao.findById(cert_key)).thenReturn(certRow);
 
         Errors errors = certificateService.updateCertificateRowEmail(requesterDn, cert_key, newEmail);
 
-        //assertEquals(4, errors.getErrorCount());
-        assertEquals(errors.getAllErrors().get(0).getDefaultMessage(),
-                "Email update failed - DN is not a host certificate");
-        assertEquals(errors.getAllErrors().get(1).getDefaultMessage(),
-                "Email update failed - DN appears to contain an email address");
-        assertEquals(errors.getAllErrors().get(2).getDefaultMessage(),
-                "Email update failed - Certificate is not VALID");
-        assertEquals(errors.getAllErrors().get(3).getDefaultMessage(), "Email update failed - Certificate is expired");
+        assertEquals(4, errors.getErrorCount());
+        assertEquals("Email update failed - DN is not a host certificate",
+                errors.getAllErrors().get(0).getDefaultMessage());
+        assertEquals("Email update failed - DN appears to contain an email address",
+                errors.getAllErrors().get(1).getDefaultMessage());
+        assertEquals("Email update failed - Certificate is not VALID",
+                errors.getAllErrors().get(2).getDefaultMessage());
+        assertEquals("Email update failed - Certificate is expired",
+                errors.getAllErrors().get(3).getDefaultMessage());
     }
 
     @Test
