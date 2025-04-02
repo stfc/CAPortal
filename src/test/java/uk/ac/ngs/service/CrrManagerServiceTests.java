@@ -208,7 +208,7 @@ public class CrrManagerServiceTests {
         when(jdbcCrrDao.insertCrrRow(any())).thenReturn(1);
 
         Long crrKey = crrManagerService.revokeCertificate(cert_key_toRevoke, raop_cert_key, reason, crrStatus);
-        assertEquals(crrKey, nextCrrKey);
+        assertEquals(nextCrrKey, crrKey);
         assertEquals("SUSPENDED", certRow.getStatus());
     }
 
@@ -298,7 +298,7 @@ public class CrrManagerServiceTests {
         when(jdbcCrrDao.insertCrrRow(any())).thenReturn(1);
 
         Long crrKey = crrManagerService.selfRevokeCertificate(cert_key_toRevoke, reason);
-        assertEquals(crrKey, nextCrrKey);
+        assertEquals(nextCrrKey, crrKey);
         assertEquals("SUSPENDED", certRow.getStatus());
     }
 

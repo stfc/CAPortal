@@ -83,8 +83,8 @@ public class CertificateServiceTests {
 
         certificateService.updateCertificateRole(cert_key, newCertRole);
 
-        assertEquals(certRow.getData(), "ROLE=" + newCertRole);
-        assertEquals(certRow.getRole(), newCertRole);
+        assertEquals("ROLE=" + newCertRole, certRow.getData());
+        assertEquals(newCertRole, certRow.getRole());
         verify(emailService, times(2)).sendAdminEmailOnRoleChange(
                 certRow.getDn(), newCertRole, cert_key, certRow.getEmail());
         verify(jdbcCertDao, times(1)).updateCertificateRow(certRow);
@@ -102,8 +102,8 @@ public class CertificateServiceTests {
 
         Errors errors = certificateService.updateCertificateRowEmail(requesterDn, cert_key, "INVALID_EMAIL");
 
-        assertEquals(errors.getErrorCount(), 1);
-        assertEquals(errors.getAllErrors().get(0).getDefaultMessage(), "Email update failed - invalid email address");
+        assertEquals(1, errors.getErrorCount());
+        assertEquals("Email update failed - invalid email address", errors.getAllErrors().get(0).getDefaultMessage());
     }
 
     @Test
@@ -143,8 +143,8 @@ public class CertificateServiceTests {
         Errors errors = certificateService.updateCertificateRowEmail(requesterDn, cert_key, newEmail);
 
         verify(jdbcCertDao, times(1)).updateCertificateRow(certRow);
-        assertEquals(errors.getErrorCount(), 0);
-        assertEquals(certRow.getData(), "emailAddress=" + newEmail);
+        assertEquals(0, errors.getErrorCount());
+        assertEquals("emailAddress=" + newEmail, certRow.getData());
     }
 
     @Test
@@ -162,7 +162,7 @@ public class CertificateServiceTests {
         Errors errors = certificateService.updateCertificateRowEmail(requesterDn, cert_key, newEmail);
 
         verify(jdbcCertDao, times(1)).updateCertificateRow(certRow);
-        assertEquals(errors.getErrorCount(), 0);
+        assertEquals(0, errors.getErrorCount());
         verify(emailService, times(1))
                 .sendEmailToNewEmailOnChange(certRow.getDn(), requesterDn, newEmail, cert_key);
     }
@@ -184,7 +184,7 @@ public class CertificateServiceTests {
         Errors errors = certificateService.updateCertificateRowEmail(requesterDn, cert_key, newEmail);
 
         verify(jdbcCertDao, times(1)).updateCertificateRow(certRow);
-        assertEquals(errors.getErrorCount(), 0);
+        assertEquals(0, errors.getErrorCount());
         verify(emailService, times(1))
                 .sendEmailToOldAndNewOnEmailChange(certRow.getDn(), requesterDn, oldEmail, newEmail, cert_key);
     }
