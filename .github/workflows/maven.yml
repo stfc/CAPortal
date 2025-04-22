@@ -1,0 +1,37 @@
+name: Java CI with Maven
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        java-version: [17]
+        
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK ${{matrix.java-version}}
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          cache: maven
+          java-version: ${{matrix.java-version}}
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      - name: Install dependencies
+        run: mvn install -DskipTests
+      - name: Run tests
+        run: mvn test
+      - name: Build application
+        run: mvn package
