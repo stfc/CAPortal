@@ -285,6 +285,57 @@ public class JdbcCertificateDao {
         return this.jdbcTemplate.query(query.toString(), namedParameters, new CertificateRowMapper());
     }
 
+    /**
+     * Find all rows with role 'RA Operator' or 'User' with a
+     * status of 'VALID' and a 'notafter' time that is in the future with the
+     * specified o (O=), loc (L=) and ou (OU=) values in the dn. 
+     *
+     * @param ou  OrgUnit value (optional, use null to prevent filtering by ou)
+     * @param o    value (optional, use null to prevent filtering by o)
+     * @param loc Locality value (optional, use null to prevent filtering by loc)
+     * @return
+     */
+    public List<CertificateRow> findActiveUserAndRAOperatorBy(String ou, String o, String loc) {
+        long currentTime = Long.parseLong(getDateFormat().format(new Date()));
+        Map<String, Object> namedParameters = new HashMap<>();
+        namedParameters.put("current_time", currentTime);
+
+        StringBuilder query = new StringBuilder(SELECT_PROJECT)
+                .append("where (role = 'RA Operator' or role = 'User') ");
+
+        String raFilter = buildRaFilter(ou, o, loc);
+        if (raFilter != null) {
+            namedParameters.put("ra", raFilter);
+            query.append("and dn like :ra ");
+        }
+
+        query.append("and status = 'VALID' ");
+        //query.append("and notafter > :current_time");
+
+        return jdbcTemplate.query(query.toString(), namedParameters, new CertificateRowMapper());
+    }
+
+    private String buildRaFilter(String ou, String o, String loc) {
+        if (ou == null && o == null && loc == null) {
+            return null;
+        }
+
+        StringJoiner raJoiner = new StringJoiner(",", "%", "%");
+
+        if (ou != null) {
+            raJoiner.add("OU=" + ou);
+        }
+        if (o != null) {
+            raJoiner.add("O=" + o);
+        }
+        if (loc != null) {
+            raJoiner.add("L=" + loc);
+        }
+
+        return raJoiner.toString();
+    }
+
+
 
     /**
      * Update the 'certificate' table with the values from the given CertificateRow.
