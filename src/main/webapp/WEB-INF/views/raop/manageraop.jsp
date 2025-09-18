@@ -3,7 +3,7 @@
 <%@ page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <!doctype html>
 <html>
 
@@ -13,6 +13,7 @@
     <title>RAOP role assignment</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="RAOP role assignment page for UK RA operators"/>
+    <meta name="_csrf" content="${_csrf.token}"/>
     <!-- Styles -->
     <%@ include file="../../jspf/styles.jspf" %>
 </head>
@@ -24,6 +25,12 @@
         <div class="col-offset-1">
 
             <h2>List of users and RA operator for your RA [<span class="text-info">${ra}</span>]</h2>
+            <c:if test="${not empty responseMessage}">
+                <div class="alert alert-info">
+                    ${responseMessage}
+                </div>
+            </c:if>
+
             <div class="col-11">
                 <table class="table tablecondensed">
                     <thead>
@@ -41,14 +48,19 @@
                             <td>                                
                                 <c:choose>
                                     <c:when test="${row.role == 'RA Operator'}">
-                                        <button id="revokeRaopRole" type="button" class="btn btn-sm btn-warning" data-content="${row.dn}">
-                                            Revoke
-                                        </button>                                    
+                                        <form:form method="post" action="${pageContext.request.contextPath}/raop/manageraop/changeroletouser">
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                            <input name="cert_key" type="hidden" value="${row.cert_key}" />
+                                            <button id="revokeRaopRole" type="submit" class="btn btn-sm btn-warning"
+                                                onclick="return confirm('Are you sure you want to revoke RA Operator role?')">
+                                                Revoke
+                                            </button>
+                                        </form:form>
                                     </c:when>
-                                    <c:otherwise>    
-                                        <button id="assignRaopRole" type="button" class="btn btn-sm btn-primary" data-content="${row.dn}">
+                                    <c:otherwise>
+                                        <button id="assignRaopRole" type="button" class="btn btn-sm btn-primary">
                                             Assign
-                                        </button>                                    
+                                        </button>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
@@ -61,21 +73,5 @@
     </div>
 </div>
 <%@ include file="../../jspf/footer.jspf" %>
-
-<script type="text/javascript">
-    $(document).ready(function () {
-        $("#revokeRaopRole").click(function () {
-            if (!window.confirm("Are you sure you want to request revocation of RA Operator role ?")) {
-                return;
-            }
-        });
-
-        $("#assignRaopRole").click(function () {
-            if (!window.confirm("Are you sure you want to request approval for RA Operator role?")) {
-                return;
-            }
-        });
-    });
-</script>
 </body>
 </html>
