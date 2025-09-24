@@ -25,7 +25,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import uk.ac.ngs.dao.JdbcCertificateDao;
+import uk.ac.ngs.dao.RoleChangeRequestRepository;
 import uk.ac.ngs.domain.CertificateRow;
+import uk.ac.ngs.domain.RoleChangeRequest;
 import uk.ac.ngs.security.CaUser;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
@@ -46,14 +48,17 @@ public class ManageRaop {
     private SecurityContextService securityContextService;
     private CertificateService certificateService;
     private JdbcCertificateDao jdbcCertificateDao;
+    private RoleChangeRequestRepository roleChangeRequestRepository;
 
     private final static Pattern DATA_PROFILE_PATTERN = Pattern.compile("PROFILE\\s?=\\s?(\\w+)$", Pattern.MULTILINE);
 
     public ManageRaop(SecurityContextService securityContextService,
-            JdbcCertificateDao jdbcCertificateDao, CertificateService certificateService) {
+            JdbcCertificateDao jdbcCertificateDao, CertificateService certificateService,
+            RoleChangeRequestRepository roleChangeRequestRepository) {
         this.securityContextService = securityContextService;
         this.jdbcCertificateDao = jdbcCertificateDao;
         this.certificateService = certificateService;
+        this.roleChangeRequestRepository = roleChangeRequestRepository;
     }
 
 
@@ -69,7 +74,8 @@ public class ManageRaop {
     String ou = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.OU);
     String o = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.O);
     String loc = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.L);
-
+    model.addAttribute("currentUserDn", currentUserDn);
+    
     // Build RA string and add to model
     String ra = String.format("%s %s", ou, loc);
     model.addAttribute("ra", ra);
@@ -79,12 +85,19 @@ public class ManageRaop {
     List<CertificateRow> userRaopRows = jdbcCertificateDao.findActiveUserAndRAOperatorBy(ou, o, loc);
 
     // Exclude current user from the list
-    List<CertificateRow> filteredRows = userRaopRows.stream()
-        .filter(row -> !currentUserDn.equals(row.getDn()))
-        .collect(Collectors.toList());
+    // List<CertificateRow> filteredRows = userRaopRows.stream()
+    //     .filter(row -> !currentUserDn.equals(row.getDn()))
+    //     .collect(Collectors.toList());
 
-    log.debug("Filtered User and RA Operator rows size: " + filteredRows.size());
-    model.addAttribute("userRaopRows", filteredRows);
+    // log.debug("Filtered User and RA Operator rows size: " + filteredRows.size());
+    model.addAttribute("userRaopRows", userRaopRows);
+    
+    List<Long> listOfRoleChangeRequestCertKey = roleChangeRequestRepository.findAll()
+            .stream()
+            .map(RoleChangeRequest::getCertKey)
+            .collect(Collectors.toList());
+
+    model.addAttribute("listOfRoleChangeRequestCertKey", listOfRoleChangeRequestCertKey);
 
     // Add timestamp
     model.addAttribute("lastPageRefreshDate", new Date());
@@ -120,42 +133,89 @@ public class ManageRaop {
         CertificateRow currentUser = securityContextService.getCaUserDetails().getCertificateRow();
         String message; 
 
-        if (viewerCanDemote(currentUser)) {
+        if (canViewerManageRaopRole(targetCert)) {
             String newRole = "User";
             certificateService.updateCertificateRole(cert_key, newRole);
 
             log.info("Role change from (" + targetCert.getRole() + ") to (" + newRole + ")for certificate ("
                     + cert_key + ") by (" + currentUser.getDn() + ")");
-            message = "Role Change OK";           
+            message = "Role updated successfully!";           
         } else {
-             message = "Role Change FAIL - Viewer does not have correct permissions";
+             message = "Role Change FAIL - user does not have correct permissions";
         }
 
         redirectAttrs.addFlashAttribute("responseMessage", message);
-        //redirectAttrs.addAttribute("certId", cert_key);
+        return "redirect:/raop/manageraop";
+    }
+
+    /**
+     * Handle POSTs to "/raop/manageraop/requestraoprole" to request RAOP role of
+     * certificate from User role by a RAOP.
+     * <p>
+     * The view is always redirected and redirect attributes added as necessary;
+     *
+     * @param cert_key      key of certificate being updated
+     * @param redirectAttrs
+     * @return
+     * @throws java.io.IOException
+     */
+    @RequestMapping(value = "/requestraoprole", method = RequestMethod.POST)
+    public String requestRaopRole(@RequestParam long cert_key, RedirectAttributes redirectAttrs)
+            throws IOException {
+        CertificateRow targetCert = jdbcCertificateDao.findById(cert_key);
+        CertificateRow currentUser = securityContextService.getCaUserDetails().getCertificateRow();
+        String message;
+
+        if (canViewerManageRaopRole(targetCert)) {
+            String newRole = "RA Operator";
+            certificateService.raiseRoleChangeRequest(cert_key, newRole, currentUser);
+
+            log.info("Role change request from (" + targetCert.getRole() + ") to (" + newRole + ")for certificate ("
+                    + cert_key + ") by (" + currentUser.getDn() + ") has been raised");
+            message = "A role change request has been raised successfully";
+        } else {
+            message = "Role change request FAIL - user does not have correct permissions";
+        }
+
+        redirectAttrs.addFlashAttribute("responseMessage", message);
         return "redirect:/raop/manageraop";
     }
 
 
     /***
-     * Check to see if a user can demote certificates. RA-OP ONLY for own RA
+     * Check to see if a user can request role change of certificate. RAOP ONLY for own RA
      * 
-     * @param viewCert certificate of the viewer
+     * @param targetCert certificate subject to role chnage
      * @return result of check
      */
-    private boolean viewerCanDemote(CertificateRow cert) {
+    private boolean canViewerManageRaopRole(CertificateRow targetCert) {
+        String currentUserDn = securityContextService.getCaUserDetails().getCertificateRow().getDn();
+
         // Check if current user has RA Operator role
         if (!securityContextService.getCaUserDetails().getAuthorities()
                 .contains(new SimpleGrantedAuthority("ROLE_RAOP"))) {
             return false;
         }
 
-        // Extract profile from certificate data
-        String profile = "default";
-        Matcher profileMatcher = DATA_PROFILE_PATTERN.matcher(cert.getData());
-        if (profileMatcher.find()) {
-            profile = profileMatcher.group(1);
+        // Check if request is for own certificate
+        if (currentUserDn.equals(targetCert.getDn())) {
+            return false;
         }
+
+        // Validate certificate data
+        if (targetCert == null || targetCert.getData() == null) {
+            log.warn("Target certificate or its data is null");
+            return false;
+        }
+
+        // Extract profile from certificate data
+        Matcher profileMatcher = DATA_PROFILE_PATTERN.matcher(targetCert.getData());
+        if (!profileMatcher.find()) {
+            log.warn("Profile not found in certificate data for certKey: " + targetCert.getCert_key());
+            return false;
+        }
+
+        String profile = profileMatcher.group(1);
 
         // Only allow demotion for UKPERSON profile
         if (!"UKPERSON".equals(profile)) {
@@ -163,13 +223,12 @@ public class ManageRaop {
         }
 
         // Compare DN attributes (OU and L) between current user and target certificate
-        String currentUserDn = securityContextService.getCaUserDetails().getCertificateRow().getDn();
-        String currentOU = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.OU);
-        String currentL = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.L);
+        String currentUserOU = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.OU);
+        String currentUserL = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.L);
 
-        String certOU = CertUtil.extractDnAttribute(cert.getDn(), CertUtil.DNAttributeType.OU);
-        String certL = CertUtil.extractDnAttribute(cert.getDn(), CertUtil.DNAttributeType.L);
+        String targetCertOU = CertUtil.extractDnAttribute(targetCert.getDn(), CertUtil.DNAttributeType.OU);
+        String targetCertL = CertUtil.extractDnAttribute(targetCert.getDn(), CertUtil.DNAttributeType.L);
 
-        return currentOU.equals(certOU) && currentL.equals(certL);
+        return currentUserOU.equals(targetCertOU) && currentUserL.equals(targetCertL);
     }
 }

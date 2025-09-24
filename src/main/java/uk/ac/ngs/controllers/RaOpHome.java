@@ -15,23 +15,36 @@ package uk.ac.ngs.controllers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import uk.ac.ngs.dao.JdbcCertificateDao;
 import uk.ac.ngs.dao.JdbcCrrDao;
 import uk.ac.ngs.dao.JdbcRaopListDao;
 import uk.ac.ngs.dao.JdbcRequestDao;
+import uk.ac.ngs.dao.RoleChangeRequestRepository;
+import uk.ac.ngs.domain.CertificateRow;
 import uk.ac.ngs.domain.CrrRow;
 import uk.ac.ngs.domain.RaopListRow;
 import uk.ac.ngs.domain.RequestRow;
+import uk.ac.ngs.domain.RoleChangeRequest;
 import uk.ac.ngs.security.CaUser;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
+import uk.ac.ngs.service.CertificateService;
 
 import javax.inject.Inject;
+
+import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //import org.springframework.security.core.GrantedAuthority;
 
@@ -48,6 +61,11 @@ public class RaOpHome {
     private JdbcRaopListDao jdbcRaopListDao;
     private JdbcRequestDao jdbcRequestDao;
     private JdbcCrrDao jdbcCrrDao;
+    private RoleChangeRequestRepository roleChangeRequestRepository;
+    private JdbcCertificateDao jdbcCertificateDao;
+    private CertificateService certificateService;
+
+    private final static Pattern DATA_PROFILE_PATTERN = Pattern.compile("PROFILE\\s?=\\s?(\\w+)$", Pattern.MULTILINE);
 
     public RaOpHome() {
         log.debug(RaOpHome.class.getName() + " ***created dave***");
@@ -58,29 +76,29 @@ public class RaOpHome {
     public void populateModel(Model model) {
         log.debug("raop populateModel");
 
-        // Get the current CaUser (so we can extract their DN)  
+        // Get the current CaUser (so we can extract their DN)
         CaUser caUser = securityContextService.getCaUserDetails();
-        //Collection<GrantedAuthority> auths = caUser.getAuthorities();
+        // Collection<GrantedAuthority> auths = caUser.getAuthorities();
 
-        //model.addAttribute("caUser", caUser);
+        // model.addAttribute("caUser", caUser);
 
         // Extract the RA value from the user's certificate DN
         String dn = caUser.getCertificateRow().getDn();
-        String OU = CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.OU); //CLRC
-        String L = CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.L); //RAL
-        String CN = CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.CN); //meryem tahar
+        String OU = CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.OU); // CLRC
+        String L = CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.L); // RAL
+        String CN = CertUtil.extractDnAttribute(dn, CertUtil.DNAttributeType.CN); // meryem tahar
         String ra = OU + " " + L;
         model.addAttribute("ra", ra);
         log.debug("ra is:[" + ra + "]");
 
-        // Get the current user's RAOP details for display (i.e. when they last 
-        // did the training etc). Note, this does not affect their ability to 
-        // do raop stuff in the portal. 
+        // Get the current user's RAOP details for display (i.e. when they last
+        // did the training etc). Note, this does not affect their ability to
+        // do raop stuff in the portal.
         List<RaopListRow> raoprows = this.jdbcRaopListDao.findBy(OU, L, CN, true);
         log.debug("raoprows size: " + raoprows.size());
         model.addAttribute("raoprows", raoprows);
 
-        // Fetch a list of pending CSRs for the RA (NEW and RENEW) 
+        // Fetch a list of pending CSRs for the RA (NEW and RENEW)
         // NEW
         Map<JdbcRequestDao.WHERE_PARAMS, String> whereParams = new HashMap<>();
         whereParams.put(JdbcRequestDao.WHERE_PARAMS.RA_EQ, ra);
@@ -94,16 +112,139 @@ public class RaOpHome {
         renewRequestRows = jdbcRequestDao.setDataNotBefore(renewRequestRows);
         model.addAttribute("renew_reqrows", renewRequestRows);
 
-        // Fetch a list of pending CRRs for the RA 
+        // Fetch a list of pending CRRs for the RA
         Map<JdbcCrrDao.WHERE_PARAMS, String> crrWhereParams = new HashMap<>();
-        crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.STATUS_EQ, "NEW"); //NEW,APPROVED,ARCHIVED,DELETED 
+        crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.STATUS_EQ, "NEW"); // NEW,APPROVED,ARCHIVED,DELETED
         crrWhereParams.put(JdbcCrrDao.WHERE_PARAMS.DN_LIKE, "%L=" + L + ",OU=" + OU + "%");
         List<CrrRow> crrRows = jdbcCrrDao.findBy(crrWhereParams, null, null);
         log.debug("crrRows size: [" + crrRows.size() + "]");
         crrRows = jdbcCrrDao.setSubmitDateFromData(crrRows);
         model.addAttribute("crr_reqrows", crrRows);
 
+        // Fetch list of pending RA operator role assignment requests for CAOP
+        if (caUser.getAuthorities()
+                .contains(new SimpleGrantedAuthority("ROLE_CAOP"))) {
+            List<RoleChangeRequest> roleChangeRequests = roleChangeRequestRepository.findAll();
+            model.addAttribute("roleChangeRequests", roleChangeRequests);
+        }
+
         model.addAttribute("lastPageRefreshDate", new Date());
+    }
+
+    /**
+     * Handle POSTs to "/raop/approverolechange" to approve a role change request of
+     * certificate to RAOP role by a CAOP.
+     * <p>
+     * The view is always redirected and redirect attributes added as necessary;
+     *
+     * @param cert_key      key of certificate being updated
+     * @param requestId     id of the role change request 
+     * @param redirectAttrs
+     * @return
+     * @throws java.io.IOException
+     */
+    @Secured("ROLE_CAOP")
+    @RequestMapping(value = "/approverolechange", method = RequestMethod.POST)
+    public String approverolechange(@RequestParam long certKey, @RequestParam Integer requestId,
+            RedirectAttributes redirectAttrs)
+            throws IOException {
+        String message;
+
+        try {
+            CertificateRow targetCert = jdbcCertificateDao.findById(certKey);
+            CertificateRow currentUser = securityContextService.getCaUserDetails().getCertificateRow();
+
+            if (targetCert == null) {
+                message = "Role Change FAIL - Certificate not found for certKey: " + certKey;
+                log.warn(message);
+            } else if (!canUserManageRaopRole(targetCert)) {
+                message = "Role Change FAIL - user does not have correct permissions";
+                log.warn("Unauthorized role change attempt by:" + currentUser.getDn());
+            } else {
+                String newRole = "RA Operator";
+                certificateService.updateCertificateRole(certKey, newRole);
+                roleChangeRequestRepository.deleteById(requestId);
+
+                log.info("Role change from (" + targetCert.getRole() + ") to (" + newRole + ") for certificate ("
+                        + certKey + ") by (" + currentUser.getDn() + ")");
+
+                message = "Role updated successfully!";
+            }
+        } catch (Exception e) {
+            log.error("Error during role change approval for certKey " + certKey + " and requestId " + requestId + ": "
+                    + e.getMessage());
+            message = "Role Change FAIL - Internal error occurred";
+        }
+
+        redirectAttrs.addFlashAttribute("responseMessage", message);
+        return "redirect:/raop";
+    }
+
+
+    /**
+     * Handle POSTs to "/raop/rejectrolechange" to reject
+     * certificate role change by a CAOP.
+     * <p>
+     * The view is always redirected and redirect attributes added as necessary;
+     *
+     * @param requestId      id of the request raised by RAOP
+     * @param redirectAttrs
+     * @return
+     * @throws java.io.IOException
+     */
+    @Secured("ROLE_CAOP")
+    @RequestMapping(value = "/rejectrolechange", method = RequestMethod.POST)
+    public String rejectrolechange(@RequestParam Integer requestId, RedirectAttributes redirectAttrs)
+            throws IOException {
+        String message;
+
+        try {
+            roleChangeRequestRepository.deleteById(requestId);
+            message = "Request rejected successfully!";
+        } catch (Exception e) {
+            message = "Request rejection failed!";
+            e.printStackTrace();
+        }
+
+        redirectAttrs.addFlashAttribute("responseMessage", message);
+        return "redirect:/raop";
+    }
+
+    /***
+     * Check to see if a user can manage certificates role change.
+     * 
+     * @param targetCert role change certificate
+     * @return result of check
+     */
+    private boolean canUserManageRaopRole(CertificateRow targetCert) {
+        // Check if current user has CA Operator management authority
+        if (!securityContextService.getCaUserDetails().getAuthorities()
+                .contains(new SimpleGrantedAuthority("ROLE_CAOP"))) {
+            return false;
+        }
+
+        // Validate certificate data
+        if (targetCert == null || targetCert.getData() == null) {
+            log.warn("Target certificate or its data is null");
+            return false;
+        }
+
+        // Extract profile from certificate data
+        Matcher profileMatcher = DATA_PROFILE_PATTERN.matcher(targetCert.getData());
+        if (!profileMatcher.find()) {
+            log.warn("Profile not found in certificate data for certKey: " + targetCert.getCert_key());
+            return false;
+        }
+
+        String profile = profileMatcher.group(1);
+
+        // Only allow role change for UKPERSON profile
+        boolean isAllowed = "UKPERSON".equals(profile);
+        if (!isAllowed) {
+            log.info("Role change not allowed for profile:" + profile);
+        }
+
+        return isAllowed;
     }
 
     /**
@@ -135,5 +276,20 @@ public class RaOpHome {
     @Inject
     public void setJdbcCrrDao(JdbcCrrDao jdbcCrrDao) {
         this.jdbcCrrDao = jdbcCrrDao;
+    }
+
+    @Inject
+    public void setRoleChangeRequestRepository(RoleChangeRequestRepository roleChangeRequestRepository) {
+        this.roleChangeRequestRepository = roleChangeRequestRepository;
+    }
+
+    @Inject
+    public void setRoleChangeRequestRepository(JdbcCertificateDao jdbcCertificateDao) {
+        this.jdbcCertificateDao = jdbcCertificateDao;
+    }
+
+    @Inject
+    public void setRoleChangeRequestRepository(CertificateService certificateService) {
+        this.certificateService = certificateService;
     }
 }
