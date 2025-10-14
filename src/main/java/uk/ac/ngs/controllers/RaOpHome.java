@@ -137,7 +137,7 @@ public class RaOpHome {
      * <p>
      * The view is always redirected and redirect attributes added as necessary;
      *
-     * @param cert_key      key of certificate being updated
+     * @param certKey      key of certificate being updated
      * @param requestId     id of the role change request 
      * @param redirectAttrs
      * @return

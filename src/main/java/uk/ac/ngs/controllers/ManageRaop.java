@@ -75,7 +75,7 @@ public class ManageRaop {
     String o = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.O);
     String loc = CertUtil.extractDnAttribute(currentUserDn, CertUtil.DNAttributeType.L);
     model.addAttribute("currentUserDn", currentUserDn);
-    
+
     // Build RA string and add to model
     String ra = String.format("%s %s", ou, loc);
     model.addAttribute("ra", ra);
@@ -168,7 +168,7 @@ public class ManageRaop {
 
         if (canViewerManageRaopRole(targetCert)) {
             String newRole = "RA Operator";
-            certificateService.raiseRoleChangeRequest(cert_key, newRole, currentUser);
+            certificateService.raiseRoleChangeRequest(cert_key, targetCert, newRole, currentUser);
 
             log.info("Role change request from (" + targetCert.getRole() + ") to (" + newRole + ")for certificate ("
                     + cert_key + ") by (" + currentUser.getDn() + ") has been raised");
@@ -197,16 +197,16 @@ public class ManageRaop {
             return false;
         }
 
-        // Check if request is for own certificate
-        if (currentUserDn.equals(targetCert.getDn())) {
-            return false;
-        }
-
         // Validate certificate data
         if (targetCert == null || targetCert.getData() == null) {
             log.warn("Target certificate or its data is null");
             return false;
         }
+
+        // Check if request is for own certificate
+        if (currentUserDn.equals(targetCert.getDn())) {
+            return false;
+        }        
 
         // Extract profile from certificate data
         Matcher profileMatcher = DATA_PROFILE_PATTERN.matcher(targetCert.getData());

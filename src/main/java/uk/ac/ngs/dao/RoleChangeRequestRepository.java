@@ -9,6 +9,9 @@ import java.util.List;
 
 @Repository
 public interface RoleChangeRequestRepository extends CrudRepository<RoleChangeRequest, Integer> {
+    @Override
     List<RoleChangeRequest> findAll();
+    
+    @Override
     void deleteById(Integer id);
 }

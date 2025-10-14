@@ -285,6 +285,21 @@ public class JdbcCertificateDao {
         return this.jdbcTemplate.query(query.toString(), namedParameters, new CertificateRowMapper());
     }
 
+     /**
+     * Find all rows with role 'CA Operator' with a
+     * status of 'VALID' and a 'notafter' time that is in the future
+     */
+    public List<CertificateRow> findActiveCAs() {
+        String currentTime = getDateFormat().format(new Date());
+        Map<String, Object> namedParameters = new HashMap<>();
+        namedParameters.put("current_time", Long.parseLong(currentTime));
+
+        StringBuilder query = new StringBuilder(SELECT_PROJECT);
+        query.append("where role='CA Operator' ");
+        query.append("and status='VALID' and notafter > :current_time");
+        return this.jdbcTemplate.query(query.toString(), namedParameters, new CertificateRowMapper());
+    }
+
     /**
      * Find all rows with role 'RA Operator' or 'User' with a
      * status of 'VALID' and a 'notafter' time that is in the future with the

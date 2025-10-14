@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -211,12 +212,32 @@ public class CertificateService {
     }
 
 
-    public void raiseRoleChangeRequest(long cert_key, String newRole, CertificateRow currentUser) {
+    public void raiseRoleChangeRequest(long cert_key, CertificateRow targetCert, String newRole,
+            CertificateRow currentUser) {
         RoleChangeRequest roleChangeRequest = new RoleChangeRequest(cert_key, newRole, currentUser.getCn(),
                 LocalDate.now());
 
-        RoleChangeRequest saved = roleChangeRequestRepository.save(roleChangeRequest);
-        log.debug("Role change request saved with ID: " + saved.getId());
+        RoleChangeRequest savedRequest = roleChangeRequestRepository.save(roleChangeRequest);
+        log.debug("Role change request saved with ID: " + savedRequest.getId());
+
+        sendEmailNotification(targetCert, currentUser);
+    }
+
+    private void sendEmailNotification(CertificateRow targetCert, CertificateRow currentUser) {
+        List<CertificateRow> activeCAs = this.jdbcCertDao.findActiveCAs();
+
+        String requesterCn = currentUser.getCn();
+        String requesterEmail = currentUser.getEmail();
+        String targetDn = targetCert.getDn();
+        String targetCn = targetCert.getCn();
+        String requestedEmail = targetCert.getEmail();
+
+        for (CertificateRow ca : activeCAs) {
+            String adminEmail = ca.getEmail();
+            this.emailService.sendAdminsOnRaopRoleRequest(requesterCn, targetDn, adminEmail);
+        }
+        this.emailService.sendRaOnRaopRoleRequest(requesterCn, targetDn, requesterEmail);
+        this.emailService.sendUserOnRaopRoleRequest(requesterCn, targetCn, requestedEmail);
     }
 
     @Inject
