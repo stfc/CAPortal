@@ -38,6 +38,7 @@ import uk.ac.ngs.security.CaUser;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
 import uk.ac.ngs.service.CertificateService;
+import uk.ac.ngs.service.email.EmailService;
 
 import javax.inject.Inject;
 
@@ -45,6 +46,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 //import org.springframework.security.core.GrantedAuthority;
 
@@ -64,6 +66,8 @@ public class RaOpHome {
     private RoleChangeRequestRepository roleChangeRequestRepository;
     private JdbcCertificateDao jdbcCertificateDao;
     private CertificateService certificateService;
+    private JdbcCertificateDao jdbcCertDao;
+    private EmailService emailService;
 
     private final static Pattern DATA_PROFILE_PATTERN = Pattern.compile("PROFILE\\s?=\\s?(\\w+)$", Pattern.MULTILINE);
 
@@ -125,6 +129,16 @@ public class RaOpHome {
         if (caUser.getAuthorities()
                 .contains(new SimpleGrantedAuthority("ROLE_CAOP"))) {
             List<RoleChangeRequest> roleChangeRequests = roleChangeRequestRepository.findAll();
+            Map<Long, String> requesterMap = roleChangeRequests.stream()
+                    .map(RoleChangeRequest::getRequestedBy)
+                    .distinct() // Avoid duplicate lookups
+                    .map(jdbcCertificateDao::findById)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toMap(
+                            CertificateRow::getCert_key,
+                            CertificateRow::getCn));
+
+            model.addAttribute("requesterMap", requesterMap);
             model.addAttribute("roleChangeRequests", roleChangeRequests);
         }
 
@@ -149,6 +163,10 @@ public class RaOpHome {
             RedirectAttributes redirectAttrs)
             throws IOException {
         String message;
+        CertificateRow requestedBy = roleChangeRequestRepository.findById(requestId)
+                .map(RoleChangeRequest::getRequestedBy)
+                .map(jdbcCertificateDao::findById)
+                .orElse(null);
 
         try {
             CertificateRow targetCert = jdbcCertificateDao.findById(certKey);
@@ -169,6 +187,7 @@ public class RaOpHome {
                         + certKey + ") by (" + currentUser.getDn() + ")");
 
                 message = "Role updated successfully!";
+                sendEmailNotificationOnApproval(targetCert, currentUser, requestedBy);
             }
         } catch (Exception e) {
             log.error("Error during role change approval for certKey " + certKey + " and requestId " + requestId + ": "
@@ -194,13 +213,21 @@ public class RaOpHome {
      */
     @Secured("ROLE_CAOP")
     @RequestMapping(value = "/rejectrolechange", method = RequestMethod.POST)
-    public String rejectrolechange(@RequestParam Integer requestId, RedirectAttributes redirectAttrs)
+    public String rejectrolechange(@RequestParam long certKey, @RequestParam Integer requestId, RedirectAttributes redirectAttrs)
             throws IOException {
         String message;
+        CertificateRow requestedBy = roleChangeRequestRepository.findById(requestId)
+                .map(RoleChangeRequest::getRequestedBy)
+                .map(jdbcCertificateDao::findById)
+                .orElse(null);
 
         try {
             roleChangeRequestRepository.deleteById(requestId);
             message = "Request rejected successfully!";
+
+            CertificateRow targetCert = jdbcCertificateDao.findById(certKey);
+            CertificateRow currentUser = securityContextService.getCaUserDetails().getCertificateRow();
+            sendEmailNotificationOnRejection(targetCert, currentUser, requestedBy);
         } catch (Exception e) {
             message = "Request rejection failed!";
             e.printStackTrace();
@@ -247,6 +274,52 @@ public class RaOpHome {
         return isAllowed;
     }
 
+    private void sendEmailNotificationOnApproval(CertificateRow targetCert, CertificateRow currentUser, CertificateRow requestedBy) {
+        List<CertificateRow> activeCAs = this.jdbcCertDao.findActiveCAs();
+
+        String actorCN = currentUser.getCn();
+        String requesterCN = requestedBy.getCn();
+        String requesterEmail = requestedBy.getEmail();
+        String targetDN = targetCert.getDn();
+        String targetCN = targetCert.getCn();
+        String requestedEmail = targetCert.getEmail();
+
+        // Send email to admins
+        for (CertificateRow ca : activeCAs) {
+            String adminEmail = ca.getEmail();
+            if (!adminEmail.equalsIgnoreCase(requesterEmail)) {
+                this.emailService.sendEmailOnRaopRoleRequestApproval("CAOP", actorCN, targetDN, adminEmail);
+            }
+        }
+        // Send email to requester RAOP
+        this.emailService.sendEmailOnRaopRoleRequestApproval(requesterCN, actorCN, targetDN, requesterEmail);
+        // Send email to user
+        this.emailService.sendEmailOnRaopRoleRequestApproval(targetCN, actorCN, targetDN, requestedEmail);
+    }
+
+    private void sendEmailNotificationOnRejection(CertificateRow targetCert, CertificateRow currentUser, CertificateRow requestedBy) {
+        List<CertificateRow> activeCAs = this.jdbcCertDao.findActiveCAs();
+
+        String actorCN = currentUser.getCn();
+        String requesterCN = requestedBy.getCn();
+        String requesterEmail = requestedBy.getEmail();
+        String targetDN = targetCert.getDn();
+        String targetCN = targetCert.getCn();
+        String requestedEmail = targetCert.getEmail();
+
+        // Send email to admins
+        for (CertificateRow ca : activeCAs) {
+            String adminEmail = ca.getEmail();
+            if (!adminEmail.equalsIgnoreCase(requesterEmail)) {
+                this.emailService.sendEmailOnRaopRoleRequestRejection("CAOP", actorCN, targetDN, adminEmail);
+            }
+        }
+        // Send email to requester RAOP
+        this.emailService.sendEmailOnRaopRoleRequestRejection(requesterCN, actorCN, targetDN, requesterEmail);
+        // Send email to user
+        this.emailService.sendEmailOnRaopRoleRequestRejection(targetCN, actorCN, targetDN, requestedEmail);
+    }
+
     /**
      * Select the raop/home view to render.
      *
@@ -291,5 +364,15 @@ public class RaOpHome {
     @Inject
     public void setRoleChangeRequestRepository(CertificateService certificateService) {
         this.certificateService = certificateService;
+    }
+
+    @Inject
+    public void setJdbcCertificateDao(JdbcCertificateDao jdbcCertDao) {
+        this.jdbcCertDao = jdbcCertDao;
+    }
+
+    @Inject
+    public void setEmailService(EmailService emailService) {
+        this.emailService = emailService;
     }
 }

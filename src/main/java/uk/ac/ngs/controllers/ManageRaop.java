@@ -32,6 +32,7 @@ import uk.ac.ngs.security.CaUser;
 import uk.ac.ngs.security.SecurityContextService;
 import uk.ac.ngs.service.CertUtil;
 import uk.ac.ngs.service.CertificateService;
+import uk.ac.ngs.service.email.EmailService;
 
 import java.io.IOException;
 import java.util.*;
@@ -49,16 +50,18 @@ public class ManageRaop {
     private CertificateService certificateService;
     private JdbcCertificateDao jdbcCertificateDao;
     private RoleChangeRequestRepository roleChangeRequestRepository;
+    private EmailService emailService;
 
     private final static Pattern DATA_PROFILE_PATTERN = Pattern.compile("PROFILE\\s?=\\s?(\\w+)$", Pattern.MULTILINE);
 
     public ManageRaop(SecurityContextService securityContextService,
             JdbcCertificateDao jdbcCertificateDao, CertificateService certificateService,
-            RoleChangeRequestRepository roleChangeRequestRepository) {
+            RoleChangeRequestRepository roleChangeRequestRepository, EmailService emailService) {
         this.securityContextService = securityContextService;
         this.jdbcCertificateDao = jdbcCertificateDao;
         this.certificateService = certificateService;
         this.roleChangeRequestRepository = roleChangeRequestRepository;
+        this.emailService = emailService;
     }
 
 
@@ -139,7 +142,8 @@ public class ManageRaop {
 
             log.info("Role change from (" + targetCert.getRole() + ") to (" + newRole + ")for certificate ("
                     + cert_key + ") by (" + currentUser.getDn() + ")");
-            message = "Role updated successfully!";           
+            message = "Role updated successfully!";
+            sendEmailNotificationOnRoleChangeToUser(targetCert, currentUser);     
         } else {
              message = "Role Change FAIL - user does not have correct permissions";
         }
@@ -147,6 +151,20 @@ public class ManageRaop {
         redirectAttrs.addFlashAttribute("responseMessage", message);
         return "redirect:/raop/manageraop";
     }
+
+    private void sendEmailNotificationOnRoleChangeToUser(CertificateRow targetCert, CertificateRow currentUser) {
+        String actorCN = currentUser.getCn();
+        String actorEmail = currentUser.getEmail();
+        String targetDN = targetCert.getDn();
+        String targetCN = targetCert.getCn();
+        String requestedEmail = targetCert.getEmail();
+
+        // Send email to actor RAOP
+        this.emailService.sendEmailOnRoleChangeToUser(actorCN, actorCN, targetDN, actorEmail);
+        // Send email to user
+        this.emailService.sendEmailOnRoleChangeToUser(targetCN, actorCN, targetDN, requestedEmail);
+    }
+
 
     /**
      * Handle POSTs to "/raop/manageraop/requestraoprole" to request RAOP role of

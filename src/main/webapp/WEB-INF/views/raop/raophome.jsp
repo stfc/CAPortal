@@ -126,7 +126,7 @@
                                 href="${pageContext.request.contextPath}/raop/viewcert?certId=${row.certKey}">${row.certKey}</a>
                         </td>
                         <td>${row.requestedRole}</td>
-                        <td>${row.requestedBy}</td>
+                        <td>${requesterMap[row.requestedBy]}</td>
                         <td>${row.requestedOn}</td>
                         <td>
                             <div class="d-flex gap-2 align-items-center flex-wrap">
@@ -141,6 +141,7 @@
                                 <form:form method="post" action="${pageContext.request.contextPath}/raop/rejectrolechange">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                     <input type="hidden" name="requestId" value="${row.id}" />
+                                    <input type="hidden" name="certKey" value="${row.certKey}" />
                                     <button type="submit" class="btn btn-sm btn-danger"
                                         onclick="return confirm('Are you sure you want to reject RA Operator role?')">Reject</button>
                                 </form:form>

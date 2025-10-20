@@ -19,7 +19,7 @@ public class RoleChangeRequest {
     private String requestedRole;
 
     @Column("requested_by")
-    private String requestedBy;
+    private Long requestedBy;
 
     @Column("requested_on")
     private LocalDate requestedOn;
@@ -27,7 +27,7 @@ public class RoleChangeRequest {
     // Constructors
     public RoleChangeRequest() {}
 
-    public RoleChangeRequest(Long certKey, String requestedRole, String requestedBy, LocalDate requestedOn) {
+    public RoleChangeRequest(Long certKey, String requestedRole, Long requestedBy, LocalDate requestedOn) {
         this.certKey = certKey;
         this.requestedRole = requestedRole;
         this.requestedBy = requestedBy;
@@ -58,11 +58,11 @@ public class RoleChangeRequest {
         this.requestedRole = requestedRole;
     }
 
-    public String getRequestedBy() {
+    public Long getRequestedBy() {
         return requestedBy;
     }
 
-    public void setRequestedBy(String requestedBy) {
+    public void setRequestedBy(Long requestedBy) {
         this.requestedBy = requestedBy;
     }
 

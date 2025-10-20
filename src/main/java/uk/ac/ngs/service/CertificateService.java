@@ -214,7 +214,7 @@ public class CertificateService {
 
     public void raiseRoleChangeRequest(long cert_key, CertificateRow targetCert, String newRole,
             CertificateRow currentUser) {
-        RoleChangeRequest roleChangeRequest = new RoleChangeRequest(cert_key, newRole, currentUser.getCn(),
+        RoleChangeRequest roleChangeRequest = new RoleChangeRequest(cert_key, newRole, currentUser.getCert_key(),
                 LocalDate.now());
 
         RoleChangeRequest savedRequest = roleChangeRequestRepository.save(roleChangeRequest);
@@ -226,18 +226,20 @@ public class CertificateService {
     private void sendEmailNotification(CertificateRow targetCert, CertificateRow currentUser) {
         List<CertificateRow> activeCAs = this.jdbcCertDao.findActiveCAs();
 
-        String requesterCn = currentUser.getCn();
+        String requesterCN = currentUser.getCn();
         String requesterEmail = currentUser.getEmail();
-        String targetDn = targetCert.getDn();
-        String targetCn = targetCert.getCn();
+        String targetDN = targetCert.getDn();
+        String targetCN = targetCert.getCn();
         String requestedEmail = targetCert.getEmail();
 
         for (CertificateRow ca : activeCAs) {
             String adminEmail = ca.getEmail();
-            this.emailService.sendAdminsOnRaopRoleRequest(requesterCn, targetDn, adminEmail);
+            if (!adminEmail.equalsIgnoreCase(requesterEmail)) {
+                this.emailService.sendAdminsOnRaopRoleRequest(requesterCN, targetDN, adminEmail);
+            }
         }
-        this.emailService.sendRaOnRaopRoleRequest(requesterCn, targetDn, requesterEmail);
-        this.emailService.sendUserOnRaopRoleRequest(requesterCn, targetCn, requestedEmail);
+        this.emailService.sendRaOnRaopRoleRequest(requesterCN, targetDN, requesterEmail);
+        this.emailService.sendUserOnRaopRoleRequest(requesterCN, targetCN, requestedEmail);
     }
 
     @Inject

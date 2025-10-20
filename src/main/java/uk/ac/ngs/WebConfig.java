@@ -117,6 +117,9 @@ public class WebConfig implements WebMvcConfigurer {
         emailService.setEmailAdminsOnRaopRoleRequestTemplate("emailAdminsOnRaopRoleRequestTemplate.html");
         emailService.setEmailRaOnRaopRoleRequestTemplate("emailRaOnRaopRoleRequestTemplate.html");
         emailService.setEmailUserOnRaopRoleRequestTemplate("emailUserOnRaopRoleRequestTemplate.html");
+        emailService.setEmailOnRaopRoleRequestApprovalTemplate("emailOnRaopRoleRequestApprovalTemplate.html");
+        emailService.setEmailOnRaopRoleRequestRejectionTemplate("emailOnRaopRoleRequestRejectionTemplate.html");
+        emailService.setEmailOnRoleChangeToUserTemplate("emailOnRoleChangeToUserTemplate.html");
         emailService.setBasePortalUrl(basePortalUrl);
         return emailService;
     }
