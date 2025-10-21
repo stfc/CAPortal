@@ -375,17 +375,18 @@ public class EmailService {
      /**
      * Email the CAOP on user to RAOP role change request.
      *
-     * @param requestorCN    The CN/name of the requestor.
-     * @param requestedDN    the requested cert DN
+     * @param requesterCN    The CN/name of the requester.
+     * @param targetDN    the target cert DN
      * @param recipientEmail
      */
-    public void sendAdminsOnRaopRoleRequest(String requesterCN, String requestedDN, String recipientEmail) {
+    public void sendAdminsOnRaopRoleRequest(String caopCN, String requesterCN, String targetDN, String recipientEmail) {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(recipientEmail);
         Map<String, Object> vars = new HashMap<>();
 
+        vars.put("caopCN", caopCN);
         vars.put("requesterCN", requesterCN);
-        vars.put("requestedDN", requestedDN);
+        vars.put("targetDN", targetDN);
         vars.put("basePortalUrl", basePortalUrl);
 
         try {
@@ -399,16 +400,16 @@ public class EmailService {
      * Email the RAOP on user to RAOP role change request.
      *
      * @param requesterCN    The CN/name of the requester.
-     * @param requestedDN    the requested cert DN
+     * @param targetDN    the target cert DN
      * @param recipientEmail
      */
-    public void sendRaOnRaopRoleRequest(String requesterCN, String requestedDN, String recipientEmail) {
+    public void sendRaOnRaopRoleRequest(String requesterCN, String targetDN, String recipientEmail) {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(recipientEmail);
         Map<String, Object> vars = new HashMap<>();
 
         vars.put("requesterCN", requesterCN);
-        vars.put("requestedDN", requestedDN);
+        vars.put("targetDN", targetDN);
 
         try {
             this.mailSender.send(msg, vars, this.emailRaOnRaopRoleRequestTemplate);
@@ -421,16 +422,16 @@ public class EmailService {
      * Email the user on user to RAOP role change request.
      *
      * @param requesterCN    The CN/name of the requester.
-     * @param requestedCN    the requested cert CN
+     * @param targetCN    the target cert CN
      * @param recipientEmail
      */
-    public void sendUserOnRaopRoleRequest(String requesterCN, String requestedCN, String recipientEmail) {
+    public void sendUserOnRaopRoleRequest(String requesterCN, String targetCN, String recipientEmail) {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(recipientEmail);
         Map<String, Object> vars = new HashMap<>();
 
         vars.put("requesterCN", requesterCN);
-        vars.put("requestedCN", requestedCN);
+        vars.put("targetCN", targetCN);
 
         try {
             this.mailSender.send(msg, vars, this.emailUserOnRaopRoleRequestTemplate);
@@ -439,35 +440,12 @@ public class EmailService {
         }
     }
 
-    /**
-     * Email the RAOP on user to RAOP role change request.
-     *
-     * @param recipient    The CN/name of the recipient.
-     * @param actorCN    The CN/name of the actor RAOP.
-     * @param targetDN    the target cert DN
-     * @param recipientEmail
-     */
-    public void sendEmailOnRoleChangeToUser(String recipient, String actorCN, String targetDN, String recipientEmail) {
-        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
-        msg.setTo(recipientEmail);
-        Map<String, Object> vars = new HashMap<>();
-
-        vars.put("recipient", recipient);
-        vars.put("actorCN", actorCN);
-        vars.put("targetDN", targetDN);
-
-        try {
-            this.mailSender.send(msg, vars, this.emailOnRoleChangeToUserTemplate);
-        } catch (MailException ex) {
-            log.error("MailSender " + ex.getMessage());
-        }
-    }
-
      /**
      * Email on user to RAOP role change request approval.
      *
-     * @param requesterCN    The CN/name of the requester.
-     * @param requestedDN    the requested cert DN
+     * @param recipient    The CN/name of the recipient
+     * @param actorCN    The CN/name of the actor CAOP
+     * @param targetDN    The target cert DN
      * @param recipientEmail
      */
      public void sendEmailOnRaopRoleRequestApproval(String recipient, String actorCN, String targetDN,
@@ -490,22 +468,47 @@ public class EmailService {
     /**
      * Email on user to RAOP role change request rejection.
      *
-     * @param requestorCN    The CN/name of the requestor.
-     * @param requestedDN    the requested cert DN
+     * @param recipient    The CN/name of the recipient
+     * @param actorCN    The CN/name of the actor CAOP
+     * @param targetDN    the target cert DN
      * @param recipientEmail
      */
-    public void sendEmailOnRaopRoleRequestRejection(String recipient, String requesterCN, String requestedDN,
+    public void sendEmailOnRaopRoleRequestRejection(String recipient, String actorCN, String targetDN,
             String recipientEmail) {
         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
         msg.setTo(recipientEmail);
         Map<String, Object> vars = new HashMap<>();
 
         vars.put("recipient", recipient);
-        vars.put("requesterCN", requesterCN);
-        vars.put("requestedDN", requestedDN);
+        vars.put("actorCN", actorCN);
+        vars.put("targetDN", targetDN);
 
         try {
             this.mailSender.send(msg, vars, this.emailOnRaopRoleRequestRejectionTemplate);
+        } catch (MailException ex) {
+            log.error("MailSender " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Email on RAOP to user role change.
+     *
+     * @param recipient    The CN/name of the recipient.
+     * @param actorCN    The CN/name of the actor RAOP.
+     * @param targetDN    the target cert DN
+     * @param recipientEmail
+     */
+    public void sendEmailOnRoleChangeToUser(String recipient, String actorCN, String targetDN, String recipientEmail) {
+        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+        msg.setTo(recipientEmail);
+        Map<String, Object> vars = new HashMap<>();
+
+        vars.put("recipient", recipient);
+        vars.put("actorCN", actorCN);
+        vars.put("targetDN", targetDN);
+
+        try {
+            this.mailSender.send(msg, vars, this.emailOnRoleChangeToUserTemplate);
         } catch (MailException ex) {
             log.error("MailSender " + ex.getMessage());
         }

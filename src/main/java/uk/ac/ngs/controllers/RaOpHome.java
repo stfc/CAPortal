@@ -82,9 +82,6 @@ public class RaOpHome {
 
         // Get the current CaUser (so we can extract their DN)
         CaUser caUser = securityContextService.getCaUserDetails();
-        // Collection<GrantedAuthority> auths = caUser.getAuthorities();
-
-        // model.addAttribute("caUser", caUser);
 
         // Extract the RA value from the user's certificate DN
         String dn = caUser.getCertificateRow().getDn();
@@ -141,7 +138,6 @@ public class RaOpHome {
             model.addAttribute("requesterMap", requesterMap);
             model.addAttribute("roleChangeRequests", roleChangeRequests);
         }
-
         model.addAttribute("lastPageRefreshDate", new Date());
     }
 
@@ -282,19 +278,19 @@ public class RaOpHome {
         String requesterEmail = requestedBy.getEmail();
         String targetDN = targetCert.getDn();
         String targetCN = targetCert.getCn();
-        String requestedEmail = targetCert.getEmail();
+        String targetEmail = targetCert.getEmail();
 
         // Send email to admins
         for (CertificateRow ca : activeCAs) {
             String adminEmail = ca.getEmail();
             if (!adminEmail.equalsIgnoreCase(requesterEmail)) {
-                this.emailService.sendEmailOnRaopRoleRequestApproval("CAOP", actorCN, targetDN, adminEmail);
+                this.emailService.sendEmailOnRaopRoleRequestApproval(ca.getCn() + " (CAOP)", actorCN, targetDN, adminEmail);
             }
         }
         // Send email to requester RAOP
         this.emailService.sendEmailOnRaopRoleRequestApproval(requesterCN, actorCN, targetDN, requesterEmail);
         // Send email to user
-        this.emailService.sendEmailOnRaopRoleRequestApproval(targetCN, actorCN, targetDN, requestedEmail);
+        this.emailService.sendEmailOnRaopRoleRequestApproval(targetCN, actorCN, targetDN, targetEmail);
     }
 
     private void sendEmailNotificationOnRejection(CertificateRow targetCert, CertificateRow currentUser, CertificateRow requestedBy) {
@@ -305,19 +301,19 @@ public class RaOpHome {
         String requesterEmail = requestedBy.getEmail();
         String targetDN = targetCert.getDn();
         String targetCN = targetCert.getCn();
-        String requestedEmail = targetCert.getEmail();
+        String targetEmail = targetCert.getEmail();
 
         // Send email to admins
         for (CertificateRow ca : activeCAs) {
             String adminEmail = ca.getEmail();
             if (!adminEmail.equalsIgnoreCase(requesterEmail)) {
-                this.emailService.sendEmailOnRaopRoleRequestRejection("CAOP", actorCN, targetDN, adminEmail);
+                this.emailService.sendEmailOnRaopRoleRequestRejection(ca.getCn() + " (CAOP)", actorCN, targetDN, adminEmail);
             }
         }
         // Send email to requester RAOP
         this.emailService.sendEmailOnRaopRoleRequestRejection(requesterCN, actorCN, targetDN, requesterEmail);
         // Send email to user
-        this.emailService.sendEmailOnRaopRoleRequestRejection(targetCN, actorCN, targetDN, requestedEmail);
+        this.emailService.sendEmailOnRaopRoleRequestRejection(targetCN, actorCN, targetDN, targetEmail);
     }
 
     /**
@@ -326,7 +322,7 @@ public class RaOpHome {
      * @return raop/home
      */
     @RequestMapping(method = RequestMethod.GET)
-    public String raAdminHome(Locale locale, Model model) {
+    public String raAdminHome() {
         log.debug("Controller /raop/");
         return "raop/raophome";
     }

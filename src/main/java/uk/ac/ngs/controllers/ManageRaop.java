@@ -82,19 +82,14 @@ public class ManageRaop {
     // Build RA string and add to model
     String ra = String.format("%s %s", ou, loc);
     model.addAttribute("ra", ra);
-    log.debug("ra is:[" + ra + "]");
+    log.debug("ra is: [" + ra + "]");
 
     // Fetch active users and RA operators for the current RA
     List<CertificateRow> userRaopRows = jdbcCertificateDao.findActiveUserAndRAOperatorBy(ou, o, loc);
 
-    // Exclude current user from the list
-    // List<CertificateRow> filteredRows = userRaopRows.stream()
-    //     .filter(row -> !currentUserDn.equals(row.getDn()))
-    //     .collect(Collectors.toList());
-
-    // log.debug("Filtered User and RA Operator rows size: " + filteredRows.size());
     model.addAttribute("userRaopRows", userRaopRows);
-    
+
+    // To identify pending requests
     List<Long> listOfRoleChangeRequestCertKey = roleChangeRequestRepository.findAll()
             .stream()
             .map(RoleChangeRequest::getCertKey)
@@ -113,7 +108,7 @@ public class ManageRaop {
      * @return raop/manageraop
      */
     @RequestMapping(method = RequestMethod.GET)
-    public String manageRaop(Locale locale, Model model) {
+    public String manageRaop() {
         log.debug("Controller /raop/manageraop");
         return "raop/manageraop";
     }
@@ -172,7 +167,7 @@ public class ManageRaop {
      * <p>
      * The view is always redirected and redirect attributes added as necessary;
      *
-     * @param cert_key      key of certificate being updated
+     * @param cert_key      key of certificate role change being requested
      * @param redirectAttrs
      * @return
      * @throws java.io.IOException
@@ -188,7 +183,7 @@ public class ManageRaop {
             String newRole = "RA Operator";
             certificateService.raiseRoleChangeRequest(cert_key, targetCert, newRole, currentUser);
 
-            log.info("Role change request from (" + targetCert.getRole() + ") to (" + newRole + ")for certificate ("
+            log.info("Role change request from (" + targetCert.getRole() + ") to (" + newRole + ") for certificate ("
                     + cert_key + ") by (" + currentUser.getDn() + ") has been raised");
             message = "A role change request has been raised successfully";
         } else {

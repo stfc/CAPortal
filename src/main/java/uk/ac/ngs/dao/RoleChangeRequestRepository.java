@@ -11,7 +11,7 @@ import java.util.List;
 public interface RoleChangeRequestRepository extends CrudRepository<RoleChangeRequest, Integer> {
     @Override
     List<RoleChangeRequest> findAll();
-    
+
     @Override
     void deleteById(Integer id);
 }

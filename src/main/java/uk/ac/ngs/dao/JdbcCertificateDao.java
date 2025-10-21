@@ -289,16 +289,25 @@ public class JdbcCertificateDao {
      * Find all rows with role 'CA Operator' with a
      * status of 'VALID' and a 'notafter' time that is in the future
      */
-    public List<CertificateRow> findActiveCAs() {
-        String currentTime = getDateFormat().format(new Date());
-        Map<String, Object> namedParameters = new HashMap<>();
-        namedParameters.put("current_time", Long.parseLong(currentTime));
+     public List<CertificateRow> findActiveCAs() {
+         List<CertificateRow> activeCAs = Collections.emptyList();
+         try {
+             long currentTime = Long.parseLong(getDateFormat().format(new Date()));
 
-        StringBuilder query = new StringBuilder(SELECT_PROJECT);
-        query.append("where role='CA Operator' ");
-        query.append("and status='VALID' and notafter > :current_time");
-        return this.jdbcTemplate.query(query.toString(), namedParameters, new CertificateRowMapper());
-    }
+             Map<String, Object> namedParameters = new HashMap<>();
+             namedParameters.put("current_time", currentTime);
+
+             String query = SELECT_PROJECT +
+                     "where role='CA Operator' " +
+                     "and status='VALID' and notafter > :current_time";
+
+             activeCAs = this.jdbcTemplate.query(query, namedParameters, new CertificateRowMapper());
+         } catch (NumberFormatException e) {
+             // Log the error or handle it appropriately
+             log.error("Failed to parse current time for CA lookup", e);
+         }
+         return activeCAs;
+     }
 
     /**
      * Find all rows with role 'RA Operator' or 'User' with a
@@ -311,23 +320,30 @@ public class JdbcCertificateDao {
      * @return
      */
     public List<CertificateRow> findActiveUserAndRAOperatorBy(String ou, String o, String loc) {
-        long currentTime = Long.parseLong(getDateFormat().format(new Date()));
-        Map<String, Object> namedParameters = new HashMap<>();
-        namedParameters.put("current_time", currentTime);
+        List<CertificateRow> activeUserAndRAOperators = Collections.emptyList();
+        try {
+            long currentTime = Long.parseLong(getDateFormat().format(new Date()));
+            Map<String, Object> namedParameters = new HashMap<>();
+            namedParameters.put("current_time", currentTime);
 
-        StringBuilder query = new StringBuilder(SELECT_PROJECT)
-                .append("where (role = 'RA Operator' or role = 'User') ");
+            StringBuilder query = new StringBuilder(SELECT_PROJECT)
+                    .append("where (role = 'RA Operator' or role = 'User') ");
 
-        String raFilter = buildRaFilter(ou, o, loc);
-        if (raFilter != null) {
-            namedParameters.put("ra", raFilter);
-            query.append("and dn like :ra ");
+            String raFilter = buildRaFilter(ou, o, loc);
+            if (raFilter != null) {
+                namedParameters.put("ra", raFilter);
+                query.append("and dn like :ra ");
+            }
+            query.append("and status = 'VALID' ");
+            query.append("and notafter > :current_time");
+
+            activeUserAndRAOperators = jdbcTemplate.query(query.toString(), namedParameters,
+                    new CertificateRowMapper());
+        } catch (NumberFormatException e) {
+            // Log the error or handle it appropriately
+            log.error("Failed to parse current time for user RAOP lookup", e);
         }
-
-        query.append("and status = 'VALID' ");
-        //query.append("and notafter > :current_time");
-
-        return jdbcTemplate.query(query.toString(), namedParameters, new CertificateRowMapper());
+        return activeUserAndRAOperators;
     }
 
     private String buildRaFilter(String ou, String o, String loc) {
