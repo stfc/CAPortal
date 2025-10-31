@@ -64,7 +64,6 @@ public class RaOpHome {
     private JdbcRequestDao jdbcRequestDao;
     private JdbcCrrDao jdbcCrrDao;
     private RoleChangeRequestRepository roleChangeRequestRepository;
-    private JdbcCertificateDao jdbcCertificateDao;
     private CertificateService certificateService;
     private JdbcCertificateDao jdbcCertDao;
     private EmailService emailService;
@@ -129,7 +128,7 @@ public class RaOpHome {
             Map<Long, String> requesterMap = roleChangeRequests.stream()
                     .map(RoleChangeRequest::getRequestedBy)
                     .distinct() // Avoid duplicate lookups
-                    .map(jdbcCertificateDao::findById)
+                    .map(jdbcCertDao::findById)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toMap(
                             CertificateRow::getCert_key,
@@ -161,11 +160,11 @@ public class RaOpHome {
         String message;
         CertificateRow requestedBy = roleChangeRequestRepository.findById(requestId)
                 .map(RoleChangeRequest::getRequestedBy)
-                .map(jdbcCertificateDao::findById)
+                .map(jdbcCertDao::findById)
                 .orElse(null);
 
         try {
-            CertificateRow targetCert = jdbcCertificateDao.findById(certKey);
+            CertificateRow targetCert = jdbcCertDao.findById(certKey);
             CertificateRow currentUser = securityContextService.getCaUserDetails().getCertificateRow();
 
             if (targetCert == null) {
@@ -214,14 +213,14 @@ public class RaOpHome {
         String message;
         CertificateRow requestedBy = roleChangeRequestRepository.findById(requestId)
                 .map(RoleChangeRequest::getRequestedBy)
-                .map(jdbcCertificateDao::findById)
+                .map(jdbcCertDao::findById)
                 .orElse(null);
 
         try {
             roleChangeRequestRepository.deleteById(requestId);
             message = "Request rejected successfully!";
 
-            CertificateRow targetCert = jdbcCertificateDao.findById(certKey);
+            CertificateRow targetCert = jdbcCertDao.findById(certKey);
             CertificateRow currentUser = securityContextService.getCaUserDetails().getCertificateRow();
             sendEmailNotificationOnRejection(targetCert, currentUser, requestedBy);
         } catch (Exception e) {
@@ -353,12 +352,7 @@ public class RaOpHome {
     }
 
     @Inject
-    public void setRoleChangeRequestRepository(JdbcCertificateDao jdbcCertificateDao) {
-        this.jdbcCertificateDao = jdbcCertificateDao;
-    }
-
-    @Inject
-    public void setRoleChangeRequestRepository(CertificateService certificateService) {
+    public void setCertificateService(CertificateService certificateService) {
         this.certificateService = certificateService;
     }
 
