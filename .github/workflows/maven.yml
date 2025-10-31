@@ -32,11 +32,6 @@ jobs:
       - name: Install dependencies
         run: mvn install -DskipTests
       - name: Run tests
-        env:
-          SUPPORTED_PKCS10_ORGNAME_OID: eScienceDev
-          SUPPORTED_PKCS10_COUNTRY_OID: UK
-          SUPPORTED_PKCS10_MIN_MODULUS: 2048
-          SUPPORTED_PKCS10_MIN_EXPONENT: 5
         run: mvn test
       - name: Build application
         run: mvn package
