@@ -38,20 +38,9 @@ public class JdbcCaUserAuthDao {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public JdbcCaUserAuthDao() {
-
+    public JdbcCaUserAuthDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    }
-
 
     private static final class CertificateRowMapper implements RowMapper<CertificateRow> {
         public CertificateRow mapRow(ResultSet rs, int rowNum) throws SQLException {

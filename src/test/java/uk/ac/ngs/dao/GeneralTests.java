@@ -23,6 +23,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
 import static org.junit.Assert.*;
 import uk.ac.ngs.service.CrrManagerService;
 
@@ -32,6 +35,9 @@ import uk.ac.ngs.service.CrrManagerService;
  * @author David Meredith
  */
 public class GeneralTests {
+
+    @Mock
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     public GeneralTests() {
     }
@@ -64,7 +70,7 @@ public class GeneralTests {
         assertFalse(userCN_Pattern.matcher("DAVE - DAVE +").matches()); 
         assertFalse(userCN_Pattern.matcher("DAVE - DAVE /").matches()); 
         assertFalse(userCN_Pattern.matcher("' adfa ").matches()); 
-        assertFalse(userCN_Pattern.matcher("davídó garçoné").matches()); 
+        assertFalse(userCN_Pattern.matcher("davÃ­dÃ³ garÃ§onÃ©").matches()); 
 
         // Note, this method uses 'find()' to find an illegal char using negation       
         userCN_Pattern = Pattern.compile("[^A-Za-z0-9\\-\\(\\) ]");
@@ -76,7 +82,7 @@ public class GeneralTests {
         assertTrue(userCN_Pattern.matcher("DAVE test the - (3rd) +").find()); 
         assertTrue(userCN_Pattern.matcher("DAVE - DAVE /").find()); 
         assertTrue(userCN_Pattern.matcher("' adfa ").find()); 
-        assertTrue(userCN_Pattern.matcher("davídó garçoné").find()); 
+        assertTrue(userCN_Pattern.matcher("davÃ­dÃ³ garÃ§onÃ©").find()); 
         
         // Note, illegal multiple white space/tabs have to be tested separtely
         assertFalse(" hello world ".contains("  "));  // single space is ok  
@@ -221,7 +227,7 @@ public class GeneralTests {
                 "SUBMIT_DATE = Wed Feb  6 17:08:30 2013 UTC \n";
         
         int raopId = 1111111; 
-        JdbcCrrDao dao = new JdbcCrrDao(); 
+        JdbcCrrDao dao = new JdbcCrrDao(jdbcTemplate); 
         data = dao.updateDataCol_StatusRaop(data, CrrManagerService.CRR_STATUS.APPROVED.toString(), raopId);
         //System.out.println(data); 
         String expectedData = 

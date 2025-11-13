@@ -14,7 +14,6 @@ package uk.ac.ngs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Repository;
 import uk.ac.ngs.common.Pair;
 import uk.ac.ngs.domain.CertificateRow;
 
-import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -85,28 +83,17 @@ public class JdbcCertificateDao {
      * only EMAIL_EQ is used to create the query.
      */
     public enum WHERE_PARAMS {
-
         DN_HAS_RA_LIKE, CN_LIKE, EMAIL_LIKE, EMAIL_EQ, DN_LIKE, ROLE_LIKE, STATUS_LIKE, DATA_LIKE, NOTAFTER_GREATERTHAN_CURRENTTIME
     }
 
-    public JdbcCertificateDao() {
-
+    public JdbcCertificateDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     private static DateFormat getDateFormat() {
         DateFormat utcTimeStampFormatter = new SimpleDateFormat("yyyyMMddHHmmss");
         utcTimeStampFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         return utcTimeStampFormatter;
-    }
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     private static final class CertificateRowMapper implements RowMapper<CertificateRow> {
@@ -298,8 +285,8 @@ public class JdbcCertificateDao {
              namedParameters.put("current_time", currentTime);
 
              String query = SELECT_PROJECT +
-                     "where role='CA Operator' " +
-                     "and status='VALID' and notafter > :current_time";
+                     "where role = 'CA Operator' " +
+                     "and status = 'VALID' and notafter > :current_time";
 
              activeCAs = this.jdbcTemplate.query(query, namedParameters, new CertificateRowMapper());
          } catch (NumberFormatException e) {

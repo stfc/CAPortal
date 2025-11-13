@@ -43,14 +43,8 @@ public class JdbcRalistDao {
     private static final String ORDER_BY = "order by order_id ";
     public static final String SQL_SELECT_ALL = "select ra_id, order_id, ou, l, active from ralist ";
 
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    public JdbcRalistDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     private static final class RalistRowMapper implements RowMapper<RalistRow> {

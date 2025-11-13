@@ -61,7 +61,8 @@ public class JdbcCrrDao {
     private final DateFormat dataNotBeforeDateFormat2 = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy");
 
 
-    public JdbcCrrDao() {
+    public JdbcCrrDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         this.utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
@@ -76,16 +77,6 @@ public class JdbcCrrDao {
     public enum WHERE_PARAMS {
 
         DN_HAS_RA_LIKE, RA_EQ, STATUS_EQ, DN_LIKE, DATA_LIKE, CN_LIKE
-    }
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     private final static class CrrRowMapper implements RowMapper<CrrRow> {

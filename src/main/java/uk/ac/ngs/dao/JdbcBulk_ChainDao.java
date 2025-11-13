@@ -40,7 +40,8 @@ public class JdbcBulk_ChainDao {
     private static final Log log = LogFactory.getLog(JdbcBulk_ChainDao.class);
 
 
-    public JdbcBulk_ChainDao() {
+    public JdbcBulk_ChainDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     /**
@@ -101,16 +102,5 @@ public class JdbcBulk_ChainDao {
             }
         }
         return newBulkId;
-    }
-
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 }

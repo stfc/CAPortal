@@ -45,14 +45,8 @@ public class JdbcRaopListDao {
             + "title, conemail, location, ra_id, department_hp, "
             + "institute_hp, active, ra_id2 from raoplist";
 
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    public JdbcRaopListDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
 

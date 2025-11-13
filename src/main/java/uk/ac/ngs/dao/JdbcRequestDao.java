@@ -69,7 +69,8 @@ public class JdbcRequestDao {
     private final DateFormat dataNotBeforeDateFormat2 = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy");
 
 
-    public JdbcRequestDao() {
+    public JdbcRequestDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         this.utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
@@ -98,16 +99,6 @@ public class JdbcRequestDao {
         DateFormat utcTimeStampFormatter = new SimpleDateFormat("yyyyMMddHHmmss");
         utcTimeStampFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         return utcTimeStampFormatter;
-    }
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     private static class RequestRowMapper implements RowMapper<RequestRow> {
