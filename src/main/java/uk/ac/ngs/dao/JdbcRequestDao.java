@@ -14,7 +14,6 @@ package uk.ac.ngs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -26,7 +25,6 @@ import uk.ac.ngs.domain.CSR_Flags.Profile;
 import uk.ac.ngs.domain.PKCS10_RequestWrapper;
 import uk.ac.ngs.domain.RequestRow;
 
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
