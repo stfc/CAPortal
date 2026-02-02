@@ -165,7 +165,8 @@ public class RaOpHome {
 
         try {
             CertificateRow targetCert = jdbcCertDao.findById(certKey);
-            CertificateRow currentUser = securityContextService.getCaUserDetails().getCertificateRow();
+            CaUser details = securityContextService.getCaUserDetails();
+            CertificateRow currentUser = (details != null) ? details.getCertificateRow() : null;
 
             if (targetCert == null) {
                 message = "Role Change FAIL - Certificate not found for certKey: " + certKey;
@@ -182,7 +183,9 @@ public class RaOpHome {
                         + certKey + ") by (" + currentUser.getDn() + ")");
 
                 message = "Role updated successfully!";
-                sendEmailNotificationOnApproval(targetCert, currentUser, requestedBy);
+                if (currentUser != null && requestedBy != null) {
+                    sendEmailNotificationOnApproval(targetCert, currentUser, requestedBy);
+                }
             }
         } catch (Exception e) {
             log.error("Error during role change approval for certKey " + certKey + " and requestId " + requestId + ": "
@@ -220,9 +223,13 @@ public class RaOpHome {
             roleChangeRequestRepository.deleteById(requestId);
             message = "Request rejected successfully!";
 
-            CertificateRow targetCert = jdbcCertDao.findById(certKey);
-            CertificateRow currentUser = securityContextService.getCaUserDetails().getCertificateRow();
-            sendEmailNotificationOnRejection(targetCert, currentUser, requestedBy);
+            CertificateRow targetCert = jdbcCertDao.findById(certKey);            
+            CaUser caUserDetails = securityContextService.getCaUserDetails();
+            CertificateRow currentUser = (caUserDetails != null) ? caUserDetails.getCertificateRow() : null;
+
+            if (targetCert != null && currentUser != null && requestedBy != null) {
+                sendEmailNotificationOnRejection(targetCert, currentUser, requestedBy);
+            }
         } catch (Exception e) {
             message = "Request rejection failed!";
             e.printStackTrace();

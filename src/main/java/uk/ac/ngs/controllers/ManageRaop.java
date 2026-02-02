@@ -15,6 +15,7 @@ package uk.ac.ngs.controllers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -202,22 +203,25 @@ public class ManageRaop {
      * @return result of check
      */
     private boolean canViewerManageRaopRole(CertificateRow targetCert) {
-        String currentUserDn = securityContextService.getCaUserDetails().getCertificateRow().getDn();
 
-        // Check if current user has RA Operator role
-        if (!securityContextService.getCaUserDetails().getAuthorities()
-                .contains(new SimpleGrantedAuthority("ROLE_RAOP"))) {
+        if (!hasRoleRaop()) {
+            return false;
+        }
+
+        Optional<String> currentUserDnOpt = currentUserDn();
+        if (currentUserDnOpt.isEmpty()) {
+            log.warn("Current user's DN not available");
+            return false;
+        }
+        String currentUserDn = currentUserDnOpt.get();
+        // Check if request is for own certificate
+        if (currentUserDn.equals(targetCert.getDn())) {
             return false;
         }
 
         // Validate certificate data
         if (targetCert == null || targetCert.getData() == null) {
             log.warn("Target certificate or its data is null");
-            return false;
-        }
-
-        // Check if request is for own certificate
-        if (currentUserDn.equals(targetCert.getDn())) {
             return false;
         }        
 
@@ -242,6 +246,29 @@ public class ManageRaop {
         String targetCertOU = CertUtil.extractDnAttribute(targetCert.getDn(), CertUtil.DNAttributeType.OU);
         String targetCertL = CertUtil.extractDnAttribute(targetCert.getDn(), CertUtil.DNAttributeType.L);
 
+        if (currentUserOU == null || currentUserL == null || targetCertOU == null || targetCertL == null) {
+            log.warn("DN attribute extraction failed for certKey: " + targetCert.getCert_key());
+            return false;
+        }
+
         return currentUserOU.equals(targetCertOU) && currentUserL.equals(targetCertL);
     }
+
+    private Optional<CaUser> currentUserDetails() {
+        return Optional.ofNullable(securityContextService.getCaUserDetails());
+    }
+
+    private Optional<String> currentUserDn() {
+        return currentUserDetails()
+                .map(CaUser::getCertificateRow)
+                .map(CertificateRow::getDn);
+    }
+
+    private boolean hasRoleRaop() {
+        return currentUserDetails()
+                .map(CaUser::getAuthorities)
+                .map(auths -> auths.contains(new SimpleGrantedAuthority("ROLE_RAOP")))
+                .orElse(false);
+    }
+
 }
