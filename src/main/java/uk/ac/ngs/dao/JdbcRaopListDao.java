@@ -14,14 +14,12 @@ package uk.ac.ngs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import uk.ac.ngs.domain.RaopListRow;
 
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -45,14 +43,8 @@ public class JdbcRaopListDao {
             + "title, conemail, location, ra_id, department_hp, "
             + "institute_hp, active, ra_id2 from raoplist";
 
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    public JdbcRaopListDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
 

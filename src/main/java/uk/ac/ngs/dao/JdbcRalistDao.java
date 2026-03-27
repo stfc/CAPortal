@@ -14,13 +14,11 @@ package uk.ac.ngs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import uk.ac.ngs.domain.RalistRow;
 
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -43,14 +41,8 @@ public class JdbcRalistDao {
     private static final String ORDER_BY = "order by order_id ";
     public static final String SQL_SELECT_ALL = "select ra_id, order_id, ou, l, active from ralist ";
 
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    public JdbcRalistDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     private static final class RalistRowMapper implements RowMapper<RalistRow> {

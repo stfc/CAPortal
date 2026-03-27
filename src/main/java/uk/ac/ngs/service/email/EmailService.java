@@ -48,7 +48,14 @@ public class EmailService {
     private String emailAdminsRoleChangeTemplate;
     private String emailAdminsOnErrorTemplate;
     private String emailAdminsOnNewRaTemplate;
-    private  String emailRaHostRenewTemplate;
+    private String emailRaHostRenewTemplate;
+    private String emailAdminsOnRaopRoleRequestTemplate;
+    private String emailRaOnRaopRoleRequestTemplate;
+    private String emailUserOnRaopRoleRequestTemplate;
+    private String emailOnRaopRoleRequestApprovalTemplate;
+    private String emailOnRaopRoleRequestRejectionTemplate;
+    private String emailOnRoleChangeToUserTemplate;
+
     private String basePortalUrl;
 
     public EmailService() {
@@ -365,11 +372,152 @@ public class EmailService {
         log.debug(emailDebug);
     }
 
+     /**
+     * Email the CAOP on user to RAOP role change request.
+     *
+     * @param requesterCN    The CN/name of the requester.
+     * @param targetDN    the target cert DN
+     * @param recipientEmail
+     */
+    public void sendAdminsOnRaopRoleRequest(String caopCN, String requesterCN, String targetDN, String recipientEmail) {
+        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+        msg.setTo(recipientEmail);
+        Map<String, Object> vars = new HashMap<>();
+
+        vars.put("caopCN", caopCN);
+        vars.put("requesterCN", requesterCN);
+        vars.put("targetDN", targetDN);
+        vars.put("basePortalUrl", basePortalUrl);
+
+        try {
+            this.mailSender.send(msg, vars, this.emailAdminsOnRaopRoleRequestTemplate);
+        } catch (MailException ex) {
+            log.error("MailSender " + ex.getMessage());
+        }
+    }
+
+     /**
+     * Email the RAOP on user to RAOP role change request.
+     *
+     * @param requesterCN    The CN/name of the requester.
+     * @param targetDN    the target cert DN
+     * @param recipientEmail
+     */
+    public void sendRaOnRaopRoleRequest(String requesterCN, String targetDN, String recipientEmail) {
+        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+        msg.setTo(recipientEmail);
+        Map<String, Object> vars = new HashMap<>();
+
+        vars.put("requesterCN", requesterCN);
+        vars.put("targetDN", targetDN);
+
+        try {
+            this.mailSender.send(msg, vars, this.emailRaOnRaopRoleRequestTemplate);
+        } catch (MailException ex) {
+            log.error("MailSender " + ex.getMessage());
+        }
+    }
+
+     /**
+     * Email the user on user to RAOP role change request.
+     *
+     * @param requesterCN    The CN/name of the requester.
+     * @param targetCN    the target cert CN
+     * @param recipientEmail
+     */
+    public void sendUserOnRaopRoleRequest(String requesterCN, String targetCN, String recipientEmail) {
+        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+        msg.setTo(recipientEmail);
+        Map<String, Object> vars = new HashMap<>();
+
+        vars.put("requesterCN", requesterCN);
+        vars.put("targetCN", targetCN);
+
+        try {
+            this.mailSender.send(msg, vars, this.emailUserOnRaopRoleRequestTemplate);
+        } catch (MailException ex) {
+            log.error("MailSender " + ex.getMessage());
+        }
+    }
+
+     /**
+     * Email on user to RAOP role change request approval.
+     *
+     * @param recipient    The CN/name of the recipient
+     * @param actorCN    The CN/name of the actor CAOP
+     * @param targetDN    The target cert DN
+     * @param recipientEmail
+     */
+     public void sendEmailOnRaopRoleRequestApproval(String recipient, String actorCN, String targetDN,
+             String recipientEmail) {
+         SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+         msg.setTo(recipientEmail);
+         Map<String, Object> vars = new HashMap<>();
+
+         vars.put("recipient", recipient);
+         vars.put("actorCN", actorCN);
+         vars.put("targetDN", targetDN);
+
+         try {
+             this.mailSender.send(msg, vars, this.emailOnRaopRoleRequestApprovalTemplate);
+         } catch (MailException ex) {
+             log.error("MailSender " + ex.getMessage());
+         }
+     }
+
+    /**
+     * Email on user to RAOP role change request rejection.
+     *
+     * @param recipient    The CN/name of the recipient
+     * @param actorCN    The CN/name of the actor CAOP
+     * @param targetDN    the target cert DN
+     * @param recipientEmail
+     */
+    public void sendEmailOnRaopRoleRequestRejection(String recipient, String actorCN, String targetDN,
+            String recipientEmail) {
+        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+        msg.setTo(recipientEmail);
+        Map<String, Object> vars = new HashMap<>();
+
+        vars.put("recipient", recipient);
+        vars.put("actorCN", actorCN);
+        vars.put("targetDN", targetDN);
+
+        try {
+            this.mailSender.send(msg, vars, this.emailOnRaopRoleRequestRejectionTemplate);
+        } catch (MailException ex) {
+            log.error("MailSender " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Email on RAOP to user role change.
+     *
+     * @param recipient    The CN/name of the recipient.
+     * @param actorCN    The CN/name of the actor RAOP.
+     * @param targetDN    the target cert DN
+     * @param recipientEmail
+     */
+    public void sendEmailOnRoleChangeToUser(String recipient, String actorCN, String targetDN, String recipientEmail) {
+        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+        msg.setTo(recipientEmail);
+        Map<String, Object> vars = new HashMap<>();
+
+        vars.put("recipient", recipient);
+        vars.put("actorCN", actorCN);
+        vars.put("targetDN", targetDN);
+
+        try {
+            this.mailSender.send(msg, vars, this.emailOnRoleChangeToUserTemplate);
+        } catch (MailException ex) {
+            log.error("MailSender " + ex.getMessage());
+        }
+    }
+
     @Inject
     public void setSender(Sender mailSender) {
         this.mailSender = mailSender;
     }
-
 
     /**
      * @param emailTemplate the raRenewEmailTemplate to set
@@ -457,6 +605,48 @@ public class EmailService {
      */
     public void setEmailAdminsOnErrorTemplate(String emailAdminsOnErrorTemplate) {
         this.emailAdminsOnErrorTemplate = emailAdminsOnErrorTemplate;
+    }
+
+    /**
+     * @param emailAdminsOnRaopRoleRequestTemplate the emailAdminsOnRaopRoleRequestTemplate to set
+     */
+    public void setEmailAdminsOnRaopRoleRequestTemplate(String emailAdminsOnRaopRoleRequestTemplate) {
+        this.emailAdminsOnRaopRoleRequestTemplate = emailAdminsOnRaopRoleRequestTemplate;
+    }
+
+    /**
+     * @param emailRaOnRaopRoleRequestTemplate the emailRaOnRaopRoleRequestTemplate to set
+     */
+    public void setEmailRaOnRaopRoleRequestTemplate(String emailRaOnRaopRoleRequestTemplate) {
+        this.emailRaOnRaopRoleRequestTemplate = emailRaOnRaopRoleRequestTemplate;
+    }
+
+    /**
+     * @param emailUserOnRaopRoleRequestTemplate the emailUserOnRaopRoleRequestTemplate to set
+     */
+    public void setEmailUserOnRaopRoleRequestTemplate(String emailUserOnRaopRoleRequestTemplate) {
+        this.emailUserOnRaopRoleRequestTemplate = emailUserOnRaopRoleRequestTemplate;
+    }
+
+    /**
+     * @param emailOnRaopRoleRequestApprovalTemplate the emailOnRaopRoleRequestApprovalTemplate to set
+     */
+    public void setEmailOnRaopRoleRequestApprovalTemplate(String emailOnRaopRoleRequestApprovalTemplate) {
+        this.emailOnRaopRoleRequestApprovalTemplate = emailOnRaopRoleRequestApprovalTemplate;
+    }
+
+    /**
+     * @param emailOnRaopRoleRequestRejectionTemplate the emailOnRaopRoleRequestRejectionTemplate to set
+     */
+    public void setEmailOnRaopRoleRequestRejectionTemplate(String emailOnRaopRoleRequestRejectionTemplate) {
+        this.emailOnRaopRoleRequestRejectionTemplate = emailOnRaopRoleRequestRejectionTemplate;
+    }
+
+    /**
+     * @param emailOnRoleChangeToUserTemplate the emailOnRoleChangeToUserTemplate to set
+     */
+    public void setEmailOnRoleChangeToUserTemplate(String emailOnRoleChangeToUserTemplate) {
+        this.emailOnRoleChangeToUserTemplate = emailOnRoleChangeToUserTemplate;
     }
 
 }

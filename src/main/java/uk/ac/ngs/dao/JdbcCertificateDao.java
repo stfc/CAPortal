@@ -14,7 +14,6 @@ package uk.ac.ngs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Repository;
 import uk.ac.ngs.common.Pair;
 import uk.ac.ngs.domain.CertificateRow;
 
-import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -85,28 +83,17 @@ public class JdbcCertificateDao {
      * only EMAIL_EQ is used to create the query.
      */
     public enum WHERE_PARAMS {
-
         DN_HAS_RA_LIKE, CN_LIKE, EMAIL_LIKE, EMAIL_EQ, DN_LIKE, ROLE_LIKE, STATUS_LIKE, DATA_LIKE, NOTAFTER_GREATERTHAN_CURRENTTIME
     }
 
-    public JdbcCertificateDao() {
-
+    public JdbcCertificateDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     private static DateFormat getDateFormat() {
         DateFormat utcTimeStampFormatter = new SimpleDateFormat("yyyyMMddHHmmss");
         utcTimeStampFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         return utcTimeStampFormatter;
-    }
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     private static final class CertificateRowMapper implements RowMapper<CertificateRow> {
@@ -284,6 +271,88 @@ public class JdbcCertificateDao {
         query.append("and status='VALID' and notafter > :current_time");
         return this.jdbcTemplate.query(query.toString(), namedParameters, new CertificateRowMapper());
     }
+
+     /**
+     * Find all rows with role 'CA Operator' with a
+     * status of 'VALID' and a 'notafter' time that is in the future
+     */
+     public List<CertificateRow> findActiveCAs() {
+         List<CertificateRow> activeCAs = Collections.emptyList();
+         try {
+             long currentTime = Long.parseLong(getDateFormat().format(new Date()));
+
+             Map<String, Object> namedParameters = new HashMap<>();
+             namedParameters.put("current_time", currentTime);
+
+             String query = SELECT_PROJECT +
+                     "where role = 'CA Operator' " +
+                     "and status = 'VALID' and notafter > :current_time";
+
+             activeCAs = this.jdbcTemplate.query(query, namedParameters, new CertificateRowMapper());
+         } catch (NumberFormatException e) {
+             // Log the error or handle it appropriately
+             log.error("Failed to parse current time for CA lookup", e);
+         }
+         return activeCAs;
+     }
+
+    /**
+     * Find all rows with role 'RA Operator' or 'User' with a
+     * status of 'VALID' and a 'notafter' time that is in the future with the
+     * specified o (O=), loc (L=) and ou (OU=) values in the dn. 
+     *
+     * @param ou  OrgUnit value (optional, use null to prevent filtering by ou)
+     * @param o    value (optional, use null to prevent filtering by o)
+     * @param loc Locality value (optional, use null to prevent filtering by loc)
+     * @return
+     */
+    public List<CertificateRow> findActiveUserAndRAOperatorBy(String ou, String o, String loc) {
+        List<CertificateRow> activeUserAndRAOperators = Collections.emptyList();
+        try {
+            long currentTime = Long.parseLong(getDateFormat().format(new Date()));
+            Map<String, Object> namedParameters = new HashMap<>();
+            namedParameters.put("current_time", currentTime);
+
+            StringBuilder query = new StringBuilder(SELECT_PROJECT)
+                    .append("where (role = 'RA Operator' or role = 'User') ");
+
+            String raFilter = buildRaFilter(ou, o, loc);
+            if (raFilter != null) {
+                namedParameters.put("ra", raFilter);
+                query.append("and dn like :ra ");
+            }
+            query.append("and status = 'VALID' ");
+            query.append("and notafter > :current_time");
+
+            activeUserAndRAOperators = jdbcTemplate.query(query.toString(), namedParameters,
+                    new CertificateRowMapper());
+        } catch (NumberFormatException e) {
+            // Log the error or handle it appropriately
+            log.error("Failed to parse current time for user RAOP lookup", e);
+        }
+        return activeUserAndRAOperators;
+    }
+
+    private String buildRaFilter(String ou, String o, String loc) {
+        if (ou == null && o == null && loc == null) {
+            return null;
+        }
+
+        StringJoiner raJoiner = new StringJoiner(",", "%", "%");
+
+        if (ou != null) {
+            raJoiner.add("OU=" + ou);
+        }
+        if (o != null) {
+            raJoiner.add("O=" + o);
+        }
+        if (loc != null) {
+            raJoiner.add("L=" + loc);
+        }
+
+        return raJoiner.toString();
+    }
+
 
 
     /**

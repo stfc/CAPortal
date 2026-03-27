@@ -14,15 +14,9 @@ package uk.ac.ngs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +34,8 @@ public class JdbcBulk_ChainDao {
     private static final Log log = LogFactory.getLog(JdbcBulk_ChainDao.class);
 
 
-    public JdbcBulk_ChainDao() {
+    public JdbcBulk_ChainDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     /**
@@ -101,16 +96,5 @@ public class JdbcBulk_ChainDao {
             }
         }
         return newBulkId;
-    }
-
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 }

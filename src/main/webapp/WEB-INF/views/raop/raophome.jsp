@@ -3,6 +3,7 @@
 <%@ page session="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
 <!doctype html>
 <html>
@@ -95,6 +96,63 @@
             </div>
         </div>
     </div>
+
+    <c:if test="${not empty responseMessage}">
+        <br/>
+        <br/>
+        <div class="alert alert-info">
+            ${responseMessage}
+        </div>
+    </c:if>
+    <c:if test="${not empty roleChangeRequests}">
+    <br/>
+    <div class="row">
+        <div class="col-offset-1">    
+            <h2>Pending requests for role change</h2>
+            <br/>
+            <table class="table tablecondensed">
+                <thead>
+                    <tr>
+                        <th>Certificate</th>
+                        <th>Requested role</th>
+                        <th>Requested by</th>
+                        <th>Requested On</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <c:forEach items="${roleChangeRequests}" var="row">
+                    <tr>
+                        <td><a
+                                href="${pageContext.request.contextPath}/raop/viewcert?certId=${row.certKey}">${row.certKey}</a>
+                        </td>
+                        <td>${row.requestedRole}</td>
+                        <td>${requesterMap[row.requestedBy]}</td>
+                        <td>${row.requestedOn}</td>
+                        <td>
+                            <div class="d-flex gap-2 align-items-center flex-wrap">
+                                <form:form method="post" action="${pageContext.request.contextPath}/raop/approverolechange">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <input type="hidden" name="requestId" value="${row.id}" />
+                                    <input type="hidden" name="certKey" value="${row.certKey}" />
+                                    <button type="submit" class="btn btn-sm btn-primary"
+                                        onclick="return confirm('Are you sure you want to approve RA Operator role?')">Approve</button>
+                                </form:form>
+                        
+                                <form:form method="post" action="${pageContext.request.contextPath}/raop/rejectrolechange">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <input type="hidden" name="requestId" value="${row.id}" />
+                                    <input type="hidden" name="certKey" value="${row.certKey}" />
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Are you sure you want to reject RA Operator role?')">Reject</button>
+                                </form:form>
+                            </div>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </div>
+    </div>
+    </c:if>        
 </div>
 <%--<jsp:include page="../common/footer.jsp"/>--%>
 <%@ include file="../../jspf/footer.jspf" %>

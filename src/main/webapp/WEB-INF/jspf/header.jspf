@@ -37,6 +37,7 @@
                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/raop/searchcsr">Search <b>New/Renew</b> Signing Requests</a></li>
                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/raop/searchcrr">Search <b>Revocation</b> Requests</a></li>
                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/raop/searchcert">Search <b>Certificates</b></a></li>
+                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/raop/manageraop">Manage RAOP role</a></li>
                     </ul>
                 </li>
             </sec:authorize>

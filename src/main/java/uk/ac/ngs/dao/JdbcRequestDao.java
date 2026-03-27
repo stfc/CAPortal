@@ -14,7 +14,6 @@ package uk.ac.ngs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -26,7 +25,6 @@ import uk.ac.ngs.domain.CSR_Flags.Profile;
 import uk.ac.ngs.domain.PKCS10_RequestWrapper;
 import uk.ac.ngs.domain.RequestRow;
 
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -69,7 +67,8 @@ public class JdbcRequestDao {
     private final DateFormat dataNotBeforeDateFormat2 = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy");
 
 
-    public JdbcRequestDao() {
+    public JdbcRequestDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         this.utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
@@ -98,16 +97,6 @@ public class JdbcRequestDao {
         DateFormat utcTimeStampFormatter = new SimpleDateFormat("yyyyMMddHHmmss");
         utcTimeStampFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         return utcTimeStampFormatter;
-    }
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     private static class RequestRowMapper implements RowMapper<RequestRow> {

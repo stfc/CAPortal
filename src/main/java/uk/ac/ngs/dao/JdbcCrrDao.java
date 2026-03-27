@@ -14,7 +14,6 @@ package uk.ac.ngs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Repository;
 import uk.ac.ngs.common.Pair;
 import uk.ac.ngs.domain.CrrRow;
 
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -61,7 +59,8 @@ public class JdbcCrrDao {
     private final DateFormat dataNotBeforeDateFormat2 = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy");
 
 
-    public JdbcCrrDao() {
+    public JdbcCrrDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         this.utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
@@ -76,16 +75,6 @@ public class JdbcCrrDao {
     public enum WHERE_PARAMS {
 
         DN_HAS_RA_LIKE, RA_EQ, STATUS_EQ, DN_LIKE, DATA_LIKE, CN_LIKE
-    }
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     private final static class CrrRowMapper implements RowMapper<CrrRow> {

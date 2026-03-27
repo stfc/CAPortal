@@ -313,6 +313,21 @@ CREATE TABLE raoplist (
 
 
 --
+-- Name: role_change_request; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE role_change_request (
+	id serial4 NOT NULL,
+	cert_key bigint NULL,
+	requested_role text NULL,
+	requested_by bigint NULL,
+	requested_on date NULL,
+	CONSTRAINT role_change_request_pk PRIMARY KEY (id),
+	CONSTRAINT role_change_request_unique UNIQUE (cert_key)
+);
+
+
+--
 -- Name: seq_bulk; Type: SEQUENCE; Schema: public; Owner: -
 --
 

@@ -14,8 +14,10 @@
 package uk.ac.ngs.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyMap;  
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,13 +32,16 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.Errors;
 
 import uk.ac.ngs.common.MutableConfigParams;
 import uk.ac.ngs.dao.JdbcCertificateDao;
+import uk.ac.ngs.dao.RoleChangeRequestRepository;
 import uk.ac.ngs.domain.CertificateRow;
+import uk.ac.ngs.domain.RoleChangeRequest;
 import uk.ac.ngs.service.email.EmailService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,6 +52,12 @@ public class CertificateServiceTests {
     MutableConfigParams mutableConfigParams;
     @Mock
     EmailService emailService;
+    @Mock
+    private RoleChangeRequestRepository roleChangeRequestRepository;
+    @Mock
+    private CertificateRow targetCert;
+    @Mock
+    private CertificateRow currentUser;
 
     private String requesterDn = "CN=TestUser";
     private long cert_key = 1000L;
@@ -64,6 +75,7 @@ public class CertificateServiceTests {
         certificateService.setJdbcCertificateDao(jdbcCertDao);
         certificateService.setMutableConfigParams(mutableConfigParams);
         certificateService.setEmailService(emailService);
+        certificateService.setRoleChangeRequestRepository(roleChangeRequestRepository);
     }
 
     @Test
@@ -187,5 +199,43 @@ public class CertificateServiceTests {
         assertEquals(0, errors.getErrorCount());
         verify(emailService, times(1))
                 .sendEmailToOldAndNewOnEmailChange(certRow.getDn(), requesterDn, oldEmail, newEmail, cert_key);
+    }
+
+    @Test
+    public void testRaiseRoleChangeRequestSavesRequestAndSendsEmail() {
+        CertificateRow certRow = new CertificateRow();
+        certRow.setCn("VALID.CN");
+        certRow.setDn("VALID.DN");
+        certRow.setEmail("VALID.EMAIL");
+        certRow.setStatus("VALID");
+        certRow.setNotAfter(datePlusOneDay);
+
+        long certKey = 123L;
+        String newRole = "RAOP";
+        long currentUserCertKey = 456L;
+
+        when(currentUser.getCert_key()).thenReturn(currentUserCertKey);
+
+        RoleChangeRequest mockSavedRequest = mock(RoleChangeRequest.class);
+        when(mockSavedRequest.getId()).thenReturn(789);
+        when(roleChangeRequestRepository.save(any(RoleChangeRequest.class))).thenReturn(mockSavedRequest);
+        when(jdbcCertDao.findActiveCAs()).thenReturn(new ArrayList<>(Arrays.asList(certRow)));
+
+        // Act
+        certificateService.raiseRoleChangeRequest(certKey, targetCert, newRole, currentUser);
+
+        // Assert
+        ArgumentCaptor<RoleChangeRequest> captor = ArgumentCaptor.forClass(RoleChangeRequest.class);
+        verify(roleChangeRequestRepository).save(captor.capture());
+
+        RoleChangeRequest capturedRequest = captor.getValue();
+        assertEquals((Long) certKey, capturedRequest.getCertKey());
+        assertEquals(newRole, capturedRequest.getRequestedRole());
+        assertEquals((Long) currentUserCertKey, capturedRequest.getRequestedBy());
+        assertEquals(LocalDate.now(), capturedRequest.getRequestedOn());
+
+        verify(emailService).sendAdminsOnRaopRoleRequest(any(), any(), any(), any());
+        verify(emailService).sendRaOnRaopRoleRequest(any(), any(), any());
+        verify(emailService).sendUserOnRaopRoleRequest(any(), any(), any());
     }
 }

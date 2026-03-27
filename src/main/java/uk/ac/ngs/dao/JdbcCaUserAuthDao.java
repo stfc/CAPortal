@@ -12,13 +12,11 @@
  */
 package uk.ac.ngs.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import uk.ac.ngs.domain.CertificateRow;
 
-import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,20 +36,9 @@ public class JdbcCaUserAuthDao {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public JdbcCaUserAuthDao() {
-
+    public JdbcCaUserAuthDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
-
-    /**
-     * Set the JDBC dataSource.
-     *
-     * @param dataSource
-     */
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    }
-
 
     private static final class CertificateRowMapper implements RowMapper<CertificateRow> {
         public CertificateRow mapRow(ResultSet rs, int rowNum) throws SQLException {

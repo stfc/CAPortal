@@ -20,15 +20,19 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.MapBindingResult;
 import uk.ac.ngs.common.MutableConfigParams;
 import uk.ac.ngs.dao.JdbcCertificateDao;
+import uk.ac.ngs.dao.RoleChangeRequestRepository;
 import uk.ac.ngs.domain.CertificateRow;
+import uk.ac.ngs.domain.RoleChangeRequest;
 import uk.ac.ngs.service.email.EmailService;
 import uk.ac.ngs.validation.EmailValidator;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,6 +50,8 @@ public class CertificateService {
     private JdbcCertificateDao jdbcCertDao;
     private EmailService emailService;
     private MutableConfigParams mutableConfigParams;
+    private RoleChangeRequestRepository roleChangeRequestRepository;
+
     private final static int flags = Pattern.CASE_INSENSITIVE | Pattern.MULTILINE;
     //pattern to match 'emailAddress' in cert's data field 
     private final static Pattern DATA_EMAIL_PATTERN = Pattern.compile("emailAddress\\s?=\\s?([^\\n]+)$", flags);
@@ -205,6 +211,40 @@ public class CertificateService {
         return jdbcCertDao.updateCertificateRow(certRow);
     }
 
+
+    public void raiseRoleChangeRequest(long cert_key, CertificateRow targetCert, String newRole,
+            CertificateRow currentUser) {
+        RoleChangeRequest roleChangeRequest = new RoleChangeRequest(cert_key, newRole, currentUser.getCert_key(),
+                LocalDate.now());
+
+        RoleChangeRequest savedRequest = roleChangeRequestRepository.save(roleChangeRequest);
+        log.debug("Role change request saved with ID: " + savedRequest.getId());
+
+        sendEmailNotificationOnRoleChangeRequest(targetCert, currentUser);
+    }
+
+    private void sendEmailNotificationOnRoleChangeRequest(CertificateRow targetCert, CertificateRow currentUser) {
+        List<CertificateRow> activeCAs = this.jdbcCertDao.findActiveCAs();
+
+        String requesterCN = currentUser.getCn();
+        String requesterEmail = currentUser.getEmail();
+        String targetDN = targetCert.getDn();
+        String targetCN = targetCert.getCn();
+        String targetEmail = targetCert.getEmail();
+
+        // Send email to CAOPs
+        for (CertificateRow ca : activeCAs) {
+            String adminEmail = ca.getEmail();
+            if (!adminEmail.equalsIgnoreCase(requesterEmail)) {
+                this.emailService.sendAdminsOnRaopRoleRequest(ca.getCn(), requesterCN, targetDN, adminEmail);
+            }
+        }
+        // Send email to RAOP
+        this.emailService.sendRaOnRaopRoleRequest(requesterCN, targetDN, requesterEmail);
+        // Send email to user
+        this.emailService.sendUserOnRaopRoleRequest(requesterCN, targetCN, targetEmail);
+    }
+
     @Inject
     public void setJdbcCertificateDao(JdbcCertificateDao jdbcCertDao) {
         this.jdbcCertDao = jdbcCertDao;
@@ -218,5 +258,10 @@ public class CertificateService {
     @Inject
     public void setMutableConfigParams(MutableConfigParams mutableConfigParams) {
         this.mutableConfigParams = mutableConfigParams;
+    }
+
+    @Inject
+    public void setRoleChangeRequestRepository(RoleChangeRequestRepository roleChangeRequestRepository) {
+        this.roleChangeRequestRepository = roleChangeRequestRepository;
     }
 }
