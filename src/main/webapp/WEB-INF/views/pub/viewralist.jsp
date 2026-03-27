@@ -54,8 +54,8 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>L (Location)</th>
                             <th>OU (Org Unit)</th>
+                            <th>L (Location)</th>
                         </tr>
                         </thead>
 
