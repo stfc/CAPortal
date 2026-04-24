@@ -34,6 +34,9 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -457,6 +460,50 @@ public class JdbcCertificateDao {
         return data;
     }
 
+
+    /**
+     * Retrieves all valid certificates that are expiring exactly in the given
+     * number of days.
+     *
+     * <p>
+     * This method is intended for reminder notifications (e.g. 7-day expiry
+     * reminder).
+     * A certificate is considered matching if its {@code notafter} timestamp falls
+     * within the full UTC day that is {@code daysToExpire} days from now.
+     * </p>
+     *
+     * @param daysToExpire number of days from today (e.g. 7 for a 7-day reminder)
+     * @return list of certificates expiring exactly in the specified number of days
+     */
+    public List<CertificateRow> getValidCertificatesExpiringInDays(int daysToExpire) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneOffset.UTC);
+
+        LocalDate targetDate = LocalDate.now(ZoneOffset.UTC).plusDays(daysToExpire);
+
+        long startOfDay = Long.parseLong(
+                formatter.format(targetDate.atStartOfDay(ZoneOffset.UTC)));
+
+        long endOfDay = Long.parseLong(
+                formatter.format(targetDate.plusDays(1)
+                                .atStartOfDay(ZoneOffset.UTC)));
+
+        Map<String, Object> params = Map.of(
+                "startOfDay", startOfDay,
+                "endOfDay", endOfDay);
+
+        String sql = """
+                SELECT cert_key, 'data' as data, dn, cn, email, status, role, notafter
+                FROM certificate
+                WHERE status = 'VALID'
+                  AND notafter >= :startOfDay
+                  AND notafter < :endOfDay
+                ORDER BY notafter ASC
+                """;
+
+        return jdbcTemplate.query(sql, params, new CertificateRowMapper());
+    }
+    
 
     /**
      * Build up the query using the given where by parameters in the map

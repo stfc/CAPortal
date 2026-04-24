@@ -245,6 +245,48 @@ public class CertificateService {
         this.emailService.sendUserOnRaopRoleRequest(requesterCN, targetCN, targetEmail);
     }
 
+    
+    /**
+     * Sends certificate expiry reminder emails for certificates expiring
+     * in 7 days and 30 days.
+     *
+     * <p>
+     * This method is intended to be executed by a scheduled job
+     * once per day.
+     * </p>
+     */
+    public void sendCertificateExpiryReminders() {
+
+        sendRemindersForDaysToExpire(7);
+        sendRemindersForDaysToExpire(30);
+    }
+
+    private void sendRemindersForDaysToExpire(int daysToExpire) {
+
+        List<CertificateRow> certificates = jdbcCertDao.getValidCertificatesExpiringInDays(daysToExpire);
+        
+        int count = certificates.size();
+
+        if (count > 0) {
+            log.info(count + " certificate(s) are going to expire after " + daysToExpire + " days.");
+        } else {
+            log.info("No certificates are going to expire after " + daysToExpire + " days.");
+        }
+
+        for (CertificateRow cert : certificates) {
+            log.info("Sending " + daysToExpire + "-days expiry reminder for cert [" + cert.getCert_key() + "] to "
+                    + cert.getEmail());
+
+            this.emailService.sendEmailReminderToUserOnCertExpiry(
+                    cert.getCert_key(),
+                    daysToExpire,
+                    cert.getCn(),
+                    cert.getDn(),
+                    cert.getEmail());
+        }
+    }
+
+
     @Inject
     public void setJdbcCertificateDao(JdbcCertificateDao jdbcCertDao) {
         this.jdbcCertDao = jdbcCertDao;
