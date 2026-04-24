@@ -55,6 +55,7 @@ public class EmailService {
     private String emailOnRaopRoleRequestApprovalTemplate;
     private String emailOnRaopRoleRequestRejectionTemplate;
     private String emailOnRoleChangeToUserTemplate;
+    private String emailUserCertExpiryReminderTemplate;
 
     private String basePortalUrl;
 
@@ -490,6 +491,35 @@ public class EmailService {
         }
     }
 
+    
+/**
+     * Sends an email reminder to the user informing them of an upcoming
+     * certificate expiry.
+     *
+     * @param certKey certificate identifier
+     * @param daysToExpire number of days remaining before expiry
+     * @param dn certificate distinguished name     
+     * @param recipientEmail recipient's email address
+     */
+
+    public void sendEmailReminderToUserOnCertExpiry(long certKey, int daysToExpire, String cn, String dn, String recipientEmail) {
+        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+        msg.setTo(recipientEmail);
+        Map<String, Object> vars = new HashMap<>();
+
+        vars.put("certKey", certKey);
+        vars.put("daysToExpire", daysToExpire);
+        vars.put("cn", cn);
+        vars.put("dn", dn);
+        vars.put("basePortalUrl", basePortalUrl);
+
+        try {
+            this.mailSender.send(msg, vars, this.emailUserCertExpiryReminderTemplate);
+        } catch (MailException ex) {
+            log.error("MailSender " + ex.getMessage());
+        }
+    }
+
     /**
      * Email on RAOP to user role change.
      *
@@ -647,6 +677,13 @@ public class EmailService {
      */
     public void setEmailOnRoleChangeToUserTemplate(String emailOnRoleChangeToUserTemplate) {
         this.emailOnRoleChangeToUserTemplate = emailOnRoleChangeToUserTemplate;
+    }
+
+    /**
+     * @param emailUserCertExpiryReminderTemplate the emailUserCertExpiryReminderTemplate to set
+     */
+    public void setEmailUserCertExpiryReminderTemplate(String emailUserCertExpiryReminderTemplate) {
+        this.emailUserCertExpiryReminderTemplate = emailUserCertExpiryReminderTemplate;
     }
 
 }

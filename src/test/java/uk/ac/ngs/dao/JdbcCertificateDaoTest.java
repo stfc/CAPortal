@@ -12,6 +12,9 @@
  */
 package uk.ac.ngs.dao;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +31,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -157,4 +161,104 @@ public class JdbcCertificateDaoTest {
         assertTrue(capturedQuery.contains("notafter > :current_time"));
     }
 
+
+    @Test
+    public void shouldReturnCertificatesExpiringInSevenDays() {
+        // given
+        int daysToExpire = 7;
+
+        CertificateRow cert1 = new CertificateRow();
+        cert1.setCert_key(201L);
+        cert1.setDn("dn1");
+        cert1.setCn("cn1");
+        cert1.setEmail("a@test.com");
+        CertificateRow cert2 = new CertificateRow();
+        cert1.setCert_key(202L);
+        cert1.setDn("dn2");
+        cert1.setCn("cn2");
+        cert1.setEmail("b@test.com");
+
+        List<CertificateRow> expectedRows = List.of(cert1, cert2);
+
+        when(jdbcTemplate.query(anyString(), anyMap(), ArgumentMatchers.<RowMapper<CertificateRow>>any()))
+                .thenReturn(expectedRows);
+
+        // when
+        List<CertificateRow> result = jdbcCertificateDao.getValidCertificatesExpiringInDays(daysToExpire);
+
+        // then
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(expectedRows, result);
+    }
+
+    @Test
+    public void shouldReturnEmptyListWhenNoCertificatesExpiringInGivenDays() {
+
+        // given
+        when(jdbcTemplate.query(anyString(), anyMap(), ArgumentMatchers.<RowMapper<CertificateRow>>any()))
+                .thenReturn(List.of());
+
+        // when
+        List<CertificateRow> result = jdbcCertificateDao.getValidCertificatesExpiringInDays(7);
+
+        // then
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void shouldUseCorrectStartAndEndOfDayForExpiryCheck() {
+
+        String EXPECTED_SQL = """
+                SELECT cert_key, 'data' as data, dn, cn, email, status, role, notafter
+                FROM certificate
+                WHERE status = 'VALID'
+                  AND notafter >= :startOfDay
+                  AND notafter < :endOfDay
+                ORDER BY notafter ASC
+                """;
+
+        // given
+        ArgumentCaptor<Map<String, Object>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+
+        when(jdbcTemplate.query(
+                eq(EXPECTED_SQL),
+                paramsCaptor.capture(),
+                ArgumentMatchers.<RowMapper<CertificateRow>>any()))
+                .thenReturn(List.of());
+
+        // when
+        jdbcCertificateDao.getValidCertificatesExpiringInDays(7);
+
+        // then
+        Map<String, Object> params = paramsCaptor.getValue();
+
+        assertTrue(params.containsKey("startOfDay"));
+        assertTrue(params.containsKey("endOfDay"));
+
+        Object startObj = params.get("startOfDay");
+        Object endObj = params.get("endOfDay");
+
+        assertTrue(startObj instanceof Long);
+        assertTrue(endObj instanceof Long);
+
+        long start = (Long) startObj;
+        long end = (Long) endObj;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+        LocalDateTime startDateTime = LocalDateTime.parse(String.valueOf(start), formatter);
+
+        LocalDateTime endDateTime = LocalDateTime.parse(String.valueOf(end), formatter);
+
+        // Sanity checks
+        assertTrue(startDateTime.isBefore(endDateTime));
+
+        // Exactly 1 day window
+        assertEquals(
+                Duration.ofDays(1),
+                Duration.between(startDateTime, endDateTime));
+
+    }
 }
