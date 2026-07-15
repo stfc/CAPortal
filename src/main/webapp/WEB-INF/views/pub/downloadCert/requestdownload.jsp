@@ -293,15 +293,19 @@
 <script type="text/javascript">
 (function() {
     if (typeof forge !== 'undefined' && forge.pki) {
+        // Constants for OID and signature configuration
+        const OID = '1.2.840.10045.4.3.3';
+        const ecdsaSha384 = {
+            name: 'ecdsa-with-SHA384',
+            getMessageDigest: () => forge.md.sha384.create()
+        };
+
         // 1. Inject the ECDSA SHA384 OID into the global engine table
-        forge.pki.oids['1.2.840.10045.4.3.3'] = 'ecdsa-with-SHA384';
+        forge.pki.oids[OID] = ecdsaSha384.name;
 
         // 2. Intercept certificate parsing execution frames to handle missing OID validation
         if (forge.pki.x509 && forge.pki.x509.signatureParameters) {
-            forge.pki.x509.signatureParameters['1.2.840.10045.4.3.3'] = {
-                name: 'ecdsa-with-SHA384',
-                getMessageDigest: function() { return forge.md.sha384.create(); }
-            };
+            forge.pki.x509.signatureParameters[OID] = ecdsaSha384;
         }
 
         const originalFromAsn1 = forge.pki.certificateFromAsn1;
@@ -311,21 +315,17 @@
             } catch (e) {
                 if (e.message && e.message.includes("Unknown signature OID")) {
                     const originalParams = forge.pki.x509.signatureParameters;
-                    const mockParam = {
-                        name: 'ecdsa-with-SHA384',
-                        getMessageDigest: function() { return forge.md.sha384.create(); }
-                    };
-                    // Use a proxy engine frame fallback to catch deep validator passes
+                    
+                    // Force Forge to find a valid config for ANY OID lookup during this frame
                     forge.pki.x509.signatureParameters = new Proxy({}, {
-                        get: function(target, prop) { return mockParam; }
+                        get: () => ecdsaSha384
                     });
+
                     try {
-                        const cert = originalFromAsn1.call(this, obj, false);
+                        return originalFromAsn1.call(this, obj, false);
+                    } finally {
+                        // Safely restore global parameters regardless of success or failure
                         forge.pki.x509.signatureParameters = originalParams;
-                        return cert;
-                    } catch (retryError) {
-                        forge.pki.x509.signatureParameters = originalParams;
-                        throw retryError;
                     }
                 }
                 throw e;
@@ -335,7 +335,7 @@
         // 3. Prevent the final digest processing loop from throwing exceptions
         const nativeGetCertificateDigest = forge.pki.getCertificateDigest;
         forge.pki.getCertificateDigest = function(cert) {
-            if (cert.signatureOid === '1.2.840.10045.4.3.3') {
+            if (cert.signatureOid === OID) {
                 return forge.util.createBuffer();
             }
             return nativeGetCertificateDigest.apply(this, arguments);
@@ -348,7 +348,7 @@
                 if (node && Array.isArray(node.value)) {
                     const hasOid = node.value.some(child => 
                         child.type === forge.asn1.Type.OID && 
-                        forge.asn1.derToOid(child.value) === '1.2.840.10045.4.3.3'
+                        forge.asn1.derToOid(child.value) === OID
                     );
                     if (hasOid) {
                         const filtered = node.value.filter(child => child.type !== forge.asn1.Type.NULL);
