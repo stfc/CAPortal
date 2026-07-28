@@ -18,6 +18,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import uk.ac.ngs.common.CertUtil;
 import uk.ac.ngs.domain.CSR_Flags;
+import uk.ac.ngs.domain.CertificateRow;
 
 import javax.inject.Inject;
 import java.io.PrintWriter;
@@ -55,6 +56,7 @@ public class EmailService {
     private String emailOnRaopRoleRequestApprovalTemplate;
     private String emailOnRaopRoleRequestRejectionTemplate;
     private String emailOnRoleChangeToUserTemplate;
+    private String emailUserCertExpiryReminderTemplate;
 
     private String basePortalUrl;
 
@@ -490,6 +492,38 @@ public class EmailService {
         }
     }
 
+    
+/**
+     * Sends an email reminder to the user informing them of an upcoming
+     * certificate expiry.
+     *
+     * @param cert certificate
+     * @param daysToExpire number of days remaining before expiry
+     */
+
+    public boolean sendEmailReminderToUserOnCertExpiry(CertificateRow cert, int daysToExpire) {
+        SimpleMailMessage msg = new SimpleMailMessage(this.emailTemplate);
+        msg.setTo(cert.getEmail());
+        msg.setSubject("Your e-Science User Certificate will expire in " + daysToExpire + " days!");
+        Map<String, Object> vars = new HashMap<>();
+
+        vars.put("certKey", cert.getCert_key());
+        vars.put("daysToExpire", daysToExpire);
+        vars.put("cn", cert.getCn());
+        vars.put("dn", cert.getDn());
+        vars.put("basePortalUrl", basePortalUrl);
+
+        try {
+            this.mailSender.send(msg, vars, this.emailUserCertExpiryReminderTemplate);
+            log.debug("Certificate expiry reminder email sent to " + cert.getCn());
+            return true;
+        } catch (MailException ex) {
+            log.error("Error while sending certificate expiry reminder email to " + cert.getCn() + ": "
+                    + ex.getMessage());
+            return false;
+        }
+    }
+
     /**
      * Email on RAOP to user role change.
      *
@@ -647,6 +681,13 @@ public class EmailService {
      */
     public void setEmailOnRoleChangeToUserTemplate(String emailOnRoleChangeToUserTemplate) {
         this.emailOnRoleChangeToUserTemplate = emailOnRoleChangeToUserTemplate;
+    }
+
+    /**
+     * @param emailUserCertExpiryReminderTemplate the emailUserCertExpiryReminderTemplate to set
+     */
+    public void setEmailUserCertExpiryReminderTemplate(String emailUserCertExpiryReminderTemplate) {
+        this.emailUserCertExpiryReminderTemplate = emailUserCertExpiryReminderTemplate;
     }
 
 }

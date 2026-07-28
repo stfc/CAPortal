@@ -328,6 +328,16 @@ CREATE TABLE role_change_request (
 
 
 --
+-- Name: job_execution_tracker; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE job_execution_tracker (
+    job_name VARCHAR(100) PRIMARY KEY,
+    last_run_date DATE
+);
+
+
+--
 -- Name: seq_bulk; Type: SEQUENCE; Schema: public; Owner: -
 --
 

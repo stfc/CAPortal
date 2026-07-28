@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.validation.MapBindingResult;
 import uk.ac.ngs.common.MutableConfigParams;
+import uk.ac.ngs.dao.JobExecutionDao;
 import uk.ac.ngs.dao.JdbcCertificateDao;
 import uk.ac.ngs.dao.RoleChangeRequestRepository;
 import uk.ac.ngs.domain.CertificateRow;
@@ -29,6 +30,7 @@ import uk.ac.ngs.validation.EmailValidator;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -48,6 +50,7 @@ import java.util.regex.Pattern;
 public class CertificateService {
     private static final Log log = LogFactory.getLog(CertificateService.class);
     private JdbcCertificateDao jdbcCertDao;
+    private JobExecutionDao jobExecutionDao;
     private EmailService emailService;
     private MutableConfigParams mutableConfigParams;
     private RoleChangeRequestRepository roleChangeRequestRepository;
@@ -245,9 +248,84 @@ public class CertificateService {
         this.emailService.sendUserOnRaopRoleRequest(requesterCN, targetCN, targetEmail);
     }
 
+    
+    /**
+     *
+     * Sends certificate expiry reminder emails for 7-day and 30-day intervals,
+     * including catch-up processing for any missed executions.
+     *
+     * <p>
+     * This method is intended to be executed by a scheduled job
+     * once per day.
+     * </p>
+     * 
+     * <p>
+     * If the scheduler did not run on previous days (e.g. due to downtime),
+     * this method processes all missed dates from the last successful run up to
+     * today, ensuring no expiry reminders are skipped.
+     * </p>
+     *
+     */
+    public void sendCertificateExpiryReminders() {
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+
+        LocalDate lastRun = jobExecutionDao.getLastRunDate("CERT_EXPIRY_REMINDER");
+
+        // First time case
+        if (lastRun == null) {
+            lastRun = today.minusDays(1);
+        }
+
+        LocalDate processingDate = lastRun.plusDays(1);
+
+        while (!processingDate.isAfter(today)) {
+            sendRemindersForDaysToExpire(processingDate, 7);
+            sendRemindersForDaysToExpire(processingDate, 30);
+            processingDate = processingDate.plusDays(1);
+        }
+
+        jobExecutionDao.updateLastRunDate(
+                "CERT_EXPIRY_REMINDER", today);
+    }
+
+    private void sendRemindersForDaysToExpire(LocalDate processingDate, int daysToExpire) {
+
+        List<CertificateRow> certificates = jdbcCertDao.getValidCertificatesExpiringInDays(processingDate,
+                daysToExpire);
+
+        int totalCertificates = certificates.size();
+
+        if (totalCertificates > 0) {
+            log.info(totalCertificates + " certificate(s) are going to expire after " + daysToExpire + " days.");
+        } else {
+            log.info("No certificates are going to expire after " + daysToExpire + " days.");
+        }
+
+        int successCount = 0;
+        int failureCount = 0;
+
+        for (CertificateRow cert : certificates) {
+            log.info("Sending " + daysToExpire + "-days expiry reminder for cert [" + cert.getCert_key() + "] to "
+                    + cert.getEmail());
+            if (this.emailService.sendEmailReminderToUserOnCertExpiry(cert, daysToExpire)) {
+                successCount++;
+            } else {
+                failureCount++;
+            }
+        }
+        log.info("Summary for " + daysToExpire + "-day expiry reminder (processingDate=" + processingDate + "): total="
+                + totalCertificates + ", sent=" + successCount + ", failed=" + failureCount);
+    }
+
+
     @Inject
     public void setJdbcCertificateDao(JdbcCertificateDao jdbcCertDao) {
         this.jdbcCertDao = jdbcCertDao;
+    }
+
+    @Inject
+    public void setJobExecutionDao(JobExecutionDao certExpiryReminderJobExecutionDao) {
+        this.jobExecutionDao = certExpiryReminderJobExecutionDao;
     }
 
     @Inject
