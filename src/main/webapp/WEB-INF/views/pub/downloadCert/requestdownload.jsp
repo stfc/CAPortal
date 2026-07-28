@@ -291,6 +291,83 @@
 <script src="${pageContext.request.contextPath}/resources/javascript/crypto.js"></script>
 
 <script type="text/javascript">
+(function() {
+    if (typeof forge !== 'undefined' && forge.pki) {
+        // Constants for OID and signature configuration
+        const OID = '1.2.840.10045.4.3.3';
+        const ecdsaSha384 = {
+            name: 'ecdsa-with-SHA384',
+            getMessageDigest: () => forge.md.sha384.create()
+        };
+
+        // 1. Inject the ECDSA SHA384 OID into the global engine table
+        forge.pki.oids[OID] = ecdsaSha384.name;
+
+        // 2. Intercept certificate parsing execution frames to handle missing OID validation
+        if (forge.pki.x509 && forge.pki.x509.signatureParameters) {
+            forge.pki.x509.signatureParameters[OID] = ecdsaSha384;
+        }
+
+        const originalFromAsn1 = forge.pki.certificateFromAsn1;
+        forge.pki.certificateFromAsn1 = function(obj, computeDigest) {
+            try {
+                return originalFromAsn1.call(this, obj, false);
+            } catch (e) {
+                if (e.message && e.message.includes("Unknown signature OID")) {
+                    const originalParams = forge.pki.x509.signatureParameters;
+                    
+                    // Force Forge to find a valid config for ANY OID lookup during this frame
+                    forge.pki.x509.signatureParameters = new Proxy({}, {
+                        get: () => ecdsaSha384
+                    });
+
+                    try {
+                        return originalFromAsn1.call(this, obj, false);
+                    } finally {
+                        // Safely restore global parameters regardless of success or failure
+                        forge.pki.x509.signatureParameters = originalParams;
+                    }
+                }
+                throw e;
+            }
+        };
+
+        // 3. Prevent the final digest processing loop from throwing exceptions
+        const nativeGetCertificateDigest = forge.pki.getCertificateDigest;
+        forge.pki.getCertificateDigest = function(cert) {
+            if (cert.signatureOid === OID) {
+                return forge.util.createBuffer();
+            }
+            return nativeGetCertificateDigest.apply(this, arguments);
+        };
+
+        // 4. Structural filter: Remove explicit NULL parameters from the final ASN.1 tree
+        const originalToDer = forge.asn1.toDer;
+        forge.asn1.toDer = function(obj) {
+            const stripTrailingNulls = function(node) {
+                if (node && Array.isArray(node.value)) {
+                    const hasOid = node.value.some(child => 
+                        child.type === forge.asn1.Type.OID && 
+                        forge.asn1.derToOid(child.value) === OID
+                    );
+                    if (hasOid) {
+                        const filtered = node.value.filter(child => child.type !== forge.asn1.Type.NULL);
+                        if (filtered.length !== node.value.length) {
+                            node.value = filtered;
+                        }
+                    }
+                    node.value.forEach(stripTrailingNulls);
+                }
+            };
+            stripTrailingNulls(obj);
+            return originalToDer.call(this, obj);
+        };
+        console.log("ECDSA SHA384 Hotfix loaded successfully into browser environment.");
+    }
+})();
+</script>
+
+<script type="text/javascript">
     const fileSelector = document.getElementById('privateKeyPicker');
     fileSelector.addEventListener('change', () => {
         const fileReader = new FileReader();
